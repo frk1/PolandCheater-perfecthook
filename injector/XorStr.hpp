@@ -132,7 +132,7 @@ static auto w_sprintf_s = [](char* buf, size_t buf_size, const char* fmt, ...) {
     vsprintf_s(buf, buf_size, fmt, args);
     va_end(args);
 };
-#define NDEBUG
+
 
 #ifdef NDEBUG
 #define XorStr( s ) ( XorCompileTime::XorString< sizeof( s ) - 1, __COUNTER__ >( s, std::make_index_sequence< sizeof( s ) - 1>() ).decrypt() )
