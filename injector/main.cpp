@@ -18,7 +18,7 @@ int main()
     printf("Simple ManualMap/LoadLibrary injector by PolandCheater\n\nPlease choose method of injection - press Enter for ManualMap or 1 for LoadLibrary\n");
     if (cin.get() == '\n')
         InjectionMethod = ManualMap;
-    else InjectionMethod = loadLibrary;
+    else { InjectionMethod = loadLibrary;  cin.get(); }
 
     printf("Please input proccess you want inject to (press Enter for csgo.exe)\n");
 
