@@ -1,0 +1,407 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Aim Functions">
+      <UniqueIdentifier>{1e959ca8-31b1-44e6-b386-238bd374badb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cancer files">
+      <UniqueIdentifier>{bf6e4ef4-4f2f-481a-9671-b305542b17fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Visual shit">
+      <UniqueIdentifier>{1396506d-a317-4bdc-86fa-fab91722176f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Misc shit">
+      <UniqueIdentifier>{a13f453f-8c54-4863-8f34-b4f17e71dd64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk">
+      <UniqueIdentifier>{186185e6-2fa4-4c6e-a332-075402427bf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hooks">
+      <UniqueIdentifier>{cdd33ab5-b0a7-480a-bc6a-5a35987e908a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main shit">
+      <UniqueIdentifier>{8cdd9eae-ba3d-4baf-a4d3-a0db7ed94a75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk\Classes">
+      <UniqueIdentifier>{1d2181f2-e540-46c2-b089-6f67d3a794ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{1e0dd0a4-d6dc-4758-ad37-e40a58d842d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menu">
+      <UniqueIdentifier>{0efb47f6-5a08-4127-8d57-a177d2b756b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menu\Config">
+      <UniqueIdentifier>{2c94df01-6939-4322-8f61-83b2cada8c8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menu\Render">
+      <UniqueIdentifier>{84e81f59-36e8-4a69-8fab-f74e96cd892d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menu\Tabs">
+      <UniqueIdentifier>{f2df1b9d-cb93-4aa2-ae34-390864bc01fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menu\Variables">
+      <UniqueIdentifier>{ca871a77-22d6-4a88-b7c7-47cdb949b4c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk\Offsets">
+      <UniqueIdentifier>{1ccacafd-e7a0-4920-b65a-14442a572971}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk\gay shit">
+      <UniqueIdentifier>{a0fc8b33-27b3-4462-896d-259bb6384669}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Autowall.h">
+      <Filter>Aim Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="LegitBot.h">
+      <Filter>Aim Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="RageBot.h">
+      <Filter>Aim Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="DLLMain.h">
+      <Filter>cancer files</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonIncludes.h">
+      <Filter>cancer files</Filter>
+    </ClInclude>
+    <ClInclude Include="Hacks.h">
+      <Filter>Main shit</Filter>
+    </ClInclude>
+    <ClInclude Include="Interfaces.h">
+      <Filter>Main shit</Filter>
+    </ClInclude>
+    <ClInclude Include="AntiAntiAim.h">
+      <Filter>cancer files</Filter>
+    </ClInclude>
+    <ClInclude Include="Chams.h">
+      <Filter>Visual shit</Filter>
+    </ClInclude>
+    <ClInclude Include="ESP.h">
+      <Filter>Visual shit</Filter>
+    </ClInclude>
+    <ClInclude Include="MiscHacks.h">
+      <Filter>Misc shit</Filter>
+    </ClInclude>
+    <ClInclude Include="tinyxml2.h">
+      <Filter>cancer files</Filter>
+    </ClInclude>
+    <ClInclude Include="CRC32.h">
+      <Filter>sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="MathFunctions.h">
+      <Filter>sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="NetVars.h">
+      <Filter>sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="UTIL Functions.h">
+      <Filter>sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="Dumping.h">
+      <Filter>sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities.h">
+      <Filter>sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DumpNetvars.h" />
+    <ClInclude Include="NetVarManager.h">
+      <Filter>sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameStageNotify.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawModelExecute.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="SkinChanger.h">
+      <Filter>Visual shit</Filter>
+    </ClInclude>
+    <ClInclude Include="CreateMove.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="HooksList.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="PaintTraverse.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="InPrediction.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="OverrideView.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="OnScreenSizeChanged.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="FireEventClientSide.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="EnginePrediction.h">
+      <Filter>Aim Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseClient.h">
+      <Filter>sdk\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="bspflags.h">
+      <Filter>sdk\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientRecvProps.h">
+      <Filter>sdk\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineClient.h">
+      <Filter>sdk\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Entities.h">
+      <Filter>sdk\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Materials.h">
+      <Filter>sdk\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="MiscClasses.h">
+      <Filter>sdk\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="MiscDefinitions.h">
+      <Filter>sdk\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector.h">
+      <Filter>sdk\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector2D.h">
+      <Filter>sdk\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Surface.h">
+      <Filter>sdk\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="HookIncludes.h" />
+    <ClInclude Include="Resolver.h">
+      <Filter>Aim Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="GloveChanger.h">
+      <Filter>Visual shit</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK.h">
+      <Filter>sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderManager.h">
+      <Filter>Visual shit</Filter>
+    </ClInclude>
+    <ClInclude Include="SvCheatsGetBool.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="IDirect3DDevice9.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\stb_truetype.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imconfig.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_internal.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\stb_rect_pack.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\stb_textedit.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\examples\directx9_example\imgui_impl_dx9.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="json.hpp" />
+    <ClInclude Include="vmthook.h">
+      <Filter>sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="Configuration.hpp">
+      <Filter>Menu\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Menu\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Tabs.h">
+      <Filter>Menu\Tabs</Filter>
+    </ClInclude>
+    <ClInclude Include="Global.h">
+      <Filter>sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="dropboxes.h">
+      <Filter>Menu\Variables</Filter>
+    </ClInclude>
+    <ClInclude Include="Interface.h">
+      <Filter>Menu\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Variables.h">
+      <Filter>Menu\Variables</Filter>
+    </ClInclude>
+    <ClInclude Include="Themes.h">
+      <Filter>Menu\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="MovementRecorder.h">
+      <Filter>Misc shit</Filter>
+    </ClInclude>
+    <ClInclude Include="PlaySound.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayersList.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="Offsets.h">
+      <Filter>sdk\Offsets</Filter>
+    </ClInclude>
+    <ClInclude Include="memesets.h">
+      <Filter>sdk\Offsets</Filter>
+    </ClInclude>
+    <ClInclude Include="UtlBuffer.hpp">
+      <Filter>sdk\gay shit</Filter>
+    </ClInclude>
+    <ClInclude Include="UtlMemory.hpp">
+      <Filter>sdk\gay shit</Filter>
+    </ClInclude>
+    <ClInclude Include="UtlString.hpp">
+      <Filter>sdk\gay shit</Filter>
+    </ClInclude>
+    <ClInclude Include="UtlVector.hpp">
+      <Filter>sdk\gay shit</Filter>
+    </ClInclude>
+    <ClInclude Include="ViewRender.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="SpoofedConvar.h">
+      <Filter>sdk\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="FindMDL.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="CaviarDreams.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Autowall.cpp">
+      <Filter>Aim Functions</Filter>
+    </ClCompile>
+    <ClCompile Include="LegitBot.cpp">
+      <Filter>Aim Functions</Filter>
+    </ClCompile>
+    <ClCompile Include="RageBot.cpp">
+      <Filter>Aim Functions</Filter>
+    </ClCompile>
+    <ClCompile Include="DLLMain.cpp">
+      <Filter>Main shit</Filter>
+    </ClCompile>
+    <ClCompile Include="Hacks.cpp">
+      <Filter>Main shit</Filter>
+    </ClCompile>
+    <ClCompile Include="Interfaces.cpp">
+      <Filter>Main shit</Filter>
+    </ClCompile>
+    <ClCompile Include="AntiAntiAim.cpp">
+      <Filter>cancer files</Filter>
+    </ClCompile>
+    <ClCompile Include="Chams.cpp">
+      <Filter>Visual shit</Filter>
+    </ClCompile>
+    <ClCompile Include="ESP.cpp">
+      <Filter>Visual shit</Filter>
+    </ClCompile>
+    <ClCompile Include="MiscHacks.cpp">
+      <Filter>Misc shit</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyxml2.cpp">
+      <Filter>cancer files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dumping.cpp">
+      <Filter>sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="CRC32.cpp">
+      <Filter>sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="MathFunctions.cpp">
+      <Filter>sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="NetVars.cpp">
+      <Filter>sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="UTIL Functions.cpp">
+      <Filter>sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities.cpp">
+      <Filter>sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="NetVarManager.cpp">
+      <Filter>sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooks.cpp">
+      <Filter>Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="EnginePrediction.cpp">
+      <Filter>Aim Functions</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderManager.cpp">
+      <Filter>Visual shit</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_draw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\examples\directx9_example\imgui_impl_dx9.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Configuration.cpp">
+      <Filter>Menu\Config</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Menu\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Global.cpp">
+      <Filter>sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="Offsets.cpp">
+      <Filter>sdk\Offsets</Filter>
+    </ClCompile>
+    <ClCompile Include="memesets.cpp">
+      <Filter>sdk\Offsets</Filter>
+    </ClCompile>
+    <ClCompile Include="UtlString.cpp">
+      <Filter>sdk\gay shit</Filter>
+    </ClCompile>
+    <ClCompile Include="SpoofedConvar.cpp">
+      <Filter>sdk\Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="CaviarDreams.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="ClassDiagram1.cd">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="gayshit.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
