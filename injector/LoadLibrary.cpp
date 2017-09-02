@@ -3,7 +3,7 @@
 
 int loadlibrary::loadlibrarymain(const char* proccessname, const char* dllname)
 {
-
+    printf("You have chosen LoadLibrary injection method\n");
     while (!LoadProcess(proccessname))
     {
         printf("Looking for a process...\n\n");

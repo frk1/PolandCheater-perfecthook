@@ -2,6 +2,7 @@
 
 int manualmap::manualmapmain(const char* proccessname, const char* dllname)
 {
+    printf("You have chosen ManualMap injection method\n");
     while (!LoadProcess(proccessname))
     {
         printf("Looking for a process...\n\n");

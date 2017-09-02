@@ -1,11 +1,13 @@
 
 #include "ManualMap.h"
 #include "LoadLibrary.h"
+
 enum InjectionType : int
 {
     ManualMap,
     loadLibrary
 };
+
 InjectionType InjectionMethod;
 string proccessname;
 string dllname;
@@ -17,6 +19,7 @@ int main()
     if (cin.get() == '\n')
         InjectionMethod = ManualMap;
     else InjectionMethod = loadLibrary;
+
     printf("Please input proccess you want inject to (press Enter for csgo.exe)\n");
 
     getline(cin, proccessname);
