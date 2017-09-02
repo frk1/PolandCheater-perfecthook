@@ -1,0 +1,220 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="PerfectHook\Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="PerfectHook\Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="PerfectHook\Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="PerfectHook\Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{EDEE63E8-381D-470F-90BD-AF33CCAA1E5E}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>a perfecthook private</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>C:\Release\</OutDir>
+    <TargetName>memehook</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;BLAZYP2C_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;BLAZYP2C_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>MaxSpeed</Optimization>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="PerfectHook\CaviarDreams.cpp" />
+    <ClCompile Include="PerfectHook\recvproxy.cpp" />
+    <ClCompile Include="PerfectHook\Autowall.cpp" />
+    <ClCompile Include="PerfectHook\Chams.cpp" />
+    <ClCompile Include="PerfectHook\Configuration.cpp" />
+    <ClCompile Include="PerfectHook\DLLMain.cpp" />
+    <ClCompile Include="PerfectHook\EnginePrediction.cpp" />
+    <ClCompile Include="PerfectHook\ESP.cpp" />
+    <ClCompile Include="PerfectHook\Global.cpp" />
+    <ClCompile Include="PerfectHook\GrenadePrediction.cpp" />
+    <ClCompile Include="PerfectHook\Hacks.cpp" />
+    <ClCompile Include="PerfectHook\Hooks.cpp" />
+    <ClCompile Include="PerfectHook\imgui\examples\directx9_example\imgui_impl_dx9.cpp" />
+    <ClCompile Include="PerfectHook\imgui\imgui.cpp" />
+    <ClCompile Include="PerfectHook\imgui\imgui_draw.cpp" />
+    <ClCompile Include="PerfectHook\Interfaces.cpp" />
+    <ClCompile Include="PerfectHook\LagComp.cpp" />
+    <ClCompile Include="PerfectHook\LegitBot.cpp" />
+    <ClCompile Include="PerfectHook\MathFunctions.cpp" />
+    <ClCompile Include="PerfectHook\memesets.cpp" />
+    <ClCompile Include="PerfectHook\MiscHacks.cpp" />
+    <ClCompile Include="PerfectHook\NetVarManager.cpp" />
+    <ClCompile Include="PerfectHook\Offsets.cpp" />
+    <ClCompile Include="PerfectHook\RageBot.cpp" />
+    <ClCompile Include="PerfectHook\Renderer.cpp" />
+    <ClCompile Include="PerfectHook\RenderManager.cpp" />
+    <ClCompile Include="PerfectHook\SpoofedConvar.cpp" />
+    <ClCompile Include="PerfectHook\tinyxml2.cpp" />
+    <ClCompile Include="PerfectHook\MiscFunctions.cpp" />
+    <ClCompile Include="PerfectHook\Utilities.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="PerfectHook\CaviarDreams.h" />
+    <ClInclude Include="PerfectHook\DoPostScreenSpaceEffects.h" />
+    <ClInclude Include="PerfectHook\Listener.h" />
+    <ClInclude Include="PerfectHook\recvproxy.h" />
+    <ClInclude Include="PerfectHook\Autowall.h" />
+    <ClInclude Include="PerfectHook\BaseClient.h" />
+    <ClInclude Include="PerfectHook\bspflags.h" />
+    <ClInclude Include="PerfectHook\Chams.h" />
+    <ClInclude Include="PerfectHook\CommonIncludes.h" />
+    <ClInclude Include="PerfectHook\Configuration.hpp" />
+    <ClInclude Include="PerfectHook\CreateMove.h" />
+    <ClInclude Include="PerfectHook\DLLMain.h" />
+    <ClInclude Include="PerfectHook\DrawModelExecute.h" />
+    <ClInclude Include="PerfectHook\dropboxes.h" />
+    <ClInclude Include="PerfectHook\EngineClient.h" />
+    <ClInclude Include="PerfectHook\EnginePrediction.h" />
+    <ClInclude Include="PerfectHook\Entities.h" />
+    <ClInclude Include="PerfectHook\ESP.h" />
+    <ClInclude Include="PerfectHook\FindMDL.h" />
+    <ClInclude Include="PerfectHook\FireEventClientSide.h" />
+    <ClInclude Include="PerfectHook\FrameStageNotify.h" />
+    <ClInclude Include="PerfectHook\Global.h" />
+    <ClInclude Include="PerfectHook\GloveChanger.h" />
+    <ClInclude Include="PerfectHook\GrenadePrediction.h" />
+    <ClInclude Include="PerfectHook\Hacks.h" />
+    <ClInclude Include="PerfectHook\HookIncludes.h" />
+    <ClInclude Include="PerfectHook\Hooks.h" />
+    <ClInclude Include="PerfectHook\HooksList.h" />
+    <ClInclude Include="PerfectHook\IDirect3DDevice9.h" />
+    <ClInclude Include="PerfectHook\imgui\examples\directx9_example\imgui_impl_dx9.h" />
+    <ClInclude Include="PerfectHook\imgui\imconfig.h" />
+    <ClInclude Include="PerfectHook\imgui\imgui.h" />
+    <ClInclude Include="PerfectHook\imgui\imgui_internal.h" />
+    <ClInclude Include="PerfectHook\imgui\stb_rect_pack.h" />
+    <ClInclude Include="PerfectHook\imgui\stb_textedit.h" />
+    <ClInclude Include="PerfectHook\imgui\stb_truetype.h" />
+    <ClInclude Include="PerfectHook\InPrediction.h" />
+    <ClInclude Include="PerfectHook\Interface.h" />
+    <ClInclude Include="PerfectHook\Interfaces.h" />
+    <ClInclude Include="PerfectHook\ItemDefinitions.h" />
+    <ClInclude Include="PerfectHook\LagComp.h" />
+    <ClInclude Include="PerfectHook\LegitBot.h" />
+    <ClInclude Include="PerfectHook\Materials.h" />
+    <ClInclude Include="PerfectHook\MathFunctions.h" />
+    <ClInclude Include="PerfectHook\memesets.h" />
+    <ClInclude Include="PerfectHook\MiscClasses.h" />
+    <ClInclude Include="PerfectHook\MiscDefinitions.h" />
+    <ClInclude Include="PerfectHook\MiscHacks.h" />
+    <ClInclude Include="PerfectHook\MovementRecorder.h" />
+    <ClInclude Include="PerfectHook\NetVarManager.h" />
+    <ClInclude Include="PerfectHook\Offsets.h" />
+    <ClInclude Include="PerfectHook\OnScreenSizeChanged.h" />
+    <ClInclude Include="PerfectHook\OverrideView.h" />
+    <ClInclude Include="PerfectHook\PaintTraverse.h" />
+    <ClInclude Include="PerfectHook\PlaySound.h" />
+    <ClInclude Include="PerfectHook\PredictionSystem.h" />
+    <ClInclude Include="PerfectHook\RageBot.h" />
+    <ClInclude Include="PerfectHook\Renderer.h" />
+    <ClInclude Include="PerfectHook\RenderManager.h" />
+    <ClInclude Include="PerfectHook\Resolver.h" />
+    <ClInclude Include="PerfectHook\resource.h" />
+    <ClInclude Include="PerfectHook\SDK.h" />
+    <ClInclude Include="PerfectHook\SkinChanger.h" />
+    <ClInclude Include="PerfectHook\Surface.h" />
+    <ClInclude Include="PerfectHook\SvCheatsGetBool.h" />
+    <ClInclude Include="PerfectHook\Tabs.h" />
+    <ClInclude Include="PerfectHook\Themes.h" />
+    <ClInclude Include="PerfectHook\tinyxml2.h" />
+    <ClInclude Include="PerfectHook\MiscFunctions.h" />
+    <ClInclude Include="PerfectHook\Utilities.h" />
+    <ClInclude Include="PerfectHook\UtlBuffer.hpp" />
+    <ClInclude Include="PerfectHook\UtlMemory.hpp" />
+    <ClInclude Include="PerfectHook\UtlString.hpp" />
+    <ClInclude Include="PerfectHook\UtlVector.hpp" />
+    <ClInclude Include="PerfectHook\Variables.h" />
+    <ClInclude Include="PerfectHook\Vector.h" />
+    <ClInclude Include="PerfectHook\Vector2D.h" />
+    <ClInclude Include="PerfectHook\vmthook.h" />
+    <ClInclude Include="PerfectHook\XorStr.hpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

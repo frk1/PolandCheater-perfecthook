@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "injector", "injector\injector.vcxproj", "{AA664FD2-0F2D-4792-A634-EDBBA97ED3DB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "a perfecthook private", "a perfecthook private.vcxproj", "{EDEE63E8-381D-470F-90BD-AF33CCAA1E5E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "a perfecthook private", "PerfectHook\a perfecthook private.vcxproj", "{EDEE63E8-381D-470F-90BD-AF33CCAA1E5E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CSGOMemes", "CSGOMemes\CSGOMemes.vcxproj", "{222531BD-34DD-4FB4-92A8-A97709698384}"
 EndProject
