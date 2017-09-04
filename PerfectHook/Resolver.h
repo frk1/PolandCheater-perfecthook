@@ -108,7 +108,23 @@ void Resolver3()
                 }
                 else
                 {
-                    pEnt->GetEyeAngles()->y = pEnt->GetLowerBodyYaw() + 180;
+                    switch(pEnt->m_iShotsFired() % 4)
+                    {
+                    case 1:
+                        pEnt->GetEyeAngles()->y = pEnt->GetLowerBodyYaw();
+                        break;
+                    case 2:
+                        pEnt->GetEyeAngles()->y = pEnt->GetLowerBodyYaw() + 45;
+                        break;
+                    case 3:
+                        pEnt->GetEyeAngles()->y = pEnt->GetLowerBodyYaw() - 45;
+                        break;
+                    case 4:
+                        pEnt->GetEyeAngles()->y = pEnt->GetLowerBodyYaw() + 180;
+                        break;
+
+                    }
+
                 }
 
 

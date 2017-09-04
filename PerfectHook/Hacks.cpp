@@ -55,9 +55,8 @@ void SpecList()
 							if (I::Engine->GetPlayerInfo(pTarget->GetIndex(), &pinfo2))
 							{
 									char buf[255]; sprintf_s(buf, "%s", pinfo.name);
-									RECT TextSize = Render::GetTextSize(Render::Fonts::ESP, buf);
 									Render::Clear(scrn.right - 100, (scrn.top + 1) + (16 * kapi), 101, 16, Color(0, 0, 0, 140));
-									Render::Text(scrn.right - TextSize.right - 4, (scrn.top) + (16 * kapi), pTarget->GetIndex() == pLocal->GetIndex() ? Color(240, 70, 80, 255) : Color(255, 255, 255, 255), Render::Fonts::ESP, buf);
+									Render::Text(scrn.right, (scrn.top) + (16 * kapi), pTarget->GetIndex() == pLocal->GetIndex() ? Color(240, 70, 80, 255) : Color(255, 255, 255, 255), Render::Fonts::ESP, buf);
 									kapi++;
 							}
 						}

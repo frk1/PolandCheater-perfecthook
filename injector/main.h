@@ -8,7 +8,8 @@
 #include <signal.h>
 #include <shlwapi.h>
 #include <windows.h>
-#include "XorStr.hpp"
+#include <string>
+#include <iostream>
 #include <ostream>
 using namespace std;
 

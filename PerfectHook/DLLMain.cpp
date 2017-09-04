@@ -83,11 +83,7 @@ bool on_dll_attach(void* base)
 
 
 
-    if (wait_for_modules(10000, { L"client.dll", L"engine.dll", L"shaderapidx9.dll" }) == WAIT_TIMEOUT) {
-        // One or more modules were not loaded in time
-        return FALSE;
-    }
-
+    while (!GetModuleHandle("serverbrowser.dll")) Sleep(500);
 
 
 
