@@ -162,6 +162,8 @@ void IMisc::CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
                 player_info_t info;
                 if (!I::Engine->GetPlayerInfo(i, &info))
                     continue;
+                if (strstr(info.name, "GOTV"))
+                    continue;
                 sprintf_s(namebuf, sizeof(namebuf) - 1, "%s ", info.name);
                 name->SetValue(namebuf);
             }
