@@ -26,9 +26,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="XorStr.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ManualMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>

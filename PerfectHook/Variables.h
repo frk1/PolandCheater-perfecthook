@@ -166,6 +166,7 @@ struct Variables
 
 	struct
 	{
+        bool silentstealer;
         int ragequit;
 		bool 	Bhop;
 		bool 	AutoStrafe;

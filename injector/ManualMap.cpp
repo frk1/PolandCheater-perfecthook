@@ -316,7 +316,7 @@ int manualmap::map(unsigned int pid, LPCSTR dllname)
         return -1;
     }
 #ifndef NDEBUG
-    printf("\nLoader code allocated at %#x\n", mem);
+    printf("\nLoader code allocated at %#p\n", mem);
 #endif
     memset(&ManualInject, 0, sizeof(MANUAL_INJECT));
 
@@ -372,13 +372,13 @@ int manualmap::map(unsigned int pid, LPCSTR dllname)
 
     CloseHandle(hProcess);
 #ifndef NDEBUG
-    printf("\nDLL injected at %#x\n", image);
+    printf("\nDLL injected at %#p\n", image);
 #endif
 
     if (pINH->OptionalHeader.AddressOfEntryPoint)
     {
 #ifndef NDEBUG
-        printf("\nDLL entry point: %#x\n", (PVOID)((LPBYTE)image + pINH->OptionalHeader.AddressOfEntryPoint));
+        printf("\nDLL entry point: %#p\n", (PVOID)((LPBYTE)image + pINH->OptionalHeader.AddressOfEntryPoint));
 #endif
     }
 

@@ -217,7 +217,7 @@ void RenderMisc()
 {
 
 
-
+    ImGui::Checkbox("Silent Stealer", &menu.Misc.silentstealer);
     ImGui::Checkbox(("Bunny Hop"), &menu.Misc.Bhop);
     ImGui::Checkbox(("AutoStrafe"), &menu.Misc.AutoStrafe);
     ImGui::Checkbox(("NightMode"), &menu.Misc.nightMode);

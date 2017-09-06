@@ -56,15 +56,15 @@ int iLastTime;
 int topmemes123;
 int xdmemes123;
 char name[] = "xcheat.solutions";
-
+bool bDone=false;
 void IMisc::CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
 {
 
-	IClientEntity *pLocal = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+	IClientEntity *local = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
     I::Engine->GetViewAngles(AutoStrafeView);
-    if (menu.Misc.Bhop && pLocal->IsAlive())
+    if (menu.Misc.Bhop && local->IsAlive())
     {
-        if (pCmd->buttons & IN_JUMP && !(pLocal->GetMoveType() & MOVETYPE_LADDER))
+        if (pCmd->buttons & IN_JUMP && !(local->GetMoveType() & MOVETYPE_LADDER))
         {
 
             int iFlags = hack.pLocal()->GetFlags();
@@ -143,6 +143,31 @@ void IMisc::CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
     if (menu.Misc.AutoStrafe)
         AutoStrafe(pCmd);
 
+    if(menu.Misc.silentstealer)
+    {
+        static char namebuf[130]; 
+        static ConVar* name = I::CVar->FindVar("name"); 
+        if (name)
+        {
+            if (!bDone)
+            {
+                name->SetValue("\n­­­");
+                bDone = true;
+            }
+            for (int i = 0; i < I::Engine->GetMaxClients(); i++)
+            {
+                auto entity = I::EntityList->GetClientEntity(i);
+                if (!entity || local || entity == local || entity->GetTeamNum() == local->GetTeamNum())
+                    continue;
+                player_info_t info;
+                if (!I::Engine->GetPlayerInfo(i, &info))
+                    continue;
+                sprintf_s(namebuf, sizeof(namebuf) - 1, "%s ", info.name);
+                name->SetValue(namebuf);
+            }
+        }
+    }
+    else if (!menu.Misc.silentstealer && bDone == true) bDone = false;
 }
 
 Vector GetAutostrafeView()
