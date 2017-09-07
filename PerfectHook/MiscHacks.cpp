@@ -145,29 +145,31 @@ void IMisc::CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
 
     if(menu.Misc.silentstealer)
     {
-        static char namebuf[130]; 
-        static ConVar* name = I::CVar->FindVar("name"); 
-        if (name)
+        bool bDidMeme = false;
+        int iNameIndex = -1;
+        char chName[130];
+        static ConVar* name = I::CVar->FindVar("name");
         {
-            if (!bDone)
+            for (int iPlayerIndex = 0; iPlayerIndex < I::Engine->GetMaxClients(); iPlayerIndex++)
             {
-                name->SetValue("\n­­­");
-                bDone = true;
+                IClientEntity *pEntity = I::EntityList->GetClientEntity(iPlayerIndex);
+                if (!pEntity || pEntity == local || iPlayerIndex == I::Engine->GetLocalPlayer())
+                    continue;
+                if (rand() % 3 == 1)
+                {
+                    iNameIndex = pEntity->GetIndex();
+                    bDidMeme = true;
+                }
             }
-            for (int i = 0; i < I::Engine->GetMaxClients(); i++)
+            if (bDidMeme)
             {
-                auto entity = I::EntityList->GetClientEntity(i);
-                if (!entity || local || entity == local || entity->GetTeamNum() == local->GetTeamNum())
-                    continue;
-                player_info_t info;
-                if (!I::Engine->GetPlayerInfo(i, &info))
-                    continue;
-                if (strstr(info.name, "GOTV"))
-                    continue;
-                sprintf_s(namebuf, sizeof(namebuf) - 1, "%s ", info.name);
-                name->SetValue(namebuf);
+                player_info_t pInfo;
+                I::Engine->GetPlayerInfo(iNameIndex, &pInfo);
+                sprintf(chName, "%s ", pInfo.name);
+                name->SetValue(chName);
             }
         }
+
     }
     else if (!menu.Misc.silentstealer && bDone == true) bDone = false;
 }

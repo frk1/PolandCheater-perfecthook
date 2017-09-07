@@ -1,6 +1,7 @@
 #include "HookIncludes.h"
 #include "HooksList.h"
 #include "Listener.h"
+
 std::unique_ptr<VMTHook> d3d9_hook;
 typedef float(__thiscall *GetViewModelFOVFn)(void*);
 float __fastcall Hooked_GetViewModelFOV(void* ecx, void* edx);
@@ -14,6 +15,7 @@ is_hltv_t oIsHltv;
 bool __fastcall is_hltv(void* ecx, void* edx);
 uint8_t* m_present;
 uint8_t* m_reset;
+
 void Hooks::Hook()
 {
 
@@ -64,8 +66,6 @@ void Hooks::Hook()
 
     **reinterpret_cast<void***>(m_present) = reinterpret_cast<void*>(&Present_H);
     **reinterpret_cast<void***>(m_reset) = reinterpret_cast<void*>(&hkReset);
-
-
 
 	//d3d9_device = **reinterpret_cast<IDirect3DDevice9***>(U::FindPattern("shaderapidx9.dll", (PBYTE)"\xA1\x00\x00\x00\x00\x50\x8B\x08\xFF\x51\x0C", "x????xxxxxx") + 1);
 

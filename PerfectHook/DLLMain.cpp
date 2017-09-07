@@ -125,12 +125,11 @@ bool on_dll_attach(void* base)
 
 bool on_dll_detach()
 {
-    if (unhook)
-    {
-        AnimationFixUnhook();
-        UnloadProxy();
-        Hooks::Unhook();
-    }
+
+    AnimationFixUnhook();
+    UnloadProxy();
+    Hooks::Unhook();
+
     return 1;
 }
 

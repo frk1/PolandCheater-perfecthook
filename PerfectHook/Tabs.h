@@ -217,7 +217,16 @@ void RenderMisc()
 {
 
 
-    ImGui::Checkbox("Silent Stealer", &menu.Misc.silentstealer);
+    ImGui::Checkbox("Name Stealer", &menu.Misc.silentstealer);
+    if(ImGui::Button("Silent exploit"))
+    {
+        static ConVar* name = I::CVar->FindVar("name");
+        if (name)
+        {
+            *(int*)((DWORD)&name->fnChangeCallback + 0xC) = NULL;
+            name->SetValue("\nญญญ");
+        }
+    }
     ImGui::Checkbox(("Bunny Hop"), &menu.Misc.Bhop);
     ImGui::Checkbox(("AutoStrafe"), &menu.Misc.AutoStrafe);
     ImGui::Checkbox(("NightMode"), &menu.Misc.nightMode);

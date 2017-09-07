@@ -1855,3 +1855,16 @@ public:
 	virtual void SetupMove(IClientEntity* player, CInput::CUserCmd* ucmd, IMoveHelper* pHelper, CMoveData* move) = 0; //20
 	virtual void FinishMove(IClientEntity* player, CInput::CUserCmd* ucmd, CMoveData* move) = 0;
 };
+class C_TEFireBullets
+{
+public:
+    char    pad[12];
+    int		m_iPlayer; //12
+    int     m_iItemDefinitionIndex;
+    Vector	m_vecOrigin;
+    Vector	m_vecAngles;
+    int		m_iWeaponID;
+    int		m_iMode;
+    int		m_iSeed;
+    float	m_flSpread;
+};
