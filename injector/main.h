@@ -19,3 +19,24 @@ inline string ExePath() {
     string::size_type pos = string(buffer).find_last_of("\\/");
     return string(buffer).substr(0, pos);
 }
+inline HMODULE GetModuleHandleExtern(char *szModuleName, DWORD dwProcessId) // GetMoguleHandle recode for external processes
+{
+    if (!szModuleName || !dwProcessId) { return NULL; } // invalid input
+    HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, dwProcessId);
+    if (hSnap == INVALID_HANDLE_VALUE) { return NULL; }
+    MODULEENTRY32 me;
+    me.dwSize = sizeof(MODULEENTRY32);
+    if (Module32First(hSnap, &me)) // we go now
+    {
+        while (Module32Next(hSnap, &me)) // through all modules in the target process
+        {
+            if (!strcmp(me.szModule, szModuleName)) // is this the model we are looking for?
+            {
+                CloseHandle(hSnap);
+                return me.hModule; // this is our module, return it.
+            }
+        }
+    }
+    CloseHandle(hSnap);
+    return NULL; // counldn't find module
+}

@@ -49,11 +49,7 @@ namespace csgo
         return reinterpret_cast<CreateInterfaceFn>(GetProcAddress(module, "CreateInterface"));
     }
 
-    template<typename T>
-    T* CaptureInterface(CreateInterfaceFn f, const char* szInterfaceVersion)
-    {
-        return reinterpret_cast<T*>(f(szInterfaceVersion, nullptr));
-    }
+
     void initialize()
     {
         auto engineFactory     = get_module_factory(GetModuleHandleW(L"engine.dll"));

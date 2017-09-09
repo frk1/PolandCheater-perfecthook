@@ -240,6 +240,19 @@ int manualmap::map(unsigned int pid, LPCSTR dllname)
 #ifndef NDEBUG
     printf("\nOpening target process.\n");
 #endif
+
+
+    HMODULE module = GetModuleHandleExtern("serverbrowser.dll", ProcessId);
+
+    while (!module)
+    {
+#ifndef NDEBUG
+        printf("\nWaiting for engine.dll \n");
+#endif
+        module = GetModuleHandleExtern("serverbrowser.dll", ProcessId);
+        Sleep(1000);
+    }
+
     hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ProcessId);
 
     if (!hProcess)
@@ -253,6 +266,7 @@ int manualmap::map(unsigned int pid, LPCSTR dllname)
 
         return -1;
     }
+
 #ifndef NDEBUG
     printf("\nAllocating memory for the DLL.\n");
 #endif

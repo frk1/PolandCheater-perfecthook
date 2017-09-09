@@ -131,9 +131,6 @@
     <ClInclude Include="DrawModelExecute.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dropboxes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EngineClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -345,6 +342,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IsHltv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dropboxes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

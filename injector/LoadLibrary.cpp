@@ -15,13 +15,15 @@ int loadlibrary::loadlibrarymain(const char* proccessname, const char* dllname)
         GetProcessPID(proccessname);
     }
 
-    printf("%s found! DLL will inject once you press Insert!", proccessname);
-    while (!GetAsyncKeyState(VK_INSERT))
-        Sleep(10);
+    printf("%s found! Injecting DLL!", proccessname);
     char dllpath[512];
     sprintf_s(dllpath, sizeof(dllpath) - 1, "%s\\/%s", ExePath().c_str(), dllname);
     if (pid)
     {
+        while (!GetModuleHandleExtern("serverbrowser.dll", pid))
+        {
+            Sleep(500);
+        }
         CreateRemoteThreadMethod(pid, dllpath);
     }
     return 0;

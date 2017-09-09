@@ -136,6 +136,7 @@
   <ItemGroup>
     <ClInclude Include="CaviarDreams.h" />
     <ClInclude Include="DoPostScreenSpaceEffects.h" />
+    <ClInclude Include="dropboxes.h" />
     <ClInclude Include="IsHltv.h" />
     <ClInclude Include="Listener.h" />
     <ClInclude Include="recvproxy.h" />
@@ -148,7 +149,6 @@
     <ClInclude Include="CreateMove.h" />
     <ClInclude Include="DLLMain.h" />
     <ClInclude Include="DrawModelExecute.h" />
-    <ClInclude Include="dropboxes.h" />
     <ClInclude Include="EngineClient.h" />
     <ClInclude Include="EnginePrediction.h" />
     <ClInclude Include="Entities.h" />
