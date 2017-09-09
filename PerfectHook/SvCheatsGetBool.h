@@ -1,8 +1,8 @@
 #pragma once
 #include "HookIncludes.h"
 
-typedef bool(__thiscall *fnhkSvCheatsGetBool)(PVOID);
-fnhkSvCheatsGetBool oSvCheatsGetBool;
+typedef bool(__thiscall *svc_get_bool_t)(PVOID);
+
 
 
 
@@ -10,11 +10,11 @@ auto dwCAM_Think = U::pattern_scan(GetModuleHandleW(L"client.dll"), "85 C0 75 30
 
 bool __fastcall hkSvCheatsGetBool(PVOID pConVar, void* edx)
 {
-
-	if (!oSvCheatsGetBool)
+    static auto ofunc = hooks::sv_cheats.get_original<svc_get_bool_t>(13);
+	if (!ofunc)
 		return false;
 
 	if (reinterpret_cast<DWORD>(_ReturnAddress()) == reinterpret_cast<DWORD>(dwCAM_Think))
 		return true;
-	return oSvCheatsGetBool(pConVar);
+	return ofunc(pConVar);
 }

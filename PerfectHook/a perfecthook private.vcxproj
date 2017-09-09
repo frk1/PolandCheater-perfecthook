@@ -136,6 +136,7 @@
   <ItemGroup>
     <ClInclude Include="CaviarDreams.h" />
     <ClInclude Include="DoPostScreenSpaceEffects.h" />
+    <ClInclude Include="IsHltv.h" />
     <ClInclude Include="Listener.h" />
     <ClInclude Include="recvproxy.h" />
     <ClInclude Include="Autowall.h" />

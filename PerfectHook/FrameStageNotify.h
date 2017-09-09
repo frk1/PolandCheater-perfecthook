@@ -4,27 +4,27 @@
 #include "HookIncludes.h"
 #include "GloveChanger.h"
 #include "LagComp.h"
-typedef void(__stdcall *FrameStageNotifyFn)(ClientFrameStage_t);
-FrameStageNotifyFn oFrameStageNotify;
-void __stdcall hkFrameStageNotify(ClientFrameStage_t curStage);
+typedef void(__stdcall *fsn_t)(ClientFrameStage_t);
+
 void  __stdcall hkFrameStageNotify(ClientFrameStage_t curStage)
 {
-    if (I::Engine->IsConnected() && I::Engine->IsInGame())
+    static auto ofunc = hooks::client.get_original<fsn_t>(36);
+    if (g_Engine->IsConnected() && g_Engine->IsInGame())
     {
         if (curStage == FRAME_RENDER_START)
         {
-            auto pLocal = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+            auto pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
             auto dwDeadFlag = NetVarManager->GetOffset("DT_CSPlayer", "deadflag"); // int
             if (pLocal)
             {
-                if (pLocal->IsAlive() && I::Input->m_fCameraInThirdPerson)
+                if (pLocal->IsAlive() && g_Input->m_fCameraInThirdPerson)
                 {
                     *reinterpret_cast<Vector*>(reinterpret_cast<DWORD>(pLocal) + dwDeadFlag + 4) = qLastTickAngles;
                 }
             }
         }
     }
-	oFrameStageNotify(curStage);
+	ofunc(curStage);
 	if (curStage == FRAME_NET_UPDATE_POSTDATAUPDATE_START) {
         if(menu.Ragebot.Resolver) Resolver3();
         if (menu.Skinchanger.Enabled)

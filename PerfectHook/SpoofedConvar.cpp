@@ -8,7 +8,7 @@ inline void MinspecCvar::SetValue(T value)
 }
 MinspecCvar::MinspecCvar(const char* szCVar, char* newname, float newvalue) : m_pConVar(nullptr)
 {
-	m_pConVar = I::CVar->FindVar(szCVar);
+	m_pConVar = g_CVar->FindVar(szCVar);
 	m_newvalue = newvalue;
 	m_szReplacementName = newname;
 	Spoof();
@@ -18,10 +18,10 @@ MinspecCvar::~MinspecCvar()
 {
 	if (ValidCvar())
 	{
-		I::CVar->UnregisterConCommand(m_pConVar);
+		g_CVar->UnregisterConCommand(m_pConVar);
 		m_pConVar->pszName = m_szOriginalName;
 		m_pConVar->SetValue(m_OriginalValue);
-		I::CVar->RegisterConCommand(m_pConVar);
+		g_CVar->RegisterConCommand(m_pConVar);
 	}
 }
 
@@ -33,12 +33,12 @@ void MinspecCvar::Spoof()
 {
 	if (ValidCvar())
 	{
-		I::CVar->UnregisterConCommand(m_pConVar);
+		g_CVar->UnregisterConCommand(m_pConVar);
 		m_szOriginalName = m_pConVar->pszName;
 		m_OriginalValue = m_pConVar->GetFloat();
 
 		m_pConVar->pszName = m_szReplacementName;
-		I::CVar->RegisterConCommand(m_pConVar);
+		g_CVar->RegisterConCommand(m_pConVar);
 		m_pConVar->SetValue(m_newvalue);
 	}
 }
@@ -68,7 +68,7 @@ const char* MinspecCvar::GetString()
 }
 
 SpoofedConvar::SpoofedConvar(const char* szCVar) {
-	m_pOriginalCVar = I::CVar->FindVar(szCVar);
+	m_pOriginalCVar = g_CVar->FindVar(szCVar);
 	Spoof();
 }
 SpoofedConvar::SpoofedConvar(ConVar* pCVar, char* newname) {
@@ -88,7 +88,7 @@ SpoofedConvar::~SpoofedConvar() {
 		VirtualProtect((LPVOID)m_pOriginalCVar->pszName, 128, dwOld, &dwOld);
 
 		//Unregister dummy cvar
-		I::CVar->UnregisterConCommand(m_pDummyCVar);
+		g_CVar->UnregisterConCommand(m_pDummyCVar);
 		free(m_pDummyCVar);
 		m_pDummyCVar = NULL;
 	}
@@ -112,7 +112,7 @@ void SpoofedConvar::Spoof() {
 
 		m_pDummyCVar->pNext = NULL;
 		//Register it
-		I::CVar->RegisterConCommand(m_pDummyCVar);
+		g_CVar->RegisterConCommand(m_pDummyCVar);
 
 		//Fix "write access violation" bullshit
 		DWORD dwOld;

@@ -45,20 +45,20 @@ enum EFontFlags
 void Render::Initialise()
 {
 	Fonts::Default = 0x1D; // MainMenu Font from vgui_spew_fonts 
-	Fonts::ESP = I::Surface->FontCreate();
-	Fonts::Guns = I::Surface->FontCreate();
-	Fonts::Defuse = I::Surface->FontCreate();
-	Fonts::Time = I::Surface->FontCreate();
-	Fonts::DroppedGuns = I::Surface->FontCreate();
+	Fonts::ESP = g_Surface->FontCreate();
+	Fonts::Guns = g_Surface->FontCreate();
+	Fonts::Defuse = g_Surface->FontCreate();
+	Fonts::Time = g_Surface->FontCreate();
+	Fonts::DroppedGuns = g_Surface->FontCreate();
 
 
 
 
-	I::Surface->SetFontGlyphSet(Fonts::ESP, "Tahoma", 11, 700, 0, 0, FONTFLAG_DROPSHADOW);
-	I::Surface->SetFontGlyphSet(Fonts::Defuse, "Tahoma", 15, 700, 0, 0, FONTFLAG_DROPSHADOW);
-	I::Surface->SetFontGlyphSet(Fonts::Guns, "Tahoma", 10, 700, 0, 0, FONTFLAG_DROPSHADOW);
-	I::Surface->SetFontGlyphSet(Fonts::Time, "Arial", 13, 550, 0, 0, FONTFLAG_NONE);
-	I::Surface->SetFontGlyphSet(Fonts::DroppedGuns, "Tahoma", 8, 700, 0, 0, FONTFLAG_DROPSHADOW);
+	g_Surface->SetFontGlyphSet(Fonts::ESP, "Tahoma", 11, 700, 0, 0, FONTFLAG_DROPSHADOW);
+	g_Surface->SetFontGlyphSet(Fonts::Defuse, "Tahoma", 15, 700, 0, 0, FONTFLAG_DROPSHADOW);
+	g_Surface->SetFontGlyphSet(Fonts::Guns, "Tahoma", 10, 700, 0, 0, FONTFLAG_DROPSHADOW);
+	g_Surface->SetFontGlyphSet(Fonts::Time, "Arial", 13, 550, 0, 0, FONTFLAG_NONE);
+	g_Surface->SetFontGlyphSet(Fonts::DroppedGuns, "Tahoma", 8, 700, 0, 0, FONTFLAG_DROPSHADOW);
 
 
 }
@@ -67,27 +67,27 @@ RECT Render::GetViewport()
 {
 	RECT Viewport = { 0, 0, 0, 0 };
 	int w, h;
-	I::Engine->GetScreenSize(w, h);
+	g_Engine->GetScreenSize(w, h);
 	Viewport.right = w; Viewport.bottom = h;
 	return Viewport;
 }
 
 void Render::Clear(int x, int y, int w, int h, Color color)
 {
-	I::Surface->DrawSetColor(color);
-	I::Surface->DrawFilledRect(x, y, x + w, y + h);
+	g_Surface->DrawSetColor(color);
+	g_Surface->DrawFilledRect(x, y, x + w, y + h);
 }
 
 void Render::DrawOutlinedRect(int x, int y, int w, int h, Color col)
 {
-	I::Surface->DrawSetColor(col);
-	I::Surface->DrawOutlinedRect(x, y, x + w, y + h);
+	g_Surface->DrawSetColor(col);
+	g_Surface->DrawOutlinedRect(x, y, x + w, y + h);
 }
 
 void Render::Outline(int x, int y, int w, int h, Color color)
 {
-	I::Surface->DrawSetColor(color);
-	I::Surface->DrawOutlinedRect(x, y, x + w, y + h);
+	g_Surface->DrawSetColor(color);
+	g_Surface->DrawOutlinedRect(x, y, x + w, y + h);
 }
 
 void Render::DrawString2(DWORD font, int x, int y, Color color, DWORD alignment, const char* msg, ...)
@@ -104,17 +104,17 @@ void Render::DrawString2(DWORD font, int x, int y, Color color, DWORD alignment,
 	color.GetColor(r, g, b, a);
 
 	int width, height;
-	I::Surface->GetTextSize(font, wbuf, width, height);
+	g_Surface->GetTextSize(font, wbuf, width, height);
 
 	if (alignment & FONT_RIGHT)
 		x -= width;
 	if (alignment & FONT_CENTER)
 		x -= width / 2;
 
-	I::Surface->DrawSetTextFont(font);
-	I::Surface->DrawSetTextColor(r, g, b, a);
-	I::Surface->DrawSetTextPos(x, y - height / 2);
-	I::Surface->DrawPrintText(wbuf, wcslen(wbuf));
+	g_Surface->DrawSetTextFont(font);
+	g_Surface->DrawSetTextColor(r, g, b, a);
+	g_Surface->DrawSetTextPos(x, y - height / 2);
+	g_Surface->DrawPrintText(wbuf, wcslen(wbuf));
 }
 
 
@@ -138,25 +138,25 @@ void Render::OutlineRainbow(int x, int y, int width, int height, float flSpeed, 
 
 void Render::Pixel(int x, int y, Color col)
 {
-	I::Surface->DrawSetColor(col);
-	I::Surface->DrawFilledRect(x, y, x + 1, y + 1);
+	g_Surface->DrawSetColor(col);
+	g_Surface->DrawFilledRect(x, y, x + 1, y + 1);
 }
 
 void Render::Line(int x, int y, int x2, int y2, Color color)
 {
-	I::Surface->DrawSetColor(color);
-	I::Surface->DrawLine(x, y, x2, y2);
+	g_Surface->DrawSetColor(color);
+	g_Surface->DrawLine(x, y, x2, y2);
 }
 
 void Render::PolyLine(int *x, int *y, int count, Color color)
 {
-	I::Surface->DrawSetColor(color);
-	I::Surface->DrawPolyLine(x, y, count);
+	g_Surface->DrawSetColor(color);
+	g_Surface->DrawPolyLine(x, y, count);
 }
 
 bool Render::WorldToScreen(Vector &in, Vector &out)
 {
-	const matrix3x4& worldToScreen = I::Engine->WorldToScreenMatrix(); //Grab the world to screen matrix from CEngineClient::WorldToScreenMatrix
+	const matrix3x4& worldToScreen = g_Engine->WorldToScreenMatrix(); //Grab the world to screen matrix from CEngineClient::WorldToScreenMatrix
 
 	float w = worldToScreen[3][0] * in[0] + worldToScreen[3][1] * in[1] + worldToScreen[3][2] * in[2] + worldToScreen[3][3]; //Calculate the angle in compareson to the player's camera.
 	out.z = 0; //Screen doesn't have a 3rd dimension.
@@ -181,27 +181,27 @@ void Render::Text(int x, int y, Color color, DWORD font, const char* text, ...)
 	wchar_t wcstring[newsize];
 	mbstowcs_s(&convertedChars, wcstring, origsize, text, _TRUNCATE);
 
-	I::Surface->DrawSetTextFont(font);
+	g_Surface->DrawSetTextFont(font);
 
-	I::Surface->DrawSetTextColor(color);
-	I::Surface->DrawSetTextPos(x, y);
-	I::Surface->DrawPrintText(wcstring, wcslen(wcstring));
+	g_Surface->DrawSetTextColor(color);
+	g_Surface->DrawSetTextPos(x, y);
+	g_Surface->DrawPrintText(wcstring, wcslen(wcstring));
 	return;
 }
 
 void Render::Text(int x, int y, Color color, DWORD font, const wchar_t* text)
 {
-	I::Surface->DrawSetTextFont(font);
-	I::Surface->DrawSetTextColor(color);
-	I::Surface->DrawSetTextPos(x, y);
-	I::Surface->DrawPrintText(text, wcslen(text));
+	g_Surface->DrawSetTextFont(font);
+	g_Surface->DrawSetTextColor(color);
+	g_Surface->DrawSetTextPos(x, y);
+	g_Surface->DrawPrintText(text, wcslen(text));
 }
 
 void Render::Text(int x, int y, DWORD font, const wchar_t* text)
 {
-	I::Surface->DrawSetTextFont(font);
-	I::Surface->DrawSetTextPos(x, y);
-	I::Surface->DrawPrintText(text, wcslen(text));
+	g_Surface->DrawSetTextFont(font);
+	g_Surface->DrawSetTextPos(x, y);
+	g_Surface->DrawPrintText(text, wcslen(text));
 }
 
 void Render::Textf(int x, int y, Color color, DWORD font, const char* fmt, ...)
@@ -230,7 +230,7 @@ RECT Render::GetTextSize(DWORD font, const char* text)
 	mbstowcs_s(&convertedChars, wcstring, origsize, text, _TRUNCATE);
 
 	RECT rect; int x, y;
-	I::Surface->GetTextSize(font, wcstring, x, y);
+	g_Surface->GetTextSize(font, wcstring, x, y);
 	rect.left = x; rect.bottom = y;
 	rect.right = x;
 	return rect;
@@ -268,14 +268,14 @@ void Render::GradientH(int x, int y, int w, int h, Color c1, Color c2)
 
 void Render::Polygon(int count, Vertex_t* Vertexs, Color color)
 {
-	static int Texture = I::Surface->CreateNewTextureID(true); //need to make a texture with procedural true
+	static int Texture = g_Surface->CreateNewTextureID(true); //need to make a texture with procedural true
 	unsigned char buffer[4] = { 255, 255, 255, 255 };//{ color.r(), color.g(), color.b(), color.a() };
 
-	I::Surface->DrawSetTextureRGBA(Texture, buffer, 1, 1); //Texture, char array of texture, width, height
-	I::Surface->DrawSetColor(color); // keep this full color and opacity use the RGBA @top to set values.
-	I::Surface->DrawSetTexture(Texture); // bind texture
+	g_Surface->DrawSetTextureRGBA(Texture, buffer, 1, 1); //Texture, char array of texture, width, height
+	g_Surface->DrawSetColor(color); // keep this full color and opacity use the RGBA @top to set values.
+	g_Surface->DrawSetTexture(Texture); // bind texture
 
-	I::Surface->DrawTexturedPolygon(count, Vertexs);
+	g_Surface->DrawTexturedPolygon(count, Vertexs);
 }
 
 void Render::PolygonOutline(int count, Vertex_t* Vertexs, Color color, Color colorLine)
@@ -310,9 +310,9 @@ void Render::PolyLine(int count, Vertex_t* Vertexs, Color colorLine)
 
 void Render::OutlineCircle(int x, int y, int r, int seg, Color color)
 {
-	I::Surface->DrawSetColor(0, 0, 0, 255);
-	I::Surface->DrawOutlinedCircle(x, y, r - 1, seg);
-	I::Surface->DrawOutlinedCircle(x, y, r + 1, seg);
-	I::Surface->DrawSetColor(color);
-	I::Surface->DrawOutlinedCircle(x, y, r, seg);
+	g_Surface->DrawSetColor(0, 0, 0, 255);
+	g_Surface->DrawOutlinedCircle(x, y, r - 1, seg);
+	g_Surface->DrawOutlinedCircle(x, y, r + 1, seg);
+	g_Surface->DrawSetColor(color);
+	g_Surface->DrawOutlinedCircle(x, y, r, seg);
 }

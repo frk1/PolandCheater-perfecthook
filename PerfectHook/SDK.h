@@ -33,10 +33,13 @@ inline void RandomSeed(int seed)
 }
 
 #define XM_2PI              6.283185307f
-
+#include <deque>
 struct backtrackData {
     float simtime;
     Vector hitboxPos;
+    IClientEntity* entity;
 };
 
+
 extern backtrackData headPositions[64][16];
+

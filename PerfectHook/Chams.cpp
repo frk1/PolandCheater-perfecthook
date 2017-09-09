@@ -55,7 +55,7 @@ IMaterial* CreateMaterial(std::string type, std::string texture, bool ignorez, b
     InitKeyValues(keyValues, type.c_str());
     LoadFromBuffer(keyValues, materialName.c_str(), materialData.str().c_str());
 
-    return I::MaterialSystem->CreateMaterial(materialName.c_str(), keyValues);
+    return g_MaterialSystem->CreateMaterial(materialName.c_str(), keyValues);
 }
 
 IMaterial* CreateMaterial(bool shouldIgnoreZ, bool isLit, bool isWireframe) 
@@ -92,7 +92,7 @@ IMaterial* CreateMaterial(bool shouldIgnoreZ, bool isLit, bool isWireframe)
 	InitKeyValues(keyValues, baseType);
 	LoadFromBuffer(keyValues, name, material);
 
-	IMaterial* createdMaterial = I::MaterialSystem->CreateMaterial(name, keyValues);
+	IMaterial* createdMaterial = g_MaterialSystem->CreateMaterial(name, keyValues);
 	createdMaterial->IncrementReferenceCount();
 
 	return createdMaterial;
@@ -119,12 +119,12 @@ void ForceMaterial(Color color, IMaterial* material, bool useColor, bool forceMa
 
 		float alpha = (float)color.a();
 
-		I::RenderView->SetBlend(1.0f);
-		I::RenderView->SetColorModulation(temp);
+		g_RenderView->SetBlend(1.0f);
+		g_RenderView->SetColorModulation(temp);
 	}
 
 	if (forceMaterial)
-		I::ModelRender->ForcedMaterialOverride(material);
+		g_ModelRender->ForcedMaterialOverride(material);
 	else
-		I::ModelRender->ForcedMaterialOverride(NULL);
+		g_ModelRender->ForcedMaterialOverride(NULL);
 }

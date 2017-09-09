@@ -179,7 +179,7 @@ void RenderVisuals()
 		ImGui::Checkbox(("SpreadCrosshair"), &menu.Visuals.SpreadCrosshair);
 		ImGui::Checkbox(("GrenadeESP"), &menu.Visuals.GrenadeESP);
 		ImGui::Checkbox(("C4"), &menu.Visuals.C4);
-        //ImGui::Checkbox("Glow", &menu.Visuals.Glow);
+        ImGui::Checkbox("Glow", &menu.Visuals.Glow);
 	}
 	ImGui::NextColumn();
 	{
@@ -220,7 +220,7 @@ void RenderMisc()
     ImGui::Checkbox("Name Stealer", &menu.Misc.silentstealer);
     if(ImGui::Button("Silent exploit"))
     {
-        static ConVar* name = I::CVar->FindVar("name");
+        static ConVar* name = g_CVar->FindVar("name");
         if (name)
         {
             *(int*)((DWORD)&name->fnChangeCallback + 0xC) = NULL;
@@ -244,13 +244,13 @@ void RenderMisc()
         meme.Colors[ImGuiCol_WindowBg] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
         ImGui::Begin(("Confirmation Menu"), &menu.Misc.SpoofConfirmation, ImVec2(225, 120), 0.9f, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
         {
-            if (!I::Engine->IsInGame())
+            if (!g_Engine->IsInGame())
             {
                 ImGui::Text("Do you want to spoof mat_picmip?");
                 ImGui::Columns(2, ("##memes"), false);
                 if (ImGui::Button(("Yes"), ImVec2(93.f, 24.f)))
                 {
-                    auto drawmemes = I::CVar->FindVar("mat_picmip");
+                    auto drawmemes = g_CVar->FindVar("mat_picmip");
                     auto drawmemesenabled = new SpoofedConvar(drawmemes, "newdrawmemesaredank");
                     drawmemesenabled->SetInt(4);
                     menu.Misc.SpoofConfirmation = false;
@@ -274,7 +274,7 @@ void RenderMisc()
     ImGui::PushItemWidth(50);
     if (ImGui::Button(("Change Name")))
     {
-        ConVar* name = I::CVar->FindVar("name");
+        ConVar* name = g_CVar->FindVar("name");
         if (name)
         {
             *(int*)((DWORD)&name->fnChangeCallback + 0xC) = NULL;
@@ -318,7 +318,7 @@ void RenderMisc()
     ImGui::SameLine();
     if (ImGui::Button("ragequit"))
     {
-        I::Engine->ClientCmd_Unrestricted("cl_mouseenable 1");
+        g_Engine->ClientCmd_Unrestricted("cl_mouseenable 1");
         DoUnload = true;
     }
 

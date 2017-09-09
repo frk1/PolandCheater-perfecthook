@@ -10,7 +10,7 @@
 
 using namespace std;
 
-#define TICK_INTERVAL			(I::Globals->interval_per_tick)
+#define TICK_INTERVAL			(g_Globals->interval_per_tick)
 #define TIME_TO_TICKS( dt )		( (int)( 0.5f + (float)(dt) / TICK_INTERVAL ) )
 
 void IRage::Init()
@@ -26,167 +26,112 @@ void IRage::PaintTraverse()
 
 }
 
-Vector MultipointFull(IClientEntity* entity, int hitbox, Vector pos)
-{
-    int health = entity->GetHealth();
-    float highest_damage = fminf(menu.Ragebot.MinimumDamage, (float)health);
 
 
-
-    model_t* model = (model_t*)entity->GetModel();
-    if (!model)
-        return pos;
-
-    studiohdr_t* hdr = I::ModelInfo->GetStudiomodel(model);
-    if (!hdr)
-        return pos;
-
-    matrix3x4 matrix[128];
-    if (!entity->SetupBones(matrix, 128, 0x100, 0.f))
-        return pos;
-
-    mstudiohitboxset_t* set = hdr->GetHitboxSet(entity->GetHitboxSet());
-    if (!set)
-        return pos;
-
-    mstudiobbox_t* box = set->GetHitbox(hitbox);
-    if (!box)
-        return pos;
-
-    Vector bbmin = box->bbmin;
-    Vector bbmax = box->bbmax;
-
-    float radius = box->m_flRadius; //should scale it down a bit properly, e.g. 0.8f or so
-    bbmin -= Vector(radius, radius, radius);
-    bbmax += Vector(radius, radius, radius);
-
-    Vector points[9] = {
-        ((bbmin + bbmax) * .5f),
-        Vector(bbmin.x, bbmin.y, bbmin.z),
-        Vector(bbmin.x, bbmax.y, bbmin.z),
-        Vector(bbmax.x, bbmax.y, bbmin.z),
-        Vector(bbmax.x, bbmin.y, bbmin.z),
-        Vector(bbmax.x, bbmax.y, bbmax.z),
-        Vector(bbmin.x, bbmax.y, bbmax.z),
-        Vector(bbmin.x, bbmin.y, bbmax.z),
-        Vector(bbmax.x, bbmin.y, bbmax.z)
-    };
-
-    int best_point = -1; // -1 means headscaled point
-    for (int i = 0; i < 9; i++) {
-        if (i != 0)
-            points[i] = ((((points[i] + points[0]) * .5f) + points[i]) * .5f);
-
-        VectorTransform(points[i], matrix[box->bone], points[i]);
-
-        float temp_dmg;
-        if (CanHit(points[i], &temp_dmg))
-        {
-            if (temp_dmg > highest_damage + 1.f)
-            {
-                best_point = i;
-                highest_damage = temp_dmg;
-            }
-
-            if (temp_dmg > health)
-                return points[i];
-        }
-    }
-
-    if (best_point == -1)
-        return pos;
-
-    return points[best_point];
-}
-
-bool IRage::hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseCombatWeapon* weapon, IClientEntity* target)
-{
-	Vector forward, right, up;
-
-	constexpr auto max_traces = 256;
-
-	AngleVectors(cmd->viewangles, &forward, &right, &up);
-
-	int total_hits = 0;
-	int needed_hits = static_cast<int>(max_traces * (menu.Ragebot.HitchanceAmount / 100.f));
-
-	weapon->UpdateAccuracyPenalty(weapon);
-
-	auto eyes = local->GetEyePosition();
-	auto flRange = weapon->GetCSWpnData()->m_fRange;
-
-	for (int i = 0; i < max_traces; i++) {
-		RandomSeed(i + 1);
-
-		float fRand1 = RandomFloat(0.f, 1.f);
-		float fRandPi1 = RandomFloat(0.f, XM_2PI);
-		float fRand2 = RandomFloat(0.f, 1.f);
-		float fRandPi2 = RandomFloat(0.f, XM_2PI);
-
-		float fRandInaccuracy = fRand1 * weapon->GetInaccuracy();
-		float fRandSpread = fRand2 * weapon->GetSpread();
-
-		float fSpreadX = cos(fRandPi1) * fRandInaccuracy + cos(fRandPi2) * fRandSpread;
-		float fSpreadY = sin(fRandPi1) * fRandInaccuracy + sin(fRandPi2) * fRandSpread;
-
-		auto viewSpreadForward = (forward + fSpreadX * right + fSpreadY * up).Normalized();
-
-		Vector viewAnglesSpread;
-		VectorAngles(viewSpreadForward, viewAnglesSpread);
-		MiscFunctions::NormaliseViewAngle(viewAnglesSpread);
-
-		Vector viewForward;
-		AngleVectors(viewAnglesSpread, &viewForward);
-		viewForward.NormalizeInPlace();
-
-		viewForward = eyes + (viewForward * flRange);
-
-		trace_t tr;
-		Ray_t ray;
-		ray.Init(eyes, viewForward);
-
-		I::Trace->ClipRayToEntity(ray, MASK_SHOT | CONTENTS_GRATE, target, &tr);
-
-
-		if (tr.m_pEnt == target)
-			total_hits++;
-
-		if (total_hits >= needed_hits)
-			return true;
-
-		if ((max_traces - i + total_hits) < needed_hits)
-			return false;
-	}
-
-	return false;
-}
 
 void IRage::CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
 {
-	if (!menu.Ragebot.b1g)
-		return;
+    if (!menu.Ragebot.b1g)
+        return;
 
-	IClientEntity *pLocal = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
-	if (pLocal != nullptr && pLocal->IsAlive())
-	{
+    IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+    if (pLocal && pLocal->IsAlive())
+    {
+        if (menu.Ragebot.BAIMkey && G::PressedKeys[menu.Ragebot.BAIMkey] && menu.Ragebot.Hitscan != 4)
+        {
+            menu.Ragebot.Hitscan = 4;
+        }
+        else if (menu.Ragebot.BAIMkey && !G::PressedKeys[menu.Ragebot.BAIMkey] && menu.Ragebot.Hitscan != 3)
+        {
+            menu.Ragebot.Hitscan = 3;
+        }
 
-		
-		if (menu.Ragebot.Enabled)
-			DoAimbot(pCmd, bSendPacket);
-
-		if (menu.Ragebot.AntiRecoil)
-			DoNoRecoil(pCmd);
-
-		
-
-		if (menu.Ragebot.EnabledAntiAim)
-			DoAntiAim(pCmd, bSendPacket);
+        CBaseCombatWeapon* weapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
+        if (weapon && weapon->m_AttributeManager()->m_Item()->GetItemDefinitionIndex() == 64)
+        {
+            if (!CanAttack() && weapon->GetAmmoInClip() > 0)
+            {
+                pCmd->buttons |= IN_ATTACK;
+            }
+        }
 
 
-	}
-	LastAngle = pCmd->viewangles;
+        if (menu.Ragebot.Enabled)
+            DoAimbot(pCmd, bSendPacket);
+
+        if (menu.Ragebot.AntiRecoil)
+            DoNoRecoil(pCmd);
+
+
+
+        if (menu.Ragebot.EnabledAntiAim)
+            DoAntiAim(pCmd, bSendPacket);
+
+
+    }
+    LastAngle = pCmd->viewangles;
 }
+bool IRage::hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseCombatWeapon* weapon, IClientEntity* target)
+{
+    Vector forward, right, up;
 
+    constexpr auto max_traces = 256;
+
+    AngleVectors(cmd->viewangles, &forward, &right, &up);
+
+    int total_hits = 0;
+    int needed_hits = static_cast<int>(max_traces * (menu.Ragebot.HitchanceAmount / 100.f));
+
+    weapon->UpdateAccuracyPenalty(weapon);
+
+    auto eyes = local->GetEyePosition();
+    auto flRange = weapon->GetCSWpnData()->m_fRange;
+
+    for (int i = 0; i < max_traces; i++) {
+        RandomSeed(i + 1);
+
+        float fRand1 = RandomFloat(0.f, 1.f);
+        float fRandPi1 = RandomFloat(0.f, XM_2PI);
+        float fRand2 = RandomFloat(0.f, 1.f);
+        float fRandPi2 = RandomFloat(0.f, XM_2PI);
+
+        float fRandInaccuracy = fRand1 * weapon->GetInaccuracy();
+        float fRandSpread = fRand2 * weapon->GetSpread();
+
+        float fSpreadX = cos(fRandPi1) * fRandInaccuracy + cos(fRandPi2) * fRandSpread;
+        float fSpreadY = sin(fRandPi1) * fRandInaccuracy + sin(fRandPi2) * fRandSpread;
+
+        auto viewSpreadForward = (forward + fSpreadX * right + fSpreadY * up).Normalized();
+
+        Vector viewAnglesSpread;
+        VectorAngles(viewSpreadForward, viewAnglesSpread);
+        MiscFunctions::NormaliseViewAngle(viewAnglesSpread);
+
+        Vector viewForward;
+        AngleVectors(viewAnglesSpread, &viewForward);
+        viewForward.NormalizeInPlace();
+
+        viewForward = eyes + (viewForward * flRange);
+
+        trace_t tr;
+        Ray_t ray;
+        ray.Init(eyes, viewForward);
+
+        g_Trace->ClipRayToEntity(ray, MASK_SHOT | CONTENTS_GRATE, target, &tr);
+
+
+        if (tr.m_pEnt == target)
+            total_hits++;
+
+        if (total_hits >= needed_hits)
+            return true;
+
+        if ((max_traces - i + total_hits) < needed_hits)
+            return false;
+    }
+
+    return false;
+}
 template<class T, class U>
 T clamp(T in, U low, U high)
 {
@@ -200,21 +145,21 @@ T clamp(T in, U low, U high)
 }
 float LagFix()
 {
-	float updaterate = I::CVar->FindVar("cl_updaterate")->fValue;
-	ConVar* minupdate = I::CVar->FindVar("sv_minupdaterate");
-	ConVar* maxupdate = I::CVar->FindVar("sv_maxupdaterate");
+	float updaterate = g_CVar->FindVar("cl_updaterate")->fValue;
+	ConVar* minupdate = g_CVar->FindVar("sv_minupdaterate");
+	ConVar* maxupdate = g_CVar->FindVar("sv_maxupdaterate");
 
 	if (minupdate && maxupdate)
 		updaterate = maxupdate->fValue;
 
-	float ratio = I::CVar->FindVar("cl_interp_ratio")->fValue;
+	float ratio = g_CVar->FindVar("cl_interp_ratio")->fValue;
 
 	if (ratio == 0)
 		ratio = 1.0f;
 
-	float lerp = I::CVar->FindVar("cl_interp")->fValue;
-	ConVar* cmin = I::CVar->FindVar("sv_client_min_interp_ratio");
-	ConVar* cmax = I::CVar->FindVar("sv_client_max_interp_ratio");
+	float lerp = g_CVar->FindVar("cl_interp")->fValue;
+	ConVar* cmin = g_CVar->FindVar("sv_client_min_interp_ratio");
+	ConVar* cmax = g_CVar->FindVar("sv_client_max_interp_ratio");
 
 	if (cmin && cmax && cmin->fValue != 1)
 		ratio = clamp(ratio, cmin->fValue, cmax->fValue);
@@ -227,12 +172,12 @@ float LagFix()
 void IRage::DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket)
 {
 
-	IClientEntity* pLocal = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+	IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 	bool FindNewTarget = true;
 	//IsLocked = false;
 
 	// Don't aimbot with the knife..
-	CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)I::EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
+	CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
 
 	if (pWeapon != nullptr)
 	{
@@ -251,14 +196,14 @@ void IRage::DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket)
 	// Make sure we have a good target
 	if (IsLocked && TargetID >= 0 && HitBox >= 0)
 	{
-		pTarget = I::EntityList->GetClientEntity(TargetID);
+		pTarget = g_EntityList->GetClientEntity(TargetID);
 		if (pTarget  && TargetMeetsRequirements(pTarget))
 		{
 			HitBox = HitScan(pTarget);
 			if (HitBox >= 0)
 			{
 				Vector ViewOffset = pLocal->GetOrigin() + pLocal->GetViewOffset();
-				Vector View; I::Engine->GetViewAngles(View);
+				Vector View; g_Engine->GetViewAngles(View);
 				float FoV = FovToPlayer(ViewOffset, View, pTarget, HitBox);
 				if (FoV < menu.Ragebot.FOV)
 					FindNewTarget = false;
@@ -282,7 +227,7 @@ void IRage::DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket)
 		// Memesj
 		if (TargetID >= 0)
 		{
-			pTarget = I::EntityList->GetClientEntity(TargetID);
+			pTarget = g_EntityList->GetClientEntity(TargetID);
 		}
 	}
 
@@ -377,7 +322,7 @@ bool IRage::TargetMeetsRequirements(IClientEntity* pEntity)
 		// Entity Type checks
 		ClientClass *pClientClass = pEntity->GetClientClass();
 		player_info_t pinfo;
-		if (pClientClass->m_ClassID == (int)ClassID::CCSPlayer && I::Engine->GetPlayerInfo(pEntity->GetIndex(), &pinfo))
+		if (pClientClass->m_ClassID == (int)ClassID::CCSPlayer && g_Engine->GetPlayerInfo(pEntity->GetIndex(), &pinfo))
 		{
 			// Team Check
 			if (pEntity->GetTeamNum() != hack.pLocal()->GetTeamNum() || menu.Ragebot.FriendlyFire)
@@ -398,7 +343,7 @@ bool IRage::IsValidTARGET(int iEnt, IClientEntity* pLocal)
 {
 	IClientEntity* pEnt = nullptr;
 
-	if ((pEnt = I::EntityList->GetClientEntity(iEnt)))
+	if ((pEnt = g_EntityList->GetClientEntity(iEnt)))
 		if (!(pEnt == pLocal))
 		{
 			if (pEnt->GetTeamNum() != pLocal->GetTeamNum())
@@ -415,11 +360,11 @@ int IRage::AATARGE(CInput::CUserCmd *pCmd, IClientEntity* pLocal, CBaseCombatWea
 
 
 	Vector ViewOffset = pLocal->GetEyePosition();
-	Vector View; I::Engine->GetViewAngles(View);
+	Vector View; g_Engine->GetViewAngles(View);
 
-	for (int i = 0; i < I::EntityList->GetHighestEntityIndex(); i++)
+	for (int i = 0; i < g_EntityList->GetHighestEntityIndex(); i++)
 	{
-		IClientEntity* pEntity = I::EntityList->GetClientEntity(i);
+		IClientEntity* pEntity = g_EntityList->GetClientEntity(i);
 		if (IsValidTARGET(i, pLocal))
 		{
 			//ValveVector Difference = pLocalEntity->GetAbsOrigin() - pEntity->GetAbsOrigin();
@@ -471,13 +416,13 @@ int IRage::GetTargetCrosshair()
 	int target = -1;
 	float minFoV = menu.Ragebot.FOV;
 
-	IClientEntity* pLocal = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+	IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 	Vector ViewOffset = pLocal->GetOrigin() + pLocal->GetViewOffset();
-	Vector View; I::Engine->GetViewAngles(View);
+	Vector View; g_Engine->GetViewAngles(View);
 
-	for (int i = 0; i < I::EntityList->GetHighestEntityIndex(); i++)
+	for (int i = 0; i < g_EntityList->GetHighestEntityIndex(); i++)
 	{
-		IClientEntity *pEntity = I::EntityList->GetClientEntity(i);
+		IClientEntity *pEntity = g_EntityList->GetClientEntity(i);
 		if (TargetMeetsRequirements(pEntity))
 		{
 			int NewHitBox = HitScan(pEntity);
@@ -498,144 +443,132 @@ int IRage::GetTargetCrosshair()
 
 int IRage::HitScan(IClientEntity* pEntity)
 {
-	std::vector<int> HitBoxesToScan;
-	bool AWall = menu.Ragebot.AutoWall;
+    vector<int> HitBoxesToScan{ Head , Neck, Chest, Stomach };
 
-	// Get the hitboxes to scan
-#pragma region GetHitboxesToScan
-	int HitScanMode = menu.Ragebot.Hitscan;
-	if (HitScanMode == 0)
-	{
-		// No Hitscan, just a single hitbox	
-		switch (menu.Ragebot.Hitbox)
-		{
-		case 0:
-			HitBoxesToScan.push_back((int)CSGOHitboxID::Head);
-			break;
-		case 1:
-			HitBoxesToScan.push_back((int)CSGOHitboxID::Neck);
-			break;
-		case 2:
-			HitBoxesToScan.push_back((int)CSGOHitboxID::Chest);
-			break;
-		case 3:
-			HitBoxesToScan.push_back((int)CSGOHitboxID::Stomach);
-			break;
-		}
-	}
-	else
-	{
-		switch (HitScanMode)
-		{
-		case 1:
-			// low
-			HitBoxesToScan.push_back((int)CSGOHitboxID::Head);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::Neck);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::UpperChest);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::Chest);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::Stomach);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::Pelvis);
-			break;
-		case 2:
-			// medium
-			HitBoxesToScan.push_back((int)CSGOHitboxID::Head);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::Neck);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::UpperChest);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::Chest);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::Stomach);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::Pelvis);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::LeftUpperArm);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::RightUpperArm);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::LeftThigh);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::RightThigh);
-			break;
-		case 3:
-			// high
-			HitBoxesToScan.push_back((int)CSGOHitboxID::Head);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::Neck);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::UpperChest);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::Chest);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::Stomach);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::Pelvis);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::LeftUpperArm);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::RightUpperArm);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::LeftThigh);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::RightThigh);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::LeftHand);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::RightHand);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::LeftFoot);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::RightFoot);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::LeftShin);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::RightShin);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::LeftLowerArm);
-			HitBoxesToScan.push_back((int)CSGOHitboxID::RightLowerArm);
-			break;
+
+    int HitScanMode = menu.Ragebot.Hitscan;
+
+    if (HitScanMode == 0)
+    {
+        switch (menu.Ragebot.Hitbox)
+        {
+        case 0:
+            HitBoxesToScan.push_back(Head);
+            break;
+        case 1:
+            HitBoxesToScan.push_back(Neck);
+            break;
+        case 2:
+            HitBoxesToScan.push_back(Chest);
+            break;
+        case 3:
+            HitBoxesToScan.push_back(Stomach);
+            break;
+        }
+    }
+    else
+    {
+        switch (HitScanMode)
+        {
+        case 1:
+            // low
+            HitBoxesToScan.push_back(Head);
+            HitBoxesToScan.push_back(Neck);
+            HitBoxesToScan.push_back(UpperChest);
+            HitBoxesToScan.push_back(Chest);
+            HitBoxesToScan.push_back(Stomach);
+            HitBoxesToScan.push_back(Pelvis);
+            break;
+        case 2:
+            // medium
+            HitBoxesToScan.push_back(Head);
+            HitBoxesToScan.push_back(Neck);
+            HitBoxesToScan.push_back(UpperChest);
+            HitBoxesToScan.push_back(Chest);
+            HitBoxesToScan.push_back(Stomach);
+            HitBoxesToScan.push_back(Pelvis);
+            HitBoxesToScan.push_back(LeftUpperArm);
+            HitBoxesToScan.push_back(RightUpperArm);
+            HitBoxesToScan.push_back(LeftThigh);
+            HitBoxesToScan.push_back(RightThigh);
+            break;
+        case 3:
+            // high
+            HitBoxesToScan.push_back(Head);
+            HitBoxesToScan.push_back(Neck);
+            HitBoxesToScan.push_back(UpperChest);
+            HitBoxesToScan.push_back(Chest);
+            HitBoxesToScan.push_back(Stomach);
+            HitBoxesToScan.push_back(Pelvis);
+            HitBoxesToScan.push_back(LeftUpperArm);
+            HitBoxesToScan.push_back(RightUpperArm);
+            HitBoxesToScan.push_back(LeftThigh);
+            HitBoxesToScan.push_back(RightThigh);
+            HitBoxesToScan.push_back(LeftHand);
+            HitBoxesToScan.push_back(RightHand);
+            HitBoxesToScan.push_back(LeftFoot);
+            HitBoxesToScan.push_back(RightFoot);
+            HitBoxesToScan.push_back(LeftShin);
+            HitBoxesToScan.push_back(RightShin);
+            HitBoxesToScan.push_back(LeftLowerArm);
+            HitBoxesToScan.push_back(RightLowerArm);
+            break;
         case 4:
             // baim
-            HitBoxesToScan.push_back((int)CSGOHitboxID::UpperChest);
-            HitBoxesToScan.push_back((int)CSGOHitboxID::Chest);
-            HitBoxesToScan.push_back((int)CSGOHitboxID::Stomach);
-            HitBoxesToScan.push_back((int)CSGOHitboxID::Pelvis);
-            HitBoxesToScan.push_back((int)CSGOHitboxID::LeftUpperArm);
-            HitBoxesToScan.push_back((int)CSGOHitboxID::RightUpperArm);
-            HitBoxesToScan.push_back((int)CSGOHitboxID::LeftThigh);
-            HitBoxesToScan.push_back((int)CSGOHitboxID::RightThigh);
-            HitBoxesToScan.push_back((int)CSGOHitboxID::LeftHand);
-            HitBoxesToScan.push_back((int)CSGOHitboxID::RightHand);
-            HitBoxesToScan.push_back((int)CSGOHitboxID::LeftFoot);
-            HitBoxesToScan.push_back((int)CSGOHitboxID::RightFoot);
-            HitBoxesToScan.push_back((int)CSGOHitboxID::LeftShin);
-            HitBoxesToScan.push_back((int)CSGOHitboxID::RightShin);
-            HitBoxesToScan.push_back((int)CSGOHitboxID::LeftLowerArm);
-            HitBoxesToScan.push_back((int)CSGOHitboxID::RightLowerArm);
+            HitBoxesToScan.push_back(UpperChest);
+            HitBoxesToScan.push_back(Chest);
+            HitBoxesToScan.push_back(Stomach);
+            HitBoxesToScan.push_back(Pelvis);
+            HitBoxesToScan.push_back(LeftUpperArm);
+            HitBoxesToScan.push_back(RightUpperArm);
+            HitBoxesToScan.push_back(LeftThigh);
+            HitBoxesToScan.push_back(RightThigh);
+            HitBoxesToScan.push_back(LeftHand);
+            HitBoxesToScan.push_back(RightHand);
+            HitBoxesToScan.push_back(LeftFoot);
+            HitBoxesToScan.push_back(RightFoot);
+            HitBoxesToScan.push_back(LeftShin);
+            HitBoxesToScan.push_back(RightShin);
+            HitBoxesToScan.push_back(LeftLowerArm);
+            HitBoxesToScan.push_back(RightLowerArm);
             break;
-		}
-	}
-#pragma endregion Get the list of shit to scan
+        }
+    }
+    static vector<int> baim{ UpperChest ,Chest ,Stomach ,Pelvis ,LeftUpperArm ,RightUpperArm ,LeftThigh,RightThigh ,LeftHand ,RightHand, LeftFoot, RightFoot, LeftShin, RightShin,LeftLowerArm,RightLowerArm };
 
-	// check hits
-	/*for (auto HitBoxID : HitBoxesToScan)
-	{
-	if (AWall)
-	{
-	Vector Point = GetHitboxPosition(pEntity, HitBoxID);
-	float Damage = 0.f;
-	Color c = Color(255, 255, 255, 255);
-	if (CanHit(Point, &Damage))
-	{
-	c = Color(0, 255, 0, 255);
-	if (Damage >= Menu::Window.Rage.AccuracyMinimumDamage.GetValue())
-	{
-	return HitBoxID;
-	}
-	}
-	}
-	else
-	{
-	if (GameUtils::IsVisible(hackManager.pLocal(), pEntity, HitBoxID))
-	return HitBoxID;
-	}
-	}
+    int bestHitbox = -1;
+    float highestDamage = menu.Ragebot.MinimumDamage;
+    for (auto HitBoxID : HitBoxesToScan)
+    {
 
-	return -1;*/
-	int bestHitbox = -1;
-	float highestDamage = static_cast<float>(menu.Ragebot.MinimumDamage);
-	for (auto HitBoxID : HitBoxesToScan)
-	{
-        
-		Vector Point = GetHitboxPosition(pEntity, HitBoxID); //pvs fix disabled
+        Vector Point = GetHitboxPosition(pEntity, HitBoxID); //pvs fix disabled
 
-		float damage = 0.0f;
-		if (CanHit(Point, &damage))
-		{
-			if (damage > highestDamage)
-			{
-				bestHitbox = HitBoxID;
-				highestDamage = damage;
-			}
-		}
-	}
-	return bestHitbox;
+        float damage = 0.0f;
+        if (CanHit(Point, &damage))
+        {
+            if (damage > highestDamage || damage > pEntity->GetHealth())
+            {
+                bestHitbox = HitBoxID;
+                highestDamage = damage;
+            }
+        }
+    }
+    for (auto HitBoxID : baim)
+    {
+
+        Vector Point = GetHitboxPosition(pEntity, HitBoxID); //pvs fix disabled
+
+        float damage = 0.0f;
+        if (CanHit(Point, &damage))
+        {
+            if (damage > highestDamage && damage > pEntity->GetHealth())
+            {
+                bestHitbox = HitBoxID;
+                highestDamage = damage;
+            }
+        }
+    }
+    return bestHitbox;
 
 }
 
@@ -644,7 +577,7 @@ int IRage::HitScan(IClientEntity* pEntity)
 void IRage::DoNoRecoil(CInput::CUserCmd *pCmd)
 {
 	// Ghetto rcs shit, implement properly later
-	IClientEntity* pLocal = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+	IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 	if (pLocal != nullptr)
 	{
 		Vector AimPunch = pLocal->localPlayerExclusive()->GetAimPunchAngle();
@@ -698,9 +631,9 @@ bool IRage::AimAtPoint(IClientEntity* pLocal, Vector point, CInput::CUserCmd *pC
 	//CalcAngle(src, point, angles);
 	MiscFunctions::NormaliseViewAngle(angles);
 
-	CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)I::EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
+	CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
 	bool can_shoot = true;
-	float server_time = pLocal->GetTickBase() * I::Globals->interval_per_tick;
+	float server_time = pLocal->GetTickBase() * g_Globals->interval_per_tick;
 
 	if (pWeapon != nullptr)
 	{
@@ -718,7 +651,7 @@ bool IRage::AimAtPoint(IClientEntity* pLocal, Vector point, CInput::CUserCmd *pC
 	if (!IsAimStepping)
 		LastAimstepAngle = LastAngle; // Don't just use the viewangs because you need to consider aa
 
-	float fovLeft = FovToPlayer(ViewOffset, LastAimstepAngle, I::EntityList->GetClientEntity(TargetID), 0);
+	float fovLeft = FovToPlayer(ViewOffset, LastAimstepAngle, g_EntityList->GetClientEntity(TargetID), 0);
 
 	if (fovLeft > 25.0f && me123)
 	{
@@ -746,7 +679,7 @@ bool IRage::AimAtPoint(IClientEntity* pLocal, Vector point, CInput::CUserCmd *pC
     if (!menu.Ragebot.Silent)
     {
         pCmd->viewangles = angles;
-        I::Engine->SetViewAngles(pCmd->viewangles);
+        g_Engine->SetViewAngles(pCmd->viewangles);
     }
 	if (menu.Ragebot.FakeLagFix)
 	{
@@ -832,7 +765,7 @@ bool EdgeAntiAim(IClientEntity* pLocalBaseEntity, CInput::CUserCmd* cmd, float f
 		vecForward *= flLength;
 
 		ray.Init(vecCurPos, (vecCurPos + vecForward));
-		I::Trace->TraceRay(ray, MASK_SHOT, (CTraceFilter *)&traceFilter, &tr);
+		g_Trace->TraceRay(ray, MASK_SHOT, (CTraceFilter *)&traceFilter, &tr);
 
 		if (tr.fraction != 1.0f)
 		{
@@ -857,10 +790,10 @@ bool EdgeAntiAim(IClientEntity* pLocalBaseEntity, CInput::CUserCmd* cmd, float f
 			vecRight *= (flLength + (flLength * sin(DEG2RAD(30.f))));
 
 			ray.Init(vecCurPos, (vecCurPos + vecLeft));
-			I::Trace->TraceRay(ray, MASK_SHOT, (CTraceFilter*)&traceFilter, &leftTrace);
+			g_Trace->TraceRay(ray, MASK_SHOT, (CTraceFilter*)&traceFilter, &leftTrace);
 
 			ray.Init(vecCurPos, (vecCurPos + vecRight));
-			I::Trace->TraceRay(ray, MASK_SHOT, (CTraceFilter*)&traceFilter, &rightTrace);
+			g_Trace->TraceRay(ray, MASK_SHOT, (CTraceFilter*)&traceFilter, &rightTrace);
 
 			if ((leftTrace.fraction == 1.f) && (rightTrace.fraction != 1.f))
 				vecDummy.y -= flCornor; // left
@@ -879,8 +812,8 @@ bool EdgeAntiAim(IClientEntity* pLocalBaseEntity, CInput::CUserCmd* cmd, float f
 // AntiAim
 void IRage::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket)
 {
-	IClientEntity* pLocal = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
-	CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)I::EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
+	IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+	CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
 
 
 
@@ -917,7 +850,7 @@ void IRage::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket)
 	}
 
 	if (menu.Ragebot.AtTarget) {
-		IClientEntity *Target = I::EntityList->GetClientEntity(TargetID);
+		IClientEntity *Target = g_EntityList->GetClientEntity(TargetID);
 		AtTarget(Target, pCmd);
 	}
 
@@ -961,7 +894,7 @@ void IRage::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket)
 
 	Vector SpinAngles;
 	Vector FakeAngles;
-    float server_time = pLocal->GetTickBase() * I::Globals->interval_per_tick;
+    float server_time = pLocal->GetTickBase() * g_Globals->interval_per_tick;
 	static int ticks;
 	static bool flip;
 	if (ticks < 15 + rand() % 20)
@@ -980,7 +913,7 @@ void IRage::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket)
 	{
 	case 1: //sideways
 	{
-		I::Engine->GetViewAngles(StartAngles);
+		g_Engine->GetViewAngles(StartAngles);
 		SpinAngles.y = flip ? StartAngles.y - 90.f : StartAngles.y + 90.f;
 	}
 		break;
@@ -994,7 +927,7 @@ void IRage::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket)
 		break;
 	case 4://backwards
 	{
-		I::Engine->GetViewAngles(StartAngles);
+		g_Engine->GetViewAngles(StartAngles);
 		StartAngles.y -= 180.f;
 		SpinAngles = StartAngles;
 	}
@@ -1012,7 +945,7 @@ void IRage::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket)
 	{
 	case 1://sideways
 	{
-		I::Engine->GetViewAngles(StartAngles);
+		g_Engine->GetViewAngles(StartAngles);
 		FakeAngles.y = flip ? StartAngles.y + 90.f : StartAngles.y - 90.f;
 	}
 		break;
@@ -1024,14 +957,14 @@ void IRage::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket)
 	break;
 	case 4://backwards
 	{
-		I::Engine->GetViewAngles(StartAngles);
+		g_Engine->GetViewAngles(StartAngles);
 		StartAngles -= 180.f;
 		FakeAngles = StartAngles;
 	}
 	break;
 	case 5: //lby antiaim
 		{
-			I::Engine->GetViewAngles(StartAngles);
+			g_Engine->GetViewAngles(StartAngles);
 			static bool llamaflip;
 			static float oldLBY = 0.0f;
 			float LBY = pLocal->GetLowerBodyYaw();

@@ -6,11 +6,11 @@ std::unordered_map<char*, char*> killIcons = {};
 HANDLE worldmodel_handle;
 CBaseCombatWeapon* worldmodel;
 void SkinChanger() {
-    IClientEntity *pLocal = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+    IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
     auto weapons = pLocal->m_hMyWeapons();
     for (size_t i = 0; weapons[i] != INVALID_EHANDLE_INDEX; i++)
     {
-        IClientEntity *pEntity = I::EntityList->GetClientEntityFromHandle(weapons[i]);
+        IClientEntity *pEntity = g_EntityList->GetClientEntityFromHandle(weapons[i]);
         if (pEntity)
         {
             CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)pEntity;
@@ -663,10 +663,10 @@ void SkinChanger() {
                 if (pEntity->GetClientClass()->m_ClassID == (int)ClassID::CKnife)
                 {
                     worldmodel_handle = pWeapon->m_hWeaponWorldModel();
-                    if(worldmodel_handle) worldmodel = (CBaseCombatWeapon*)I::EntityList->GetClientEntityFromHandle(worldmodel_handle);
+                    if(worldmodel_handle) worldmodel = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(worldmodel_handle);
                     if (Model == 0) // Bayonet
                     {
-                        int iBayonet = I::ModelInfo->GetModelIndex("models/weapons/v_knife_bayonet.mdl");
+                        int iBayonet = g_ModelInfo->GetModelIndex("models/weapons/v_knife_bayonet.mdl");
                         *pWeapon->ModelIndex() = iBayonet; // m_nModelIndex
                         *pWeapon->ViewModelIndex() = iBayonet;
                         if(worldmodel) *worldmodel->ModelIndex() = iBayonet + 1;
@@ -811,7 +811,7 @@ void SkinChanger() {
                     }
                     else if (Model == 1) // Bowie Knife
                     {
-                        int iBowie = I::ModelInfo->GetModelIndex("models/weapons/v_knife_survival_bowie.mdl");
+                        int iBowie = g_ModelInfo->GetModelIndex("models/weapons/v_knife_survival_bowie.mdl");
                         *pWeapon->ModelIndex() = iBowie; // m_nModelIndex
                         *pWeapon->ViewModelIndex() = iBowie;
                         if (worldmodel) *worldmodel->ModelIndex() = iBowie + 1;
@@ -957,7 +957,7 @@ void SkinChanger() {
                     }
                     else if (Model == 2) // Butterfly Knife
                     {
-                        int iButterfly = I::ModelInfo->GetModelIndex("models/weapons/v_knife_butterfly.mdl");
+                        int iButterfly = g_ModelInfo->GetModelIndex("models/weapons/v_knife_butterfly.mdl");
                         *pWeapon->ModelIndex() = iButterfly; // m_nModelIndex
                         *pWeapon->ViewModelIndex() = iButterfly;
                         if (worldmodel) *worldmodel->ModelIndex() = iButterfly + 1;
@@ -1103,7 +1103,7 @@ void SkinChanger() {
                     }
                     else if (Model == 3) // Falchion Knife
                     {
-                        int iFalchion = I::ModelInfo->GetModelIndex("models/weapons/v_knife_falchion_advanced.mdl");
+                        int iFalchion = g_ModelInfo->GetModelIndex("models/weapons/v_knife_falchion_advanced.mdl");
                         *pWeapon->ModelIndex() = iFalchion; // m_nModelIndex
                         *pWeapon->ViewModelIndex() = iFalchion;
                         if (worldmodel) *worldmodel->ModelIndex() = iFalchion + 1;
@@ -1248,7 +1248,7 @@ void SkinChanger() {
                     }
                     else if (Model == 4) // Flip Knife
                     {
-                        int iFlip = I::ModelInfo->GetModelIndex("models/weapons/v_knife_flip.mdl");
+                        int iFlip = g_ModelInfo->GetModelIndex("models/weapons/v_knife_flip.mdl");
                         *pWeapon->ModelIndex() = iFlip; // m_nModelIndex
                         *pWeapon->ViewModelIndex() = iFlip;
                         if (worldmodel) *worldmodel->ModelIndex() = iFlip + 1;
@@ -1394,7 +1394,7 @@ void SkinChanger() {
                     }
                     else if (Model == 5) // Gut Knife
                     {
-                        int iGut = I::ModelInfo->GetModelIndex("models/weapons/v_knife_gut.mdl");
+                        int iGut = g_ModelInfo->GetModelIndex("models/weapons/v_knife_gut.mdl");
                         *pWeapon->ModelIndex() = iGut; // m_nModelIndex
                         *pWeapon->ViewModelIndex() = iGut;
                         if (worldmodel) *worldmodel->ModelIndex() = iGut + 1;
@@ -1539,7 +1539,7 @@ void SkinChanger() {
                     }
                     else if (Model == 6) // Huntsman Knife
                     {
-                        int iHuntsman = I::ModelInfo->GetModelIndex("models/weapons/v_knife_tactical.mdl");
+                        int iHuntsman = g_ModelInfo->GetModelIndex("models/weapons/v_knife_tactical.mdl");
                         *pWeapon->ModelIndex() = iHuntsman; // m_nModelIndex
                         *pWeapon->ViewModelIndex() = iHuntsman;
                         if (worldmodel) *worldmodel->ModelIndex() = iHuntsman + 1;
@@ -1684,7 +1684,7 @@ void SkinChanger() {
                     }
                     else if (Model == 7) // Karambit
                     {
-                        int iKarambit = I::ModelInfo->GetModelIndex("models/weapons/v_knife_karam.mdl");
+                        int iKarambit = g_ModelInfo->GetModelIndex("models/weapons/v_knife_karam.mdl");
                         *pWeapon->ModelIndex() = iKarambit; // m_nModelIndex
                         *pWeapon->ViewModelIndex() = iKarambit;
                         if (worldmodel) *worldmodel->ModelIndex() = iKarambit + 1;
@@ -1837,7 +1837,7 @@ void SkinChanger() {
                     }
                     else if (Model == 8) // M9 Bayonet
                     {
-                        int iM9Bayonet = I::ModelInfo->GetModelIndex("models/weapons/v_knife_m9_bay.mdl");
+                        int iM9Bayonet = g_ModelInfo->GetModelIndex("models/weapons/v_knife_m9_bay.mdl");
                         *pWeapon->ModelIndex() = iM9Bayonet; // m_nModelIndex
                         *pWeapon->ViewModelIndex() = iM9Bayonet;
                         if (worldmodel) *worldmodel->ModelIndex() = iM9Bayonet + 1;
@@ -1990,7 +1990,7 @@ void SkinChanger() {
                     }
                     else if (Model == 9) // Shadow Daggers
                     {
-                        int iDagger = I::ModelInfo->GetModelIndex("models/weapons/v_knife_push.mdl");
+                        int iDagger = g_ModelInfo->GetModelIndex("models/weapons/v_knife_push.mdl");
                         *pWeapon->ModelIndex() = iDagger; // m_nModelIndex
                         *pWeapon->ViewModelIndex() = iDagger;
                         if (worldmodel) *worldmodel->ModelIndex() = iDagger + 1;

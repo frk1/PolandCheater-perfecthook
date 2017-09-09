@@ -6,7 +6,7 @@ void CNetVarManager::Initialize()
 {
 	m_tables.clear();
 
-	ClientClass *clientClass = I::Client->GetAllClasses();
+	ClientClass *clientClass = g_Client->GetAllClasses();
 	if (!clientClass)
 		return;
 

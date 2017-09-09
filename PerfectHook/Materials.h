@@ -1,7 +1,6 @@
 #pragma once
 
 #include "MiscDefinitions.h"
-
 #include "offsets.h"
 #include "Vector.h"
 #include "MiscClasses.h"
@@ -48,6 +47,7 @@ public:
 		call_vfunc<SetMaterialVarFlagFn>(this, 29)(this, flag, on);
 	}
 };
+
 #define VirtualFn( cast )typedef cast( __thiscall* OriginalFn )
 class CMaterialSystem
 {

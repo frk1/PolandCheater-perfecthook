@@ -11,11 +11,11 @@ class item_purchase
     public:
         void start()
         {
-            I::EventManager->AddListener(this, "item_purchase", false);
+            g_EventManager->AddListener(this, "item_purchase", false);
         }
         void stop()
         {
-            I::EventManager->RemoveListener(this);
+            g_EventManager->RemoveListener(this);
         }
         void FireGameEvent(IGameEvent *event) override
         {
@@ -45,7 +45,7 @@ public:
 
     void on_fire_event(IGameEvent* event)
     {
-        IClientEntity* local = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+        IClientEntity* local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
         if (!strcmp(event->GetName(), "item_purchase"))
         {
             auto _buyer = event->GetInt("userid");
@@ -61,16 +61,16 @@ public:
                 || strstr(_gun.c_str(), "cutter")
                 || strstr(_gun.c_str(), "defuse")
                 )  return;
-            auto _player_index = I::Engine->GetPlayerForUserID(_buyer);
-            IClientEntity* player = (IClientEntity*)I::EntityList->GetClientEntity(_player_index);
+            auto _player_index = g_Engine->GetPlayerForUserID(_buyer);
+            IClientEntity* player = (IClientEntity*)g_EntityList->GetClientEntity(_player_index);
             player_info_t pinfo;
             
-            if (player && local &&  player->GetTeamNum() != local->GetTeamNum() && I::Engine->GetPlayerInfo(_player_index, &pinfo))
+            if (player && local &&  player->GetTeamNum() != local->GetTeamNum() && g_Engine->GetPlayerInfo(_player_index, &pinfo))
             {
-                if (I::ChatElement)
+                if (g_ChatElement)
                 {
                     _gun.erase(_gun.find("weapon_"), 7);
-                    I::ChatElement->ChatPrintf(0, 0, " ""\x04""%s bought %s\n", pinfo.name, _gun.c_str());
+                    g_ChatElement->ChatPrintf(0, 0, " ""\x04""%s bought %s\n", pinfo.name, _gun.c_str());
                 }
             }
         }

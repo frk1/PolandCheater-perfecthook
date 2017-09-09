@@ -2,7 +2,7 @@
 #include "HookIncludes.h"
 static CreateClientClassFn GetWearableCreateFn()
 {
-    auto clazz = I::Client->GetAllClasses();
+    auto clazz = g_Client->GetAllClasses();
 
     while (strcmp(clazz->m_pNetworkName, "CEconWearable"))
         clazz = clazz->m_pNext;
@@ -11,7 +11,7 @@ static CreateClientClassFn GetWearableCreateFn()
 }
 IClientNetworkable* CL_CreateDLLEntity(int iEnt, int iClass, int iSerialNum)
 {
-    ClientClass* pClient = I::Client->GetAllClasses();
+    ClientClass* pClient = g_Client->GetAllClasses();
     if (!pClient)
         return false;
 
@@ -55,20 +55,20 @@ bool isKnife(int id)
 }
 void GloveChanger()
 {
-    IClientEntity *local = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+    IClientEntity *local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
     player_info_t localPlayerInfo;
-    if (!I::Engine->GetPlayerInfo(I::Engine->GetLocalPlayer(), &localPlayerInfo)) return;
+    if (!g_Engine->GetPlayerInfo(g_Engine->GetLocalPlayer(), &localPlayerInfo)) return;
 
 
     auto wearables = local->GetWearables();
     static CBaseHandle glove_handle = 0;
 
-    auto glove = reinterpret_cast<CGloves*>(I::EntityList->GetClientEntityFromHandle(wearables[0]));
+    auto glove = reinterpret_cast<CGloves*>(g_EntityList->GetClientEntityFromHandle(wearables[0]));
 
     if (!glove) // There is no glove
     {
         // Try to get our last created glove
-        auto our_glove = reinterpret_cast<CGloves*>(I::EntityList->GetClientEntityFromHandle(glove_handle));
+        auto our_glove = reinterpret_cast<CGloves*>(g_EntityList->GetClientEntityFromHandle(glove_handle));
 
         if (our_glove) // Our glove still exists
         {
@@ -93,7 +93,7 @@ void GloveChanger()
 
     if (!glove)
     {
-        int iEnt = I::EntityList->GetHighestEntityIndex() + 1;
+        int iEnt = g_EntityList->GetHighestEntityIndex() + 1;
         int iSerialNumber = RandomInt(0x0, 0xFFF);
 
         CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)CL_CreateDLLEntity(iEnt, (int)ClassID::CEconWearable, iSerialNumber);
@@ -102,7 +102,7 @@ void GloveChanger()
             auto m_Index = iEnt | (iSerialNumber << 16);
             glove_handle = m_Index;
             *(DWORD*)((DWORD)local + offsetz.DT_BaseCombatCharacter.m_hMyWearables) = m_Index;
-            glove = (CGloves*)I::EntityList->GetClientEntity(iEnt);
+            glove = (CGloves*)g_EntityList->GetClientEntity(iEnt);
         }
 
         {
@@ -136,7 +136,7 @@ void GloveChanger()
                 *glove->FallbackStatTrak() = -1;
                 *glove->m_AttributeManager()->m_Item()->ItemIDHigh() = -1;
                 *glove->AccountID() = localPlayerInfo.xuid;
-                glove->SetGloveModelIndex(I::ModelInfo->GetModelIndex("models/weapons/v_models/arms/glove_bloodhound/v_glove_bloodhound.mdl"));
+                glove->SetGloveModelIndex(g_ModelInfo->GetModelIndex("models/weapons/v_models/arms/glove_bloodhound/v_glove_bloodhound.mdl"));
                 glove->PreDataUpdate(DATA_UPDATE_CREATED);
             }
         }
@@ -145,7 +145,7 @@ void GloveChanger()
         {
             if (*glove->m_AttributeManager()->m_Item()->ItemDefinitionIndex() != 5030 || *glove->FallbackPaintKit() != 10037)
             {
-                glove->SetGloveModelIndex(I::ModelInfo->GetModelIndex("models/weapons/v_models/arms/glove_sporty/v_glove_sporty.mdl"));
+                glove->SetGloveModelIndex(g_ModelInfo->GetModelIndex("models/weapons/v_models/arms/glove_sporty/v_glove_sporty.mdl"));
                 *glove->m_AttributeManager()->m_Item()->ItemDefinitionIndex() = 5030;
                 *glove->FallbackPaintKit() = 10037;
                 *glove->GetEntityQuality() = 4;
@@ -163,7 +163,7 @@ void GloveChanger()
         {
             if (*glove->m_AttributeManager()->m_Item()->ItemDefinitionIndex() != 5031 || *glove->FallbackPaintKit() != 10016)
             {
-                glove->SetGloveModelIndex(I::ModelInfo->GetModelIndex("models/weapons/v_models/arms/glove_slick/v_glove_slick.mdl"));
+                glove->SetGloveModelIndex(g_ModelInfo->GetModelIndex("models/weapons/v_models/arms/glove_slick/v_glove_slick.mdl"));
                 *glove->m_AttributeManager()->m_Item()->ItemDefinitionIndex() = 5031;
                 *glove->FallbackPaintKit() = 10016;
                 *glove->GetEntityQuality() = 4;
@@ -181,7 +181,7 @@ void GloveChanger()
         {
             if (*glove->m_AttributeManager()->m_Item()->ItemDefinitionIndex() != 5032 || *glove->FallbackPaintKit() != 10009)
             {
-                glove->SetGloveModelIndex(I::ModelInfo->GetModelIndex("models/weapons/v_models/arms/glove_handwrap_leathery/v_glove_handwrap_leathery.mdl"));
+                glove->SetGloveModelIndex(g_ModelInfo->GetModelIndex("models/weapons/v_models/arms/glove_handwrap_leathery/v_glove_handwrap_leathery.mdl"));
                 *glove->m_AttributeManager()->m_Item()->ItemDefinitionIndex() = 5032;
                 *glove->FallbackPaintKit() = 10009;
                 *glove->GetEntityQuality() = 4;
@@ -199,7 +199,7 @@ void GloveChanger()
         {
             if (*glove->m_AttributeManager()->m_Item()->ItemDefinitionIndex() != 5033 || *glove->FallbackPaintKit() != 10026)
             {
-                glove->SetGloveModelIndex(I::ModelInfo->GetModelIndex("models/weapons/v_models/arms/glove_motorcycle/v_glove_motorcycle.mdl"));
+                glove->SetGloveModelIndex(g_ModelInfo->GetModelIndex("models/weapons/v_models/arms/glove_motorcycle/v_glove_motorcycle.mdl"));
                 *glove->m_AttributeManager()->m_Item()->ItemDefinitionIndex() = 5033;
                 *glove->FallbackPaintKit() = 10026;
                 *glove->GetEntityQuality() = 4;
@@ -217,7 +217,7 @@ void GloveChanger()
         {
             if (*glove->m_AttributeManager()->m_Item()->ItemDefinitionIndex() != 5034 || *glove->FallbackPaintKit() != 10033)
             {
-                glove->SetGloveModelIndex(I::ModelInfo->GetModelIndex("models/weapons/v_models/arms/glove_specialist/v_glove_specialist.mdl"));
+                glove->SetGloveModelIndex(g_ModelInfo->GetModelIndex("models/weapons/v_models/arms/glove_specialist/v_glove_specialist.mdl"));
                 *glove->m_AttributeManager()->m_Item()->ItemDefinitionIndex() = 5034;
                 *glove->FallbackPaintKit() = 10033;
                 *glove->GetEntityQuality() = 4;

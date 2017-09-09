@@ -93,7 +93,7 @@ bool MiscFunctions::IsVisible(IClientEntity* pLocal, IClientEntity* pEntity, int
 
 
 
-	//I::Trace->TraceRay(Ray,MASK_SOLID, NULL/*&filter*/, &Trace);
+	//g_Trace->TraceRay(Ray,MASK_SOLID, NULL/*&filter*/, &Trace);
 	UTIL_TraceLine(start, end, MASK_SOLID, pLocal, 0, &Trace);
 
 	if (Trace.m_pEnt == entCopy)
@@ -163,7 +163,7 @@ void SayInChat(const char *text)
 {
 	char buffer[250];
 	sprintf_s(buffer, "say \"%s\"", text);
-	I::Engine->ClientCmd_Unrestricted(buffer);
+	g_Engine->ClientCmd_Unrestricted(buffer);
 }
 
 float GenerateRandomFloat(float Min, float Max)
@@ -178,25 +178,43 @@ float GenerateRandomFloat(float Min, float Max)
 
 Vector GetHitboxPosition(IClientEntity* pEntity, int Hitbox)
 {
-	matrix3x4 matrix[128];
+    matrix3x4 matrix[128];
 
 
-		if (!pEntity->SetupBones(matrix, 128, 0x00000100, (float)GetTickCount64()))
-			return Vector(0, 0, 0);
+    if (!pEntity->SetupBones(matrix, 128, 0x00000100, pEntity->GetSimulationTime()))
+        return Vector(0, 0, 0);
 
 
 
-	studiohdr_t* hdr = I::ModelInfo->GetStudiomodel(pEntity->GetModel());
-	mstudiohitboxset_t* set = hdr->GetHitboxSet(0);
+    studiohdr_t* hdr = g_ModelInfo->GetStudiomodel(pEntity->GetModel());
+    mstudiohitboxset_t* set = hdr->GetHitboxSet(0);
 
-	mstudiobbox_t* hitbox = set->GetHitbox(Hitbox);
+    mstudiobbox_t* hitbox = set->GetHitbox(Hitbox);
 
-	if (!hitbox)
-		return Vector(0, 0, 0);
+    if (!hitbox)
+        return Vector(0, 0, 0);
 
-	Vector vMin, vMax, vCenter, sCenter;
-	VectorTransform(hitbox->bbmin, matrix[hitbox->bone], vMin);
-	VectorTransform(hitbox->bbmax, matrix[hitbox->bone], vMax);
-	vCenter = (vMin + vMax) *0.5f;
-	return vCenter;
+    Vector vMin, vMax, vCenter, sCenter;
+    VectorTransform(hitbox->bbmin, matrix[hitbox->bone], vMin);
+    VectorTransform(hitbox->bbmax, matrix[hitbox->bone], vMax);
+    vCenter = (vMin + vMax) *0.5f;
+    return vCenter;
+}
+
+Vector GetHitboxPositionFromMatrix(IClientEntity* pEntity, matrix3x4 matrix[128], int Hitbox)
+{
+
+    studiohdr_t* hdr = g_ModelInfo->GetStudiomodel(pEntity->GetModel());
+    mstudiohitboxset_t* set = hdr->GetHitboxSet(0);
+
+    mstudiobbox_t* hitbox = set->GetHitbox(Hitbox);
+
+    if (!hitbox)
+        return Vector(0, 0, 0);
+
+    Vector vMin, vMax, vCenter, sCenter;
+    VectorTransform(hitbox->bbmin, matrix[hitbox->bone], vMin);
+    VectorTransform(hitbox->bbmax, matrix[hitbox->bone], vMax);
+    vCenter = (vMin + vMax) *0.5f;
+    return vCenter;
 }

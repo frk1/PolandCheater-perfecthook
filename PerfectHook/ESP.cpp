@@ -6,7 +6,7 @@
 #include <iostream>
 #include <algorithm>
 #include "GrenadePrediction.h"
-
+backtrackData headPositions[64][16];
 const char* itemNames[] =
 {
     "knife", //0 - default
@@ -135,14 +135,14 @@ void IESP::PaintTraverse()
     {
 
 
-        for (int i = 0; i < I::EntityList->GetHighestEntityIndex(); i++)
+        for (int i = 0; i < g_EntityList->GetHighestEntityIndex(); i++)
         {
-            IClientEntity *pEntity = I::EntityList->GetClientEntity(i);
+            IClientEntity *pEntity = g_EntityList->GetClientEntity(i);
             player_info_t pinfo;
-            IClientEntity *pLocal = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
-            if (pEntity == pLocal && pLocal->IsAlive() && I::Engine->GetPlayerInfo(I::Engine->GetLocalPlayer(), &pinfo))
+            IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+            if (pEntity == pLocal && pLocal->IsAlive() && g_Engine->GetPlayerInfo(g_Engine->GetLocalPlayer(), &pinfo))
             {
-                if (I::Input->m_fCameraInThirdPerson && menu.Visuals.Enabled)
+                if (g_Input->m_fCameraInThirdPerson && menu.Visuals.Enabled)
                 {
                     Vector max = pEntity->GetCollideable()->OBBMaxs();
                     Vector pos, pos3D;
@@ -171,7 +171,7 @@ void IESP::PaintTraverse()
             }
             if (pEntity &&  pEntity != pLocal && !pEntity->IsDormant())
             {
-                if (I::Engine->GetPlayerInfo(i, &pinfo) && pEntity->IsAlive())
+                if (g_Engine->GetPlayerInfo(i, &pinfo) && pEntity->IsAlive())
                 {
                     if (menu.Legitbot.backtrack)
                     {
@@ -179,13 +179,14 @@ void IESP::PaintTraverse()
                         for (int t = 0; t <= 12; ++t)
                         {
                             Vector screenbacktrack[64][16];
-                            if (headPositions[i][t].simtime > pLocal->GetSimulationTime() - 1)
+
+                            if (headPositions[i][t].entity && headPositions[i][t].entity == pEntity && headPositions[i][t].simtime < pLocal->GetSimulationTime() + 1)
                             {
                                 if (Render::WorldToScreen(headPositions[i][t].hitboxPos, screenbacktrack[i][t]))
                                 {
 
-                                    I::Surface->DrawSetColor(Color::Red());
-                                    I::Surface->DrawOutlinedRect(screenbacktrack[i][t].x, screenbacktrack[i][t].y, screenbacktrack[i][t].x + 2, screenbacktrack[i][t].y + 2);
+                                    g_Surface->DrawSetColor(Color::Red());
+                                    g_Surface->DrawOutlinedRect(screenbacktrack[i][t].x, screenbacktrack[i][t].y, screenbacktrack[i][t].x + 2, screenbacktrack[i][t].y + 2);
 
                                 }
                             }
@@ -222,12 +223,12 @@ void IESP::PaintTraverse()
 
         if (menu.Visuals.SpreadCrosshair)
         {
-            IClientEntity *pLocal = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
-            I::Engine->GetScreenSize(width, height);
+            IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+            g_Engine->GetScreenSize(width, height);
             if (pLocal  && pLocal->IsAlive())
             {
                 static Vector ViewAngles;
-                I::Engine->GetViewAngles(ViewAngles);
+                g_Engine->GetViewAngles(ViewAngles);
                 ViewAngles += pLocal->localPlayerExclusive()->GetAimPunchAngle() * 2.f;
 
                 static Vector fowardVec;
@@ -238,7 +239,7 @@ void IESP::PaintTraverse()
                 Vector start = pLocal->GetOrigin() + pLocal->GetViewOffset();
                 Vector end = start + fowardVec, endScreen;
 
-                CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)I::EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
+                CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
                 float cone = pWeapon->GetSpread() + pWeapon->GetInaccuracy();
                 if (cone > 0.0f)
                 {
@@ -262,14 +263,14 @@ void IESP::PaintTraverse()
         {
 
 
-            static auto sv_skyname = I::CVar->FindVar("sv_skyname");
-            static auto r_DrawSpecificStaticProp = I::CVar->FindVar("r_DrawSpecificStaticProp");
+            static auto sv_skyname = g_CVar->FindVar("sv_skyname");
+            static auto r_DrawSpecificStaticProp = g_CVar->FindVar("r_DrawSpecificStaticProp");
             r_DrawSpecificStaticProp->SetValue(1);
             sv_skyname->SetValue("sky_csgo_night02");
 
-            for (MaterialHandle_t i = I::MaterialSystem->FirstMaterial(); i != I::MaterialSystem->InvalidMaterial(); i = I::MaterialSystem->NextMaterial(i))
+            for (MaterialHandle_t i = g_MaterialSystem->FirstMaterial(); i != g_MaterialSystem->InvalidMaterial(); i = g_MaterialSystem->NextMaterial(i))
             {
-                IMaterial *pMaterial = I::MaterialSystem->GetMaterial(i);
+                IMaterial *pMaterial = g_MaterialSystem->GetMaterial(i);
 
                 if (!pMaterial)
                     continue;
@@ -307,9 +308,9 @@ void IESP::PaintTraverse()
     {
         if (done)
         {
-            for (MaterialHandle_t i = I::MaterialSystem->FirstMaterial(); i != I::MaterialSystem->InvalidMaterial(); i = I::MaterialSystem->NextMaterial(i))
+            for (MaterialHandle_t i = g_MaterialSystem->FirstMaterial(); i != g_MaterialSystem->InvalidMaterial(); i = g_MaterialSystem->NextMaterial(i))
             {
-                IMaterial *pMaterial = I::MaterialSystem->GetMaterial(i);
+                IMaterial *pMaterial = g_MaterialSystem->GetMaterial(i);
 
                 if (!pMaterial)
                     continue;
@@ -408,7 +409,7 @@ void IESP::DrawPlayer(IClientEntity* pEntity, player_info_t pinfo, IClientEntity
 	std::vector<std::string> rank;
 	std::vector<std::string> wins;
 
-	CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)I::EntityList->GetClientEntityFromHandle((HANDLE)pEntity->GetActiveWeaponHandle());
+	CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle((HANDLE)pEntity->GetActiveWeaponHandle());
     if (menu.Visuals.Weapon && pWeapon)
     {
         int weapon_id = pWeapon->m_AttributeManager()->m_Item()->GetItemDefinitionIndex();
@@ -455,11 +456,11 @@ void IESP::DrawPlayer(IClientEntity* pEntity, player_info_t pinfo, IClientEntity
 
 void IESP::PlayerBox(float x, float y, float w, float h, Color clr)
 {
-	I::Surface->DrawSetColor(clr);
-	I::Surface->DrawOutlinedRect(int(x - w), int(y), int(x + w), int(y + h));
-	I::Surface->DrawSetColor(Color::Black());
-	I::Surface->DrawOutlinedRect(int(x - w - 1), int(y - 1), int(x + w + 1), int(y + h + 1));
-	I::Surface->DrawOutlinedRect(int(x - w + 1), int(y + 1), int(x + w - 1), int(y + h - 1));
+	g_Surface->DrawSetColor(clr);
+	g_Surface->DrawOutlinedRect(int(x - w), int(y), int(x + w), int(y + h));
+	g_Surface->DrawSetColor(Color::Black());
+	g_Surface->DrawOutlinedRect(int(x - w - 1), int(y - 1), int(x + w + 1), int(y + h + 1));
+	g_Surface->DrawOutlinedRect(int(x - w + 1), int(y + 1), int(x + w - 1), int(y + h - 1));
 }
 
 Color IESP::GetPlayerColor(IClientEntity* pEntity)
@@ -560,9 +561,9 @@ void IESP::DrawBombPlanted(IClientEntity* pEntity, ClientClass* cClass)
 	Vector vOrig; Vector vScreen;
 	vOrig = pEntity->GetOrigin();
 	CCSBomb* Bomb = (CCSBomb*)pEntity;
-	IClientEntity *pLocal = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+	IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 	float flBlow = Bomb->GetC4BlowTime();
-	float lifetime = flBlow - (I::Globals->interval_per_tick * pLocal->GetTickBase());
+	float lifetime = flBlow - (g_Globals->interval_per_tick * pLocal->GetTickBase());
 	if (Render::WorldToScreen(vOrig, vScreen))
 	{
 		if (pLocal->IsAlive())
@@ -596,14 +597,14 @@ void IESP::DrawBombPlanted(IClientEntity* pEntity, ClientClass* cClass)
 
 	}
 
-	I::Engine->GetScreenSize(xd, meme);
+	g_Engine->GetScreenSize(xd, meme);
 	int halfX = xd / 2;
 	int halfY = meme / 2;
 
 
 	if (Bomb->GetBombDefuser() > 0)
 	{
-		float countdown = Bomb->GetC4DefuseCountDown() - (pLocal->GetTickBase() * I::Globals->interval_per_tick);
+		float countdown = Bomb->GetC4DefuseCountDown() - (pLocal->GetTickBase() * g_Globals->interval_per_tick);
 		if (countdown > 0.01f)
 		{
 			if (lifetime > countdown)
@@ -631,7 +632,7 @@ void IESP::DrawBomb(IClientEntity* pEntity, ClientClass* cClass)
 	auto parent = BombWeapon->GetOwnerHandle();
 	if (parent || (vOrig.x == 0 && vOrig.y == 0 && vOrig.z == 0))
 	{
-		IClientEntity* pParentEnt = (I::EntityList->GetClientEntityFromHandle(parent));
+		IClientEntity* pParentEnt = (g_EntityList->GetClientEntityFromHandle(parent));
 		if (pParentEnt && pParentEnt->IsAlive())
 		{
 			BombCarrier = pParentEnt;
@@ -742,7 +743,7 @@ void IESP::DrawThrowable(IClientEntity* throwable)
 	if (!nadeModel)
 		return;
 
-	studiohdr_t* hdr = I::ModelInfo->GetStudiomodel(nadeModel);
+	studiohdr_t* hdr = g_ModelInfo->GetStudiomodel(nadeModel);
 
 	if (!hdr)
 		return;
@@ -753,7 +754,7 @@ void IESP::DrawThrowable(IClientEntity* throwable)
 	std::string nadeName = "Unknown Grenade";
 
 	IMaterial* mats[32];
-	I::ModelInfo->GetModelMaterials(nadeModel, hdr->numtextures, mats);
+	g_ModelInfo->GetModelMaterials(nadeModel, hdr->numtextures, mats);
 
 	for (int i = 0; i < hdr->numtextures; i++)
 	{
@@ -813,7 +814,7 @@ void IESP::DrawScoreboard()
 
 	int boardWidth = 950, boardHeight = 325;
 
-	I::Engine->GetScreenSize(width, height);
+	g_Engine->GetScreenSize(width, height);
 	int x = width / 2 - boardWidth / 2;
 	int y = height / 2 - boardHeight / 2;
 
@@ -843,13 +844,13 @@ void IESP::DrawScoreboard()
 	int place = 0, place2 = 0;
 	bool doSwap = false, doSwap2 = false;
 
-	for (int i = 1; i <= I::Globals->maxClients; i++)
+	for (int i = 1; i <= g_Globals->maxClients; i++)
 	{
 		player_info_t playerInfo;
 
-		IClientEntity *entity = I::EntityList->GetClientEntity(i);
+		IClientEntity *entity = g_EntityList->GetClientEntity(i);
 		if (!entity
-			|| !I::Engine->GetPlayerInfo(i, &playerInfo))
+			|| !g_Engine->GetPlayerInfo(i, &playerInfo))
 			continue;
 
 		int playerRank = *reinterpret_cast< int * >(playerresources + offsetz.DT_CSPlayerResource.m_iCompetitiveRanking + i * 4);

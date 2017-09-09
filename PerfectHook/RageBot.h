@@ -4,11 +4,11 @@
 #include "Hacks.h"
 inline bool CanAttack()
 {
-    auto local = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+    auto local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 
     if (local && local->IsAlive())
     {
-        CBaseCombatWeapon* weapon = (CBaseCombatWeapon*)I::EntityList->GetClientEntityFromHandle(local->GetActiveWeaponHandle());
+        CBaseCombatWeapon* weapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(local->GetActiveWeaponHandle());
         if (weapon)
         {
             if (weapon->GetAmmoInClip() < 1 && !MiscFunctions::IsKnife(weapon))
@@ -17,11 +17,11 @@ inline bool CanAttack()
             bool revolver_can_shoot = true;
             if (weapon->m_AttributeManager()->m_Item()->GetItemDefinitionIndex() == 64)
             {
-                float time_to_shoot = weapon->m_flPostponeFireReadyTime() - local->GetTickBase() * I::Globals->interval_per_tick;
-                revolver_can_shoot = time_to_shoot <= I::Globals->absoluteframetime;
+                float time_to_shoot = weapon->m_flPostponeFireReadyTime() - local->GetTickBase() * g_Globals->interval_per_tick;
+                revolver_can_shoot = time_to_shoot <= g_Globals->absoluteframetime;
             }
 
-            float time = local->GetTickBase() * I::Globals->interval_per_tick;
+            float time = local->GetTickBase() * g_Globals->interval_per_tick;
             float next_attack = weapon->GetNextPrimaryAttack();
             return revolver_can_shoot && !(next_attack > time);
         }

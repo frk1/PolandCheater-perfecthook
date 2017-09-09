@@ -1,22 +1,22 @@
 ﻿#pragma once
 #include "HookIncludes.h"
-typedef void(__thiscall* DrawModelEx_)(void*, void*, void*, const ModelRenderInfo_t&, matrix3x4*);
-DrawModelEx_ oDrawModelExecute;
-void __fastcall hkDrawModelExecute(void* thisptr, int edx, void* ctx, void* state, const ModelRenderInfo_t &pInfo, matrix3x4 *pCustomBoneToWorld);
+typedef void(__thiscall* dme_t)(void*, void*, void*, const ModelRenderInfo_t&, matrix3x4*);
+
 float flColor[3] = { 0.9686274, 0.7254901,  0.0784313 };
 
 void __fastcall hkDrawModelExecute(void* thisptr, int edx, void* ctx, void* state, const ModelRenderInfo_t &pInfo, matrix3x4 *pCustomBoneToWorld)
 {
     static bool DontDraw = false;
+    static auto ofunc = hooks::modelrender.get_original<dme_t>(21);
     if (menu.Visuals.Enabled && menu.Visuals.Chams)
     {
         static IMaterial* ignorez = CreateMaterial("VertexLitGeneric", "vgui/white_additive", true, true, true, true, true);
         static IMaterial* notignorez = CreateMaterial("VertexLitGeneric", "vgui/white_additive", false, true, true, true, true);
         DontDraw = false;
 
-        const char * ModelName = I::ModelInfo->GetModelName((model_t*)pInfo.pModel);
-        IClientEntity* pModelEntity = (IClientEntity*)I::EntityList->GetClientEntity(pInfo.entity_index);
-        IClientEntity* pLocal = (IClientEntity*)I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+        const char * ModelName = g_ModelInfo->GetModelName((model_t*)pInfo.pModel);
+        IClientEntity* pModelEntity = (IClientEntity*)g_EntityList->GetClientEntity(pInfo.entity_index);
+        IClientEntity* pLocal = (IClientEntity*)g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 
 
 
@@ -29,7 +29,7 @@ void __fastcall hkDrawModelExecute(void* thisptr, int edx, void* ctx, void* stat
                 if (!menu.Visuals.Filter.EnemyOnly ||
                     pModelEntity->GetTeamNum() != pLocal->GetTeamNum())
                 {
-                    pModelEntity = I::EntityList->GetClientEntity(pInfo.entity_index);
+                    pModelEntity = g_EntityList->GetClientEntity(pInfo.entity_index);
                     if (pModelEntity)
                     {
 
@@ -40,15 +40,15 @@ void __fastcall hkDrawModelExecute(void* thisptr, int edx, void* ctx, void* stat
                             if (pModelEntity->HasGunGameImmunity())
                                 alpha = 0.5f;
 
-                            I::RenderView->SetColorModulation(flColor);
-                            I::RenderView->SetBlend(alpha);
-                            I::ModelRender->ForcedMaterialOverride(ignorez);
-                            oDrawModelExecute(thisptr, ctx, state, pInfo, pCustomBoneToWorld);
+                            g_RenderView->SetColorModulation(flColor);
+                            g_RenderView->SetBlend(alpha);
+                            g_ModelRender->ForcedMaterialOverride(ignorez);
+                            ofunc(thisptr, ctx, state, pInfo, pCustomBoneToWorld);
 
 
-                            I::RenderView->SetColorModulation(flColor);
-                            I::RenderView->SetBlend(alpha);
-                            I::ModelRender->ForcedMaterialOverride(notignorez);
+                            g_RenderView->SetColorModulation(flColor);
+                            g_RenderView->SetBlend(alpha);
+                            g_ModelRender->ForcedMaterialOverride(notignorez);
 
                         }
                         else
@@ -68,16 +68,16 @@ void __fastcall hkDrawModelExecute(void* thisptr, int edx, void* ctx, void* stat
             }
             if (menu.Visuals.Hands == 2)
             {
-                IMaterial* Hands = I::MaterialSystem->FindMaterial(ModelName, "Model textures");
-                if (!I::Input->m_fCameraInThirdPerson)
+                IMaterial* Hands = g_MaterialSystem->FindMaterial(ModelName, "Model textures");
+                if (!g_Input->m_fCameraInThirdPerson)
                 {
                     Hands->SetMaterialVarFlag(MATERIAL_VAR_WIREFRAME, true);
-                    I::ModelRender->ForcedMaterialOverride(Hands);
+                    g_ModelRender->ForcedMaterialOverride(Hands);
                 }
                 else
                 {
                     Hands->SetMaterialVarFlag(MATERIAL_VAR_WIREFRAME, false);
-                    I::ModelRender->ForcedMaterialOverride(Hands);
+                    g_ModelRender->ForcedMaterialOverride(Hands);
                 }
             }
         }
@@ -87,8 +87,8 @@ void __fastcall hkDrawModelExecute(void* thisptr, int edx, void* ctx, void* stat
         }
     }
     if (!DontDraw)
-        oDrawModelExecute(thisptr, ctx, state, pInfo, pCustomBoneToWorld);
-    I::ModelRender->ForcedMaterialOverride(NULL);
+        ofunc(thisptr, ctx, state, pInfo, pCustomBoneToWorld);
+    g_ModelRender->ForcedMaterialOverride(NULL);
 
 
 }

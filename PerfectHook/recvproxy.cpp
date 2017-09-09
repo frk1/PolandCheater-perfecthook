@@ -49,23 +49,23 @@ RecvVarProxyFn oRecvnModelIndex;
 void Hooked_RecvProxy_Viewmodel(CRecvProxyData *pData, void *pStruct, void *pOut)
 {
     // Get the knife view model id's
-    int default_t = I::ModelInfo->GetModelIndex("models/weapons/v_knife_default_t.mdl");
-    int default_ct = I::ModelInfo->GetModelIndex("models/weapons/v_knife_default_ct.mdl");
-    int iBayonet = I::ModelInfo->GetModelIndex("models/weapons/v_knife_bayonet.mdl");
-    int iButterfly = I::ModelInfo->GetModelIndex("models/weapons/v_knife_butterfly.mdl");
-    int iFlip = I::ModelInfo->GetModelIndex("models/weapons/v_knife_flip.mdl");
-    int iGut = I::ModelInfo->GetModelIndex("models/weapons/v_knife_gut.mdl");
-    int iKarambit = I::ModelInfo->GetModelIndex("models/weapons/v_knife_karam.mdl");
-    int iM9Bayonet = I::ModelInfo->GetModelIndex("models/weapons/v_knife_m9_bay.mdl");
-    int iHuntsman = I::ModelInfo->GetModelIndex("models/weapons/v_knife_tactical.mdl");
-    int iFalchion = I::ModelInfo->GetModelIndex("models/weapons/v_knife_falchion_advanced.mdl");
-    int iDagger = I::ModelInfo->GetModelIndex("models/weapons/v_knife_push.mdl");
-    int iBowie = I::ModelInfo->GetModelIndex("models/weapons/v_knife_survival_bowie.mdl");
+    int default_t = g_ModelInfo->GetModelIndex("models/weapons/v_knife_default_t.mdl");
+    int default_ct = g_ModelInfo->GetModelIndex("models/weapons/v_knife_default_ct.mdl");
+    int iBayonet = g_ModelInfo->GetModelIndex("models/weapons/v_knife_bayonet.mdl");
+    int iButterfly = g_ModelInfo->GetModelIndex("models/weapons/v_knife_butterfly.mdl");
+    int iFlip = g_ModelInfo->GetModelIndex("models/weapons/v_knife_flip.mdl");
+    int iGut = g_ModelInfo->GetModelIndex("models/weapons/v_knife_gut.mdl");
+    int iKarambit = g_ModelInfo->GetModelIndex("models/weapons/v_knife_karam.mdl");
+    int iM9Bayonet = g_ModelInfo->GetModelIndex("models/weapons/v_knife_m9_bay.mdl");
+    int iHuntsman = g_ModelInfo->GetModelIndex("models/weapons/v_knife_tactical.mdl");
+    int iFalchion = g_ModelInfo->GetModelIndex("models/weapons/v_knife_falchion_advanced.mdl");
+    int iDagger = g_ModelInfo->GetModelIndex("models/weapons/v_knife_push.mdl");
+    int iBowie = g_ModelInfo->GetModelIndex("models/weapons/v_knife_survival_bowie.mdl");
 
-    int iGunGame = I::ModelInfo->GetModelIndex("models/weapons/v_knife_gg.mdl");
+    int iGunGame = g_ModelInfo->GetModelIndex("models/weapons/v_knife_gg.mdl");
 
     // Get local player (just to stop replacing spectators knifes)
-    IClientEntity* pLocal = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+    IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
     if (menu.Skinchanger.Enabled && pLocal)
     {
         // If we are alive and holding a default knife(if we already have a knife don't worry about changing)
@@ -126,14 +126,14 @@ void SetViewModelSequence2(const CRecvProxyData *pDataConst, void *pStruct, void
 
     if (pViewModel)
     {
-        IClientEntity* pOwner = static_cast<IClientEntity*>(I::EntityList->GetClientEntity(pViewModel->GetOwner() & 0xFFF));
+        IClientEntity* pOwner = static_cast<IClientEntity*>(g_EntityList->GetClientEntity(pViewModel->GetOwner() & 0xFFF));
 
         // Compare the owner entity of this view model to the local player entity.
-        if (pOwner && pOwner->GetIndex() == I::Engine->GetLocalPlayer())
+        if (pOwner && pOwner->GetIndex() == g_Engine->GetLocalPlayer())
         {
             // Get the filename of the current view model.
-            void* pModel = I::ModelInfo->GetModel(pViewModel->GetModelIndex());
-            std::string szModel = I::ModelInfo->GetModelName(pModel);
+            void* pModel = g_ModelInfo->GetModel(pViewModel->GetModelIndex());
+            std::string szModel = g_ModelInfo->GetModelName(pModel);
 
             // Store the current sequence.
             int m_nSequence = pData->m_Value.m_Int;
@@ -233,7 +233,7 @@ void NoSmoke(const CRecvProxyData *pData, void *pStruct, void *pOut)
 
 void NetvarHook()
 {
-	ClientClass *pClass = I::Client->GetAllClasses();
+	ClientClass *pClass = g_Client->GetAllClasses();
 	while (pClass)
 	{
 		const char *pszName = pClass->m_pRecvTable->m_pNetTableName;
@@ -278,7 +278,7 @@ void NetvarHook()
 }
 void UnloadProxy()
 {
-	ClientClass *pClass = I::Client->GetAllClasses();
+	ClientClass *pClass = g_Client->GetAllClasses();
 	while (pClass)
 	{
 		const char *pszName = pClass->m_pRecvTable->m_pNetTableName;
@@ -325,7 +325,7 @@ void UnloadProxy()
 
 void AnimationFixHook()
 {
-    for (ClientClass* pClass = I::Client->GetAllClasses(); pClass; pClass = pClass->m_pNext) {
+    for (ClientClass* pClass = g_Client->GetAllClasses(); pClass; pClass = pClass->m_pNext) {
         if (!strcmp(pClass->m_pNetworkName, "CBaseViewModel")) {
             // Search for the 'm_nModelIndex' property.
             RecvTable* pClassTable = pClass->m_pRecvTable;
@@ -352,7 +352,7 @@ void AnimationFixHook()
 
 void AnimationFixUnhook()
 {
-    for (ClientClass* pClass = I::Client->GetAllClasses(); pClass; pClass = pClass->m_pNext) {
+    for (ClientClass* pClass = g_Client->GetAllClasses(); pClass; pClass = pClass->m_pNext) {
         if (!strcmp(pClass->m_pNetworkName, "CBaseViewModel")) {
             // Search for the 'm_nModelIndex' property.
             RecvTable* pClassTable = pClass->m_pRecvTable;

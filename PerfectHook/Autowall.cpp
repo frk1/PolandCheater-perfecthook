@@ -183,7 +183,7 @@ bool SimulateFireBullet(IClientEntity *local, CBaseCombatWeapon *weapon, FireBul
 
 bool HandleBulletPenetration(CSWeaponInfo *wpn_data, FireBulletData &data)
 {
-	surfacedata_t *enter_surface_data = I::PhysProps->GetSurfaceData(data.enter_trace.surface.surfaceProps);
+	surfacedata_t *enter_surface_data = g_PhysProps->GetSurfaceData(data.enter_trace.surface.surfaceProps);
 	int enter_material = enter_surface_data->game.material;
 	float enter_surf_penetration_mod = enter_surface_data->game.flPenetrationModifier;
 
@@ -202,7 +202,7 @@ bool HandleBulletPenetration(CSWeaponInfo *wpn_data, FireBulletData &data)
 	if (!TraceToExit(dummy, data.enter_trace, data.enter_trace.endpos, data.direction, &trace_exit))
 		return false;
 
-	surfacedata_t *exit_surface_data = I::PhysProps->GetSurfaceData(trace_exit.surface.surfaceProps);
+	surfacedata_t *exit_surface_data = g_PhysProps->GetSurfaceData(trace_exit.surface.surfaceProps);
 	int exit_material = exit_surface_data->game.material;
 
 	float exit_surf_penetration_mod = exit_surface_data->game.flPenetrationModifier;
@@ -262,7 +262,7 @@ bool HandleBulletPenetration(CSWeaponInfo *wpn_data, FireBulletData &data)
 bool CanHit(const Vector &point, float *damage_given)
 {
 	//Utils::ToLog("CANHIT");
-	auto *local = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+	auto *local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 	auto data = FireBulletData(local->GetOrigin() + local->GetViewOffset());
 	data.filter = CTraceFilter();
 	data.filter.pSkip = local;
@@ -273,7 +273,7 @@ bool CanHit(const Vector &point, float *damage_given)
 	AngleVectors(angles, &data.direction);
 	VectorNormalize(data.direction);
 
-	if (SimulateFireBullet(local, reinterpret_cast<CBaseCombatWeapon*>(I::EntityList->GetClientEntityFromHandle(static_cast<HANDLE>(local->GetActiveWeaponHandle()))), data))
+	if (SimulateFireBullet(local, reinterpret_cast<CBaseCombatWeapon*>(g_EntityList->GetClientEntityFromHandle(static_cast<HANDLE>(local->GetActiveWeaponHandle()))), data))
 	{
 		*damage_given = data.current_damage;
 		//Utils::ToLog("CANHIT END");

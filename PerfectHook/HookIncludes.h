@@ -11,7 +11,7 @@
 #include "MiscHacks.h"
 #include <unordered_map>
 
-namespace Hooks
+/*namespace hooks
 {
 	// VMT Managers
 	//U::VMT Client;
@@ -27,5 +27,5 @@ namespace Hooks
 	U::VMT autismform;
 	U::VMT engine;
 };
-
+*/
 

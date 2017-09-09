@@ -10,7 +10,7 @@
 #include <random>
 #include <string>
 #include <vector>
-#define M_RADPI 57.295779513082f
+
 void ILegit::Init()
 {
     best_target = -1;
@@ -73,8 +73,8 @@ void ILegit::CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
 
 	if (!menu.Legitbot.b1g)
 		return;
-	IClientEntity *pLocal = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
-    CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)I::EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
+	IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+    CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
 	
 	if (pLocal && pLocal->IsAlive() && pWeapon)
 	{
@@ -125,7 +125,7 @@ void ILegit::triggerbot(CInput::CUserCmd *cmd, IClientEntity* local, CBaseCombat
     Filter.pSkip = local;
 
     Ray.Init(TraceSource, TraceDestination);
-    I::Trace->TraceRay(Ray, MASK_SHOT, &Filter, &Trace);
+    g_Trace->TraceRay(Ray, MASK_SHOT, &Filter, &Trace);
 
     if (!Trace.m_pEnt)
         return;
@@ -171,50 +171,7 @@ void ILegit::triggerbot(CInput::CUserCmd *cmd, IClientEntity* local, CBaseCombat
     }
 
 }
-void compute_angle(const Vector &source, const Vector &destination, QAngle& angles)
-{
-    Vector delta = source - destination;
-    angles.x = static_cast< float >(asin(delta.z / delta.Length()) * M_RADPI);
-    angles.y = static_cast< float >(atan(delta.y / delta.x) * M_RADPI);
-    angles.z = 0.0f;
 
-    if (delta.x >= 0.0f)
-        angles.y += 180.0f;
-}
-float get_distance(const Vector &start, const Vector &end)
-{
-    float distance = sqrt((start - end).Length());
-
-    if (distance < 1.0f)
-        distance = 1.0f;
-
-    return distance;
-}
-void clamp_angles(QAngle& angles)
-{
-    if (angles.x > 89.0f) angles.x = 89.0f;
-    else if (angles.x < -89.0f) angles.x = -89.0f;
-
-    if (angles.y > 180.0f) angles.y = 180.0f;
-    else if (angles.y < -180.0f) angles.y = -180.0f;
-
-    angles.z = 0;
-}
-bool sanitize_angles(QAngle &angles)
-{
-    QAngle temp = angles;
-    MiscFunctions::NormaliseViewAngle(temp);
-    clamp_angles(temp);
-
-    if (!isfinite(temp.x) ||
-        !isfinite(temp.y) ||
-        !isfinite(temp.z))
-        return false;
-
-    angles = temp;
-
-    return true;
-}
 void ILegit::do_aimbot(IClientEntity *local, CBaseCombatWeapon *weapon, CInput::CUserCmd *cmd)
 {
     if (!menu.Legitbot.b1g)
@@ -250,7 +207,7 @@ void ILegit::do_aimbot(IClientEntity *local, CBaseCombatWeapon *weapon, CInput::
 
     if (best_target == -1)
         return;
-    IClientEntity* entity = (IClientEntity*)I::EntityList->GetClientEntity(best_target);
+    IClientEntity* entity = (IClientEntity*)g_EntityList->GetClientEntity(best_target);
     if (!entity)
         return;
 
@@ -286,7 +243,7 @@ void ILegit::do_aimbot(IClientEntity *local, CBaseCombatWeapon *weapon, CInput::
         return;
 
     cmd->viewangles = final_angle;
-    I::Engine->SetViewAngles(cmd->viewangles);
+    g_Engine->SetViewAngles(cmd->viewangles);
 }
 
 bool ILegit::hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseCombatWeapon* weapon, IClientEntity* target)
@@ -336,7 +293,7 @@ bool ILegit::hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseCombat
         Ray_t ray;
         ray.Init(eyes, viewForward);
 
-        I::Trace->ClipRayToEntity(ray, MASK_SHOT | CONTENTS_GRATE, target, &tr);
+        g_Trace->ClipRayToEntity(ray, MASK_SHOT | CONTENTS_GRATE, target, &tr);
 
 
         if (tr.m_pEnt == target)
@@ -433,12 +390,12 @@ bool get_hitbox_pos(IClientEntity* entity, int hitbox, Vector &output)
     if (!model)
         return false;
 
-    studiohdr_t *studioHdr = I::ModelInfo->GetStudiomodel(model);
+    studiohdr_t *studioHdr = g_ModelInfo->GetStudiomodel(model);
     if (!studioHdr)
         return false;
 
     matrix3x4 matrix[128];
-    if (!entity->SetupBones(matrix, 128, 0x100, 0))
+    if (!entity->SetupBones(matrix, 128, 0x100, entity->GetSimulationTime()))
         return false;
 
     mstudiobbox_t *studioBox = studioHdr->GetHitboxSet(0)->GetHitbox(hitbox);
@@ -490,11 +447,11 @@ int ILegit::get_target(IClientEntity *local, CBaseCombatWeapon *weapon, CInput::
     int best_target = -1;
     float best_fov = aim_fov;
 
-    I::Engine->GetViewAngles(view_angle);
+    g_Engine->GetViewAngles(view_angle);
 
-    for (int i = 1; i <= I::Globals->maxClients; i++)
+    for (int i = 1; i <= g_Globals->maxClients; i++)
     {
-        IClientEntity *entity = (IClientEntity*)I::EntityList->GetClientEntity(i);
+        IClientEntity *entity = (IClientEntity*)g_EntityList->GetClientEntity(i);
         if (!entity
             || entity == local
             || entity->IsDormant()

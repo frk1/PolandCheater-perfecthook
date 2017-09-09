@@ -3,29 +3,32 @@
 #include "Renderer.h"
 #include "Interface.h"
 #include <d3d9.h>
+uint8_t* m_present;
+uint8_t* m_reset;
+
 IDirect3DDevice9* d3d9_device;
 typedef HRESULT(__stdcall *EndScene_t) (IDirect3DDevice9*);
 
 typedef HRESULT(__stdcall *Reset_t) (IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 
-EndScene_t	g_fnOriginalEndScene = nullptr;
-Reset_t		g_fnOriginalReset = nullptr;
+EndScene_t	oEndScene = nullptr;
+Reset_t		oReset = nullptr;
 
 HRESULT __stdcall hkReset(IDirect3DDevice9* thisptr, D3DPRESENT_PARAMETERS* params) {
 
 	if (!renderer->IsReady())
-		return g_fnOriginalReset(thisptr, params);
+		return oReset(thisptr, params);
 
 
 	ImGui_ImplDX9_InvalidateDeviceObjects();
 	renderer->~Renderer();
 
-	HRESULT result = g_fnOriginalReset(thisptr, params);
+	HRESULT result = oReset(thisptr, params);
 
 	ImGui_ImplDX9_CreateDeviceObjects();
 
 	renderer->Initialize(FindWindowA("Valve001", NULL), thisptr);
-
+    Render::Initialise();
 	return result;
 }
 
@@ -39,13 +42,13 @@ HRESULT __stdcall hkEndScene(IDirect3DDevice9* thisptr) {
 
 	if (is_renderer_active) {
 		if (mouse_enabled) {
-			I::Engine->ClientCmd_Unrestricted("cl_mouseenable 0");
+			g_Engine->ClientCmd_Unrestricted("cl_mouseenable 0");
 			mouse_enabled = false;
 		}
 	}
 	else {
 		if (!mouse_enabled) {
-			I::Engine->ClientCmd_Unrestricted("cl_mouseenable 1");
+			g_Engine->ClientCmd_Unrestricted("cl_mouseenable 1");
 			mouse_enabled = true;
 		}
 	}
@@ -53,7 +56,7 @@ HRESULT __stdcall hkEndScene(IDirect3DDevice9* thisptr) {
 	ImGui::GetIO().MouseDrawCursor = is_renderer_active;
 
 	if (!is_renderer_active)
-		return g_fnOriginalEndScene(thisptr);
+		return oEndScene(thisptr);
 
 	ImGui_ImplDX9_NewFrame();
 
@@ -61,11 +64,11 @@ HRESULT __stdcall hkEndScene(IDirect3DDevice9* thisptr) {
 
 	ImGui::Render();
 
-	return g_fnOriginalEndScene(thisptr);
+	return oEndScene(thisptr);
 }
 
 typedef HRESULT(_stdcall *Present_T)(void*, const RECT*, RECT*, HWND, RGNDATA*);
-Present_T Present_O;
+Present_T oPresent;
 HRESULT _stdcall Present_H(LPDIRECT3DDEVICE9 pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion)
 {
     if (!renderer->IsReady())
@@ -78,13 +81,13 @@ HRESULT _stdcall Present_H(LPDIRECT3DDEVICE9 pDevice, RECT* pSourceRect, RECT* p
 
     if (is_renderer_active) {
         if (mouse_enabled) {
-            I::Engine->ClientCmd_Unrestricted("cl_mouseenable 0");
+            g_Engine->ClientCmd_Unrestricted("cl_mouseenable 0");
             mouse_enabled = false;
         }
     }
     else {
         if (!mouse_enabled) {
-            I::Engine->ClientCmd_Unrestricted("cl_mouseenable 1");
+            g_Engine->ClientCmd_Unrestricted("cl_mouseenable 1");
             mouse_enabled = true;
         }
     }
@@ -92,7 +95,7 @@ HRESULT _stdcall Present_H(LPDIRECT3DDEVICE9 pDevice, RECT* pSourceRect, RECT* p
     ImGui::GetIO().MouseDrawCursor = is_renderer_active;
 
     if (!is_renderer_active)
-        return Present_O(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
+        return oPresent(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
 
     ImGui_ImplDX9_NewFrame();
 
@@ -100,5 +103,5 @@ HRESULT _stdcall Present_H(LPDIRECT3DDEVICE9 pDevice, RECT* pSourceRect, RECT* p
 
     ImGui::Render();
 
-    return Present_O(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
+    return oPresent(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
 }

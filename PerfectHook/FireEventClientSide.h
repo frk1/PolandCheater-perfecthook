@@ -22,7 +22,7 @@ bool __fastcall hkFireEventClientSide(PVOID ECX, PVOID EDX, IGameEvent *Event) {
 	{
 		int nUserID = Event->GetInt("attacker");
 
-		if (nUserID && (I::Engine->GetPlayerForUserID(nUserID) == I::Engine->GetLocalPlayer()))
+		if (nUserID && (g_Engine->GetPlayerForUserID(nUserID) == g_Engine->GetLocalPlayer()))
 		{
 			const char* szWeapon = Event->GetString("weapon");
 

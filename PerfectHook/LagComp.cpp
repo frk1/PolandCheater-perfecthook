@@ -15,13 +15,13 @@ void llamaBT::Update(int tick_count)
 bool llamaBT::IsTickValid(int tick)
 {
     int delta = latest_tick - tick;
-    float deltaTime = delta * I::Globals->interval_per_tick;
+    float deltaTime = delta * g_Globals->interval_per_tick;
     return (fabs(deltaTime) <= 0.2f);
 }
 
 void llamaBT::UpdateRecord(int i)
 {
-    IClientEntity* pEntity = I::EntityList->GetClientEntity(i);
+    IClientEntity* pEntity = g_EntityList->GetClientEntity(i);
     if (pEntity && pEntity->IsAlive() && !pEntity->IsDormant())
     {
         float lby = pEntity->GetLowerBodyYaw();

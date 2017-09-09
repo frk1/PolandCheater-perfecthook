@@ -4,17 +4,17 @@
 
 int GetEstimatedServerTickCount(float latency)
 {
-	return (int)floorf( float(( float ) ( ( float ) ( latency ) / ( float ) ( ( uintptr_t ) &I::Globals->interval_per_tick ) ) + 0.5 ) + 1 + ( int ) ( (uintptr_t ) &I::Globals->tickcount ));
+	return (int)floorf( float(( float ) ( ( float ) ( latency ) / ( float ) ( ( uintptr_t ) &g_Globals->interval_per_tick ) ) + 0.5 ) + 1 + ( int ) ( (uintptr_t ) &g_Globals->tickcount ));
 }
 
 float oldlowerbodyyaw = 0;
 /*void Resolver3()
 {
-    IClientEntity *pLocal = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+    IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 
-    for (auto i = 0; i < I::EntityList->GetHighestEntityIndex(); i++)
+    for (auto i = 0; i < g_EntityList->GetHighestEntityIndex(); i++)
     {
-        IClientEntity* pEnt = I::EntityList->GetClientEntity(i);
+        IClientEntity* pEnt = g_EntityList->GetClientEntity(i);
         if (!pEnt) continue;
 
         if ((pEnt == pLocal)) continue;
@@ -23,7 +23,7 @@ float oldlowerbodyyaw = 0;
 
         player_info_t pTemp;
 
-        if (!I::Engine->GetPlayerInfo(i, &pTemp))
+        if (!g_Engine->GetPlayerInfo(i, &pTemp))
             continue;
         auto FYaw = pEnt->GetLowerBodyYaw();
         auto pitch = pEnt->GetEyeAngles()->x;
@@ -83,11 +83,11 @@ void Resolver3()
 
     if (menu.Ragebot.Resolver)
     {
-        IClientEntity *pLocal = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+        IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
         {
-            for (auto i = 0; i < I::EntityList->GetHighestEntityIndex(); i++)
+            for (auto i = 0; i < g_EntityList->GetHighestEntityIndex(); i++)
             {
-                IClientEntity* pEnt = I::EntityList->GetClientEntity(i);
+                IClientEntity* pEnt = g_EntityList->GetClientEntity(i);
                 if (!pEnt) continue;
 
                 if ((pEnt == pLocal)) continue;
@@ -96,7 +96,7 @@ void Resolver3()
 
                 player_info_t pTemp;
 
-                if (!I::Engine->GetPlayerInfo(i, &pTemp))
+                if (!g_Engine->GetPlayerInfo(i, &pTemp))
                     continue;
 
 

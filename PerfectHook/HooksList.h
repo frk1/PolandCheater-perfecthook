@@ -12,3 +12,4 @@
 #include "PlaySound.h"
 #include "DoPostScreenSpaceEffects.h"
 #include "FindMDL.h"
+#include "IsHltv.h"

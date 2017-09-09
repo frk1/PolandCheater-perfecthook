@@ -88,14 +88,14 @@ bool on_dll_attach(void* base)
 
 
     Offsets::Initialise();
-    I::Initialise();
+    InitialiseInterfaces();
     NetVarManager->Initialize();
 
 
     Offsetz::GetOffsets();
     Render::Initialise();
     Hacks::SetupHacks();
-    Hooks::Hook();
+    hooks::initialize();
     NetvarHook();
     AnimationFixHook();
 
@@ -112,7 +112,7 @@ bool on_dll_attach(void* base)
 
     AnimationFixUnhook();
     UnloadProxy();
-    Hooks::Unhook();
+    hooks::cleanup();
 
     Sleep(2000);
     FreeLibraryAndExitThread((HMODULE)base, 0);
@@ -128,7 +128,7 @@ bool on_dll_detach()
 
     AnimationFixUnhook();
     UnloadProxy();
-    Hooks::Unhook();
+    hooks::cleanup();
 
     return 1;
 }

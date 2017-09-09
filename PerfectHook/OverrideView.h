@@ -1,30 +1,38 @@
 #pragma once
 #include "HookIncludes.h"
 
-typedef void(__thiscall *FnOverrideView)(void* _this, CViewSetup* setup);
-FnOverrideView oFnOverrideView;
+typedef void(__thiscall *override_view_t)(void* _this, CViewSetup* setup);
+typedef float(__thiscall *get_fov_t)(void*);
 
 
+
+float __fastcall Hooked_GetViewModelFOV(void* ecx, void* edx)
+{
+    static auto ofunc = hooks::clientmode.get_original<get_fov_t>(35);
+    float viewmodelFOV = ofunc(ecx);
+    return menu.Visuals.viewmodelChanger;
+}
 
 void __fastcall hkOverrideView(void* _this, void* _edx, CViewSetup* setup)
 {
-	IClientEntity *pLocal = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
-	if (pLocal && I::Engine->IsInGame())
+    static auto ofunc = hooks::clientmode.get_original<override_view_t>(18);
+	IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+	if (pLocal && g_Engine->IsInGame())
 	{
 		if (!pLocal->IsScoped())
 			setup->fov += menu.Visuals.FOVChanger;
         if (menu.Visuals.ThirdPerson && pLocal->IsAlive())
         {
-            if (!I::Input->m_fCameraInThirdPerson)
+            if (!g_Input->m_fCameraInThirdPerson)
             {
-                I::Input->m_fCameraInThirdPerson = true;
+                g_Input->m_fCameraInThirdPerson = true;
             }
         }
         else
         {
-            I::Input->m_fCameraInThirdPerson = false;
+            g_Input->m_fCameraInThirdPerson = false;
         }
 	}
     grenade_prediction::instance().View(setup);
-	oFnOverrideView(_this, setup);
+    ofunc(_this, setup);
 }

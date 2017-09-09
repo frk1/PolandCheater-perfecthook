@@ -1,17 +1,16 @@
 #pragma once
 #include "HookIncludes.h"
 
-typedef bool(__thiscall* InPrediction_)(PVOID);
-InPrediction_ oInPrediction;
+typedef bool(__thiscall* in_prediction_t)(PVOID);
 bool __stdcall hkInPrediction();
 
 
 bool __stdcall hkInPrediction()
 {
 	bool result;
-	static InPrediction_ origFunc = (InPrediction_)Hooks::Prediction.GetOriginalFunction(14);
-	static IPrediction *ecxVal = I::Prediction;
-	result = origFunc(ecxVal);
+    static auto ofunc = hooks::prediction.get_original<in_prediction_t>(14);
+	static IPrediction *ecxVal = g_Prediction;
+	result = ofunc(ecxVal);
 	if (menu.Visuals.NoVisualRecoil && (DWORD)(_ReturnAddress()) == Offsets::Functions::dwCalcPlayerView)
 	{
 		IClientEntity* pLocalEntity = NULL;

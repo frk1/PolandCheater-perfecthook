@@ -7,7 +7,7 @@ void __stdcall OnScreenSizeChanged(int oldWidth, int oldHeight);
 
 void __stdcall OnScreenSizeChanged(int oldWidth, int oldHeight)
 {
-	oOnScreenSizeChanged(I::Surface, oldWidth, oldHeight);
+	oOnScreenSizeChanged(g_Surface, oldWidth, oldHeight);
 
 	Render::Initialise();
 }

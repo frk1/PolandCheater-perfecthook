@@ -38,7 +38,7 @@ void RotateMovement(CInput::CUserCmd* pCmd, float rotation)
 
 void MovementRecorder(CInput::CUserCmd *cmd)
 {
-	IClientEntity *pLocalPlayer = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+	IClientEntity *pLocalPlayer = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 
 	if (menu.Misc.isRecording && !m_bIsRecording && !menu.Misc.isReplaying)
 	{
@@ -114,7 +114,7 @@ void MovementRecorder(CInput::CUserCmd *cmd)
 		else
 		{
 			//test
-			I::Engine->SetViewAngles(m_RecordWaypoints[m_iReplayFrame].m_ViewAngles);
+			g_Engine->SetViewAngles(m_RecordWaypoints[m_iReplayFrame].m_ViewAngles);
 			cmd->sidemove = m_RecordWaypoints[m_iReplayFrame].m_SideMove;
 			cmd->forwardmove = m_RecordWaypoints[m_iReplayFrame].m_ForwardMove;
 			cmd->upmove = m_RecordWaypoints[m_iReplayFrame].m_UpMove;

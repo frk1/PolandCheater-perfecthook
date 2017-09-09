@@ -29,30 +29,30 @@ void Hacks::SetupHacks()
 
 void SpecList()
 {
-	IClientEntity *pLocal = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+	IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 
 	RECT scrn = Render::GetViewport();
 	int kapi = 0;
 
 	if (pLocal)
 	{
-		for (int i = 0; i < I::EntityList->GetHighestEntityIndex(); i++)
+		for (int i = 0; i < g_EntityList->GetHighestEntityIndex(); i++)
 		{
 			// Get the entity
-			IClientEntity *pEntity = I::EntityList->GetClientEntity(i);
+			IClientEntity *pEntity = g_EntityList->GetClientEntity(i);
 			player_info_t pinfo;
 			if (pEntity && pEntity != pLocal)
 			{
-				if (I::Engine->GetPlayerInfo(i, &pinfo) && !pEntity->IsAlive() && !pEntity->IsDormant())
+				if (g_Engine->GetPlayerInfo(i, &pinfo) && !pEntity->IsAlive() && !pEntity->IsDormant())
 				{
 					HANDLE obs = pEntity->GetObserverTargetHandle();
 					if (obs)
 					{
-						IClientEntity *pTarget = I::EntityList->GetClientEntityFromHandle(obs);
+						IClientEntity *pTarget = g_EntityList->GetClientEntityFromHandle(obs);
 						player_info_t pinfo2;
 						if (pTarget && pTarget->GetIndex() == pLocal->GetIndex())
 						{
-							if (I::Engine->GetPlayerInfo(pTarget->GetIndex(), &pinfo2))
+							if (g_Engine->GetPlayerInfo(pTarget->GetIndex(), &pinfo2))
 							{
 									char buf[255]; sprintf_s(buf, "%s", pinfo.name);
 									Render::Clear(scrn.right - 100, (scrn.top + 1) + (16 * kapi), 101, 16, Color(0, 0, 0, 140));
@@ -73,41 +73,41 @@ void SpecList()
 
 void DLight()
 {
-	IClientEntity *pLocal = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+	IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 
 	RECT scrn = Render::GetViewport();
 
 	// Loop through all active entitys
-	for (int i = 0; i < I::EntityList->GetHighestEntityIndex(); i++)
+	for (int i = 0; i < g_EntityList->GetHighestEntityIndex(); i++)
 	{
 		// Get the entity
-		IClientEntity *pEntity = I::EntityList->GetClientEntity(i);
+		IClientEntity *pEntity = g_EntityList->GetClientEntity(i);
 		player_info_t pinfo;
 
 		// The entity isn't some laggy peice of shit or something
 		if (pLocal != nullptr && pEntity != nullptr && pEntity != pLocal)
 		{
-			if (I::Engine->GetPlayerInfo(i, &pinfo) && pEntity->IsAlive() && !pEntity->IsDormant())
+			if (g_Engine->GetPlayerInfo(i, &pinfo) && pEntity->IsAlive() && !pEntity->IsDormant())
 			{
 				if (pLocal->GetTeamNum() != pEntity->GetTeamNum())
 				{
-					dlight_t* pElight = I::Dlight->CL_AllocElight(i);
+					dlight_t* pElight = g_Dlight->CL_AllocElight(i);
 					pElight->origin = pEntity->GetOrigin() + Vector(0.0f, 0.0f, 35.0f);
 					pElight->radius = 300.0f;
 					pElight->color.b = 36;
 					pElight->color.g = 224;
 					pElight->color.r = 41;
-					pElight->die = I::Globals->curtime + 0.05f;
+					pElight->die = g_Globals->curtime + 0.05f;
 					pElight->decay = pElight->radius / 5.0f;
 					pElight->key = i;
 
-					dlight_t* pDlight = I::Dlight->CL_AllocDlight(i);
+					dlight_t* pDlight = g_Dlight->CL_AllocDlight(i);
 					pDlight->origin = pEntity->GetOrigin();
 					pDlight->radius = 300.0f;
 					pDlight->color.b = 36;
 					pDlight->color.g = 224;
 					pDlight->color.r = 41;
-					pDlight->die = I::Globals->curtime + 0.05f;
+					pDlight->die = g_Globals->curtime + 0.05f;
 					pDlight->decay = pDlight->radius; // / 5.0f;
 					pDlight->key = i;
 				}
@@ -166,7 +166,7 @@ void HackManager::PaintTraverse()
 	if (!IsReady)
 		return;
 
-	pLocalInstance = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+	pLocalInstance = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 	if (!pLocalInstance) return;
 
 	for (auto &hack : Hacks)
@@ -182,7 +182,7 @@ void HackManager::CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
 		return;
 
 
-	pLocalInstance = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+	pLocalInstance = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 	if (!pLocalInstance) return;
 
 	for (auto &hack : Hacks)

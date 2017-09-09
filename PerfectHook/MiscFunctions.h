@@ -27,5 +27,6 @@ bool TraceToExit(Vector& end, trace_t& tr, Vector start, Vector vEnd, trace_t* t
 void SayInChat(const char *text);
 void SetName(const char *text);
 Vector GetHitboxPosition(IClientEntity* pEntity, int Hitbox);
+Vector GetHitboxPositionFromMatrix(IClientEntity* pEntity, matrix3x4 matrix[128], int Hitbox);
 
 void ForceUpdate();

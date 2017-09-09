@@ -1,16 +1,14 @@
 #pragma once
 #include "HookIncludes.h"
-typedef void(__thiscall* PlaySound_t)(void*, const char*);
-void      __stdcall Hooked_PlaySound(const char* szFileName);
-PlaySound_t                        g_fnOriginalPlaySound;
-using IsReadyFn = void(__cdecl*)();
-IsReadyFn IsReady;
+typedef void(__thiscall* play_sound_t)(void*, const char*);
+
 void __stdcall Hooked_PlaySound(const char* szFileName)
 {
+    static auto ofunc = hooks::surface.get_original<play_sound_t>(82);
 	//Call original PlaySound
-	g_fnOriginalPlaySound(I::Surface, szFileName);
+    ofunc(g_Surface, szFileName);
 
-	if (I::Engine->IsInGame()) return;
+	if (g_Engine->IsInGame()) return;
 
 	if (strstr(szFileName, "UI/competitive_accept_beep.wav")) 
 	{

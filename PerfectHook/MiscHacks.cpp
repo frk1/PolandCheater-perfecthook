@@ -60,8 +60,8 @@ bool bDone=false;
 void IMisc::CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
 {
 
-	IClientEntity *local = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
-    I::Engine->GetViewAngles(AutoStrafeView);
+	IClientEntity *local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+    g_Engine->GetViewAngles(AutoStrafeView);
     if (menu.Misc.Bhop && local->IsAlive())
     {
         if (pCmd->buttons & IN_JUMP && !(local->GetMoveType() & MOVETYPE_LADDER))
@@ -74,9 +74,9 @@ void IMisc::CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
     }
     if(menu.Misc.syncclantag)
     {
-        if (int(I::Globals->curtime) != iLastTime)
+        if (int(g_Globals->curtime) != iLastTime)
         {
-            switch (int(I::Globals->curtime) % 20)
+            switch (int(g_Globals->curtime) % 20)
             {
             case 0: setclantag(XorStr("thook         p")); break;
             case 1: setclantag(XorStr("hook         pe")); break;
@@ -101,7 +101,7 @@ void IMisc::CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
             }
         }
 
-        iLastTime = int(I::Globals->curtime);
+        iLastTime = int(g_Globals->curtime);
     }
     if (!menu.Misc.animatedclantag && animatedclantag.c_str() != G::AnimatedClantag)
     {
@@ -109,14 +109,14 @@ void IMisc::CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
     }
     if (menu.Misc.animatedclantag && animatedclantag.length() > 1)
     {
-        if (int(I::Globals->curtime) != iLastTime)
+        if (int(g_Globals->curtime) != iLastTime)
         {
             auto length = animatedclantag.length();
             animatedclantag.insert(0, 1, animatedclantag[length - 2]);
             animatedclantag.erase(length - 1, 1);
 
             setclantag(animatedclantag.c_str());
-            iLastTime = int(I::Globals->curtime);
+            iLastTime = int(g_Globals->curtime);
         }
     }
     static size_t lastTime = 0;
@@ -148,12 +148,12 @@ void IMisc::CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
         bool bDidMeme = false;
         int iNameIndex = -1;
         char chName[130];
-        static ConVar* name = I::CVar->FindVar("name");
+        static ConVar* name = g_CVar->FindVar("name");
         {
-            for (int iPlayerIndex = 0; iPlayerIndex < I::Engine->GetMaxClients(); iPlayerIndex++)
+            for (int iPlayerIndex = 0; iPlayerIndex < g_Engine->GetMaxClients(); iPlayerIndex++)
             {
-                IClientEntity *pEntity = I::EntityList->GetClientEntity(iPlayerIndex);
-                if (!pEntity || pEntity == local || iPlayerIndex == I::Engine->GetLocalPlayer())
+                IClientEntity *pEntity = g_EntityList->GetClientEntity(iPlayerIndex);
+                if (!pEntity || pEntity == local || iPlayerIndex == g_Engine->GetLocalPlayer())
                     continue;
                 if (rand() % 3 == 1)
                 {
@@ -164,14 +164,13 @@ void IMisc::CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
             if (bDidMeme)
             {
                 player_info_t pInfo;
-                I::Engine->GetPlayerInfo(iNameIndex, &pInfo);
+                g_Engine->GetPlayerInfo(iNameIndex, &pInfo);
                 sprintf(chName, "%s ", pInfo.name);
                 name->SetValue(chName);
             }
         }
 
     }
-    else if (!menu.Misc.silentstealer && bDone == true) bDone = false;
 }
 
 Vector GetAutostrafeView()
@@ -204,7 +203,7 @@ inline float FloatNegate(float f)
 
 void IMisc::AutoStrafe(CInput::CUserCmd *pCmd)
 {
-    IClientEntity* pLocal = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+    IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 
     static float move = 450; //4?.f; // move = max(move, (abs(cmd->move.x) + abs(cmd->move.y)) * 0.5f);
     float s_move = move * 0.5065f;
@@ -228,10 +227,10 @@ void IMisc::AutoStrafe(CInput::CUserCmd *pCmd)
             float rt = pCmd->viewangles.y, rotation;
             rotation = strafe - rt;
 
-            if (rotation < FloatNegate(I::Globals->interval_per_tick))
+            if (rotation < FloatNegate(g_Globals->interval_per_tick))
                 pCmd->sidemove = -s_move;
 
-            if (rotation > I::Globals->interval_per_tick)
+            if (rotation > g_Globals->interval_per_tick)
                 pCmd->sidemove = s_move;
 
             strafe = rt;

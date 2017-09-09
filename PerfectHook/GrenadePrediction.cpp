@@ -15,12 +15,12 @@ void grenade_prediction::Tick(int buttons)
 void grenade_prediction::View(CViewSetup* setup)
 {
 
-    auto local = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+    auto local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
     if (!menu.Visuals.GrenadePrediction)
         return;
     if (local && local->IsAlive())
     {
-        CBaseCombatWeapon* weapon = (CBaseCombatWeapon*)I::EntityList->GetClientEntityFromHandle(local->GetActiveWeaponHandle());
+        CBaseCombatWeapon* weapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(local->GetActiveWeaponHandle());
         if (weapon && MiscFunctions::IsGrenade(weapon) && act != ACT_NONE)
         {
             type = weapon->m_AttributeManager()->m_Item()->GetItemDefinitionIndex();
@@ -47,16 +47,16 @@ void grenade_prediction::Paint()
         {
             if (Render::WorldToScreen(prev, nadeStart) && Render::WorldToScreen(*it, nadeEnd))
             {
-                I::Surface->DrawSetColor(lineColor);
-                I::Surface->DrawLine((int)nadeStart.x, (int)nadeStart.y, (int)nadeEnd.x, (int)nadeEnd.y);
+                g_Surface->DrawSetColor(lineColor);
+                g_Surface->DrawLine((int)nadeStart.x, (int)nadeStart.y, (int)nadeEnd.x, (int)nadeEnd.y);
             }
             prev = *it;
         }
 
         if (Render::WorldToScreen(prev, nadeEnd))
         {
-            I::Surface->DrawSetColor(Color(255, 0, 0, 255));
-            I::Surface->DrawOutlinedCircle((int)nadeEnd.x, (int)nadeEnd.y, 10, 48);
+            g_Surface->DrawSetColor(Color(255, 0, 0, 255));
+            g_Surface->DrawOutlinedCircle((int)nadeEnd.x, (int)nadeEnd.y, 10, 48);
         }
     }
 }
@@ -98,7 +98,7 @@ void grenade_prediction::Setup(Vector& vecSrc, Vector& vecThrow, Vector viewangl
     if (!menu.Visuals.GrenadePrediction)
         return;
     Vector angThrow = viewangles;
-    auto local = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+    auto local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
     float pitch = angThrow.x;
 
     if (pitch <= 90.0f)
@@ -158,10 +158,10 @@ void grenade_prediction::Simulate(CViewSetup* setup)
     if (!menu.Visuals.GrenadePrediction)
         return;
     Vector vecSrc, vecThrow;
-    Vector angles; I::Engine->GetViewAngles(angles);
+    Vector angles; g_Engine->GetViewAngles(angles);
     Setup(vecSrc, vecThrow, angles);
 
-    float interval = I::Globals->interval_per_tick;
+    float interval = g_Globals->interval_per_tick;
 
     // Log positions 20 times per sec
     int logstep = static_cast<int>(0.05f / interval);
@@ -259,7 +259,7 @@ void grenade_prediction::TraceHull(Vector& src, Vector& end, trace_t& tr)
     //filter.SetIgnoreClass("BaseCSGrenadeProjectile");
     //filter.bShouldHitPlayers = false;
 
-    I::Trace->TraceRay(ray, 0x200400B, &filter, &tr);
+    g_Trace->TraceRay(ray, 0x200400B, &filter, &tr);
 }
 
 void grenade_prediction::AddGravityMove(Vector& move, Vector& vel, float frametime, bool onground)

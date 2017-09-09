@@ -3,9 +3,8 @@
 #include "Interfaces.h"
 #include <ctime>
 #include "MovementRecorder.h"
-typedef void(__thiscall* PaintTraverse_)(PVOID, unsigned int, bool, bool);
-PaintTraverse_ oPaintTraverse;
-void __fastcall hkPaintTraverse(PVOID pPanels, int edx, unsigned int vguiPanel, bool forceRepaint, bool allowForce);
+typedef void(__thiscall* paint_traverse_t)(PVOID, unsigned int, bool, bool);
+
 
 bool once = true;
 bool once1 = false;
@@ -13,17 +12,18 @@ int width1 = 0;
 int height1 = 0;
 void __fastcall hkPaintTraverse(PVOID pPanels, int edx, unsigned int vguiPanel, bool forceRepaint, bool allowForce)
 {
-	IClientEntity* pLocal = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
-	if (pLocal != nullptr && pLocal->IsAlive() && menu.Visuals.noscopeborder && !strcmp("HudZoom", I::Panels->GetName(vguiPanel)))
+    static auto ofunc = hooks::panel.get_original<paint_traverse_t>(41);
+	IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+	if (pLocal != nullptr && pLocal->IsAlive() && menu.Visuals.noscopeborder && !strcmp("HudZoom", g_Panel->GetName(vguiPanel)))
 	{
 		return;
 	}
-	oPaintTraverse(pPanels, vguiPanel, forceRepaint, allowForce);
+    ofunc(pPanels, vguiPanel, forceRepaint, allowForce);
 	static unsigned int FocusOverlayPanel = 0;
 	static bool FoundPanel = false;
 	if (!FoundPanel)
 	{
-		PCHAR szPanelName = (PCHAR)I::Panels->GetName(vguiPanel);
+		PCHAR szPanelName = (PCHAR)g_Panel->GetName(vguiPanel);
 		if (strstr(szPanelName, "FocusOverlayPanel"))
 		{
 			FocusOverlayPanel = vguiPanel;
@@ -32,7 +32,7 @@ void __fastcall hkPaintTraverse(PVOID pPanels, int edx, unsigned int vguiPanel, 
 	}
 	else if (FocusOverlayPanel == vguiPanel)
 	{
-		if (I::Engine->IsConnected() && I::Engine->IsInGame())
+		if (g_Engine->IsConnected() && g_Engine->IsInGame())
 		{
             static auto linegoesthrusmoke = U::FindPattern("client.dll", (PBYTE)"\x55\x8B\xEC\x83\xEC\x08\x8B\x15\x00\x00\x00\x00\x0F\x57\xC0", "xxxxxxxx????xxx");
             static auto smokecout = *(DWORD*)(linegoesthrusmoke + 0x8);
@@ -44,7 +44,7 @@ void __fastcall hkPaintTraverse(PVOID pPanels, int edx, unsigned int vguiPanel, 
 			auto m_flFlashMaxAlpha = NetVarManager->GetOffset("DT_CSPlayer", "m_flFlashMaxAlpha");
 			if (pLocal != nullptr)
 			{
-				CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)I::EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
+				CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
 				if (menu.Visuals.NoFlash) 
 				{
 					*MakePtr(float*, pLocal, m_flFlashDuration) = 0.3f;
@@ -59,7 +59,7 @@ void __fastcall hkPaintTraverse(PVOID pPanels, int edx, unsigned int vguiPanel, 
 				{
 					int width = 0;
 					int height = 0;
-					I::Engine->GetScreenSize(width, height);
+					g_Engine->GetScreenSize(width, height);
 
 					int centerX = static_cast<int>(width * 0.5f);
 					int centerY = static_cast<int>(height * 0.5f);
@@ -68,7 +68,7 @@ void __fastcall hkPaintTraverse(PVOID pPanels, int edx, unsigned int vguiPanel, 
 				}
 			}
 		}
-		if (!I::Engine->IsInGame()) {
+		if (!g_Engine->IsInGame()) {
 			menu.Misc.NameChangerFix = false; 
 			menu.Misc.NameSpammer = 0;
 			menu.Misc.NoName = false;
@@ -89,7 +89,7 @@ void __fastcall hkPaintTraverse(PVOID pPanels, int edx, unsigned int vguiPanel, 
 		{
 
 
-			printf("csPlayerResource offset: %p", I::csPlayerResource - reinterpret_cast<DWORD>(GetModuleHandleA("client.dll")));
+			printf("csPlayerResource offset: %p", g_PlayerResource - reinterpret_cast<DWORD>(GetModuleHandleA("client.dll")));
 			once1 = true;
 		}*/
 		if (menu.Visuals.Time)
@@ -98,6 +98,6 @@ void __fastcall hkPaintTraverse(PVOID pPanels, int edx, unsigned int vguiPanel, 
 			Render::Text(1, 1, Color(255, 255, 255, 255), Render::Fonts::Time, std::asctime(std::localtime(&result)));
 		}
 
-		//Menu::DoUIFrame();
+
 	}
 }

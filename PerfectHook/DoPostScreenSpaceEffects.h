@@ -10,9 +10,9 @@ bool _fastcall do_post_screen_space_effects(void* ecx, void* edx, CViewSetup* pS
     g_GlowObjManager = *(CGlowObjectManager**)(U::pattern_scan(GetModuleHandleW(L"client.dll"), "0F 11 05 ? ? ? ? 83 C8 01 C7 05 ? ? ? ? 00 00 00 00") + 3);
 
 
-    if (menu.Visuals.Glow && g_GlowObjManager && I::Engine->IsConnected())
+    if (menu.Visuals.Glow && g_GlowObjManager && g_Engine->IsConnected())
     {
-        auto local = I::EntityList->GetClientEntity(I::Engine->GetLocalPlayer());
+        auto local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
         if (local)
         {
             for (int i = 0; i < g_GlowObjManager->m_GlowObjectDefinitions.Count(); ++i)

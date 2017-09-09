@@ -14,7 +14,7 @@
 #define BONE_USED_BY_HITBOX			0x00000100
 
 
-#define TICK_INTERVAL			(I::Globals->interval_per_tick)
+#define TICK_INTERVAL			(g_Globals->interval_per_tick)
 
 #define TIME_TO_TICKS( dt )		( (int)( 0.5f + (float)(dt) / TICK_INTERVAL ) )
 enum class TeamID : int
@@ -436,7 +436,7 @@ enum class ClassID
     SporeTrail = 252
 };
 
-enum class CSGOHitboxID
+enum CSGOHitboxID : int
 {
 	Head = 0,
 	Neck,
