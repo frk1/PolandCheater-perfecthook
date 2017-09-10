@@ -233,7 +233,7 @@ void NoSmoke(const CRecvProxyData *pData, void *pStruct, void *pOut)
 
 void NetvarHook()
 {
-	ClientClass *pClass = g_Client->GetAllClasses();
+	ClientClass *pClass = g_CHLClient->GetAllClasses();
 	while (pClass)
 	{
 		const char *pszName = pClass->m_pRecvTable->m_pNetTableName;
@@ -278,7 +278,7 @@ void NetvarHook()
 }
 void UnloadProxy()
 {
-	ClientClass *pClass = g_Client->GetAllClasses();
+	ClientClass *pClass = g_CHLClient->GetAllClasses();
 	while (pClass)
 	{
 		const char *pszName = pClass->m_pRecvTable->m_pNetTableName;
@@ -325,7 +325,7 @@ void UnloadProxy()
 
 void AnimationFixHook()
 {
-    for (ClientClass* pClass = g_Client->GetAllClasses(); pClass; pClass = pClass->m_pNext) {
+    for (ClientClass* pClass = g_CHLClient->GetAllClasses(); pClass; pClass = pClass->m_pNext) {
         if (!strcmp(pClass->m_pNetworkName, "CBaseViewModel")) {
             // Search for the 'm_nModelIndex' property.
             RecvTable* pClassTable = pClass->m_pRecvTable;
@@ -352,7 +352,7 @@ void AnimationFixHook()
 
 void AnimationFixUnhook()
 {
-    for (ClientClass* pClass = g_Client->GetAllClasses(); pClass; pClass = pClass->m_pNext) {
+    for (ClientClass* pClass = g_CHLClient->GetAllClasses(); pClass; pClass = pClass->m_pNext) {
         if (!strcmp(pClass->m_pNetworkName, "CBaseViewModel")) {
             // Search for the 'm_nModelIndex' property.
             RecvTable* pClassTable = pClass->m_pRecvTable;

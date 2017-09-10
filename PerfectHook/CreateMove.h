@@ -19,7 +19,7 @@ QAngle qLastTickAngles = QAngle(0.0f, 0.0f, 0.0f);
 void __stdcall CHLCreateMove(int sequence_number, float input_sample_frametime, bool active, bool& bSendPacket)
 {
     static auto ofunc = hooks::client.get_original<create_move_t>(21);
-    ofunc(g_Client, sequence_number, input_sample_frametime, active);
+    ofunc(g_CHLClient, sequence_number, input_sample_frametime, active);
 	IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 	CInput::CUserCmd *cmd = g_Input->GetUserCmd(0, sequence_number);
 	if (!cmd)

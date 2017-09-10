@@ -6,7 +6,8 @@
 #include <iostream>
 #include <algorithm>
 #include "GrenadePrediction.h"
-backtrackData headPositions[64][16];
+#include "LagComp.h"
+backtrackData headPositions[64][12];
 const char* itemNames[] =
 {
     "knife", //0 - default
@@ -126,6 +127,10 @@ float CSGO_Armor(float flDamage, int ArmorValue)
 	return flDamage;
 }
 
+template <typename T, std::size_t N> T* end_(T(&arr)[N]) { return arr + N; }
+
+template <typename T, std::size_t N> T* begin_(T(&arr)[N]) { return arr; }
+
 
 bool done = false;
 void IESP::PaintTraverse()
@@ -137,6 +142,7 @@ void IESP::PaintTraverse()
 
         for (int i = 0; i < g_EntityList->GetHighestEntityIndex(); i++)
         {
+
             IClientEntity *pEntity = g_EntityList->GetClientEntity(i);
             player_info_t pinfo;
             IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
@@ -175,21 +181,27 @@ void IESP::PaintTraverse()
                 {
                     if (menu.Legitbot.backtrack)
                     {
-
-                        for (int t = 0; t <= 12; ++t)
+                        if (pLocal->IsAlive()) 
                         {
-                            Vector screenbacktrack[64][16];
-
-                            if (headPositions[i][t].entity && headPositions[i][t].entity == pEntity && headPositions[i][t].simtime < pLocal->GetSimulationTime() + 1)
+                            for (int t = 0; t < 12; ++t)
                             {
-                                if (Render::WorldToScreen(headPositions[i][t].hitboxPos, screenbacktrack[i][t]))
+                                Vector screenbacktrack[64][12];
+
+                                if (headPositions[i][t].simtime && headPositions[i][t].simtime > pLocal->GetSimulationTime() - 1)
                                 {
+                                    if (Render::WorldToScreen(headPositions[i][t].hitboxPos, screenbacktrack[i][t]))
+                                    {
 
-                                    g_Surface->DrawSetColor(Color::Red());
-                                    g_Surface->DrawOutlinedRect(screenbacktrack[i][t].x, screenbacktrack[i][t].y, screenbacktrack[i][t].x + 2, screenbacktrack[i][t].y + 2);
+                                        g_Surface->DrawSetColor(Color::Red());
+                                        g_Surface->DrawOutlinedRect(screenbacktrack[i][t].x, screenbacktrack[i][t].y, screenbacktrack[i][t].x + 2, screenbacktrack[i][t].y + 2);
 
+                                    }
                                 }
                             }
+                        }
+                        else
+                        {
+                            memset(&headPositions[0][0], 0, sizeof(headPositions));
                         }
                     }
                     if (menu.Visuals.Enabled && menu.Visuals.Filter.Players)

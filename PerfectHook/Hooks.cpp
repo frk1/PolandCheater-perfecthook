@@ -20,7 +20,7 @@ namespace hooks
 
     void initialize()
     {
-        client.setup(g_Client);
+        client.setup(g_CHLClient);
         client.hook_index(36, hkFrameStageNotify);
         client.hook_index(21, hkCreateMove);
 

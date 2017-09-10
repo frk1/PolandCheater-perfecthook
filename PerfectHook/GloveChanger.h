@@ -2,7 +2,7 @@
 #include "HookIncludes.h"
 static CreateClientClassFn GetWearableCreateFn()
 {
-    auto clazz = g_Client->GetAllClasses();
+    auto clazz = g_CHLClient->GetAllClasses();
 
     while (strcmp(clazz->m_pNetworkName, "CEconWearable"))
         clazz = clazz->m_pNext;
@@ -11,7 +11,7 @@ static CreateClientClassFn GetWearableCreateFn()
 }
 IClientNetworkable* CL_CreateDLLEntity(int iEnt, int iClass, int iSerialNum)
 {
-    ClientClass* pClient = g_Client->GetAllClasses();
+    ClientClass* pClient = g_CHLClient->GetAllClasses();
     if (!pClient)
         return false;
 

@@ -20,6 +20,14 @@ public:
 };
 
 extern llamaBT* llamaBacktrack;
+struct backtrackData {
+    float simtime;
+    Vector hitboxPos;
+    IClientEntity* entity;
+};
+
+
+extern backtrackData headPositions[64][12];
 
 
 inline void legitLagComp(CInput::CUserCmd* cmd, IClientEntity* pLocal)
@@ -29,6 +37,10 @@ inline void legitLagComp(CInput::CUserCmd* cmd, IClientEntity* pLocal)
         int bestTargetIndex = -1;
         float bestFov = FLT_MAX;
         player_info_t info;
+
+        if (!pLocal->IsAlive())
+            return;
+
         for (int i = 0; i < g_Engine->GetMaxClients(); i++)
         {
             auto entity = (IClientEntity*)g_EntityList->GetClientEntity(i);
@@ -74,7 +86,7 @@ inline void legitLagComp(CInput::CUserCmd* cmd, IClientEntity* pLocal)
         {
             float tempFloat = FLT_MAX;
             Vector ViewDir = angle_vector(cmd->viewangles + (pLocal->localPlayerExclusive()->GetAimPunchAngle() * 2.f));
-            for (int t = 0; t <= 12; ++t)
+            for (int t = 0; t < 12; ++t)
             {
                 float tempFOVDistance = distance_point_to_line(headPositions[bestTargetIndex][t].hitboxPos, pLocal->GetEyePosition(), ViewDir);
                 if (tempFloat > tempFOVDistance && headPositions[bestTargetIndex][t].simtime > pLocal->GetSimulationTime() - 1)

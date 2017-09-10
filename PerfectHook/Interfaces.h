@@ -7,7 +7,7 @@
 extern void InitialiseInterfaces();
 
 
-extern IBaseClientDLL* g_Client;
+extern IBaseClientDLL* g_CHLClient;
 extern IVEngineClient* g_Engine;
 extern IPanel* g_Panel;
 extern IClientEntityList* g_EntityList;
