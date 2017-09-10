@@ -20,10 +20,10 @@ public:
 };
 
 extern llamaBT* llamaBacktrack;
-struct backtrackData {
+struct backtrackData 
+{
     float simtime;
     Vector hitboxPos;
-    IClientEntity* entity;
 };
 
 
@@ -57,10 +57,8 @@ inline void legitLagComp(CInput::CUserCmd* cmd, IClientEntity* pLocal)
             if (entity->IsDormant())
                 continue;
 
-
             if (entity->GetTeamNum() == pLocal->GetTeamNum())
                 continue;
-
 
             if (entity->IsAlive())
             {
@@ -68,8 +66,7 @@ inline void legitLagComp(CInput::CUserCmd* cmd, IClientEntity* pLocal)
                 float simtime = entity->GetSimulationTime();
                 Vector hitboxPos = GetHitboxPosition(entity, 0);
 
-
-                headPositions[i][cmd->command_number % 13] = backtrackData{ simtime, hitboxPos, entity };
+                headPositions[i][cmd->command_number % 13] = backtrackData{ simtime, hitboxPos };
                 Vector ViewDir = angle_vector(cmd->viewangles + (pLocal->localPlayerExclusive()->GetAimPunchAngle() * 2.f));
                 float FOVDistance = distance_point_to_line(hitboxPos, pLocal->GetEyePosition(), ViewDir);
 
@@ -91,7 +88,6 @@ inline void legitLagComp(CInput::CUserCmd* cmd, IClientEntity* pLocal)
                 float tempFOVDistance = distance_point_to_line(headPositions[bestTargetIndex][t].hitboxPos, pLocal->GetEyePosition(), ViewDir);
                 if (tempFloat > tempFOVDistance && headPositions[bestTargetIndex][t].simtime > pLocal->GetSimulationTime() - 1)
                 {
-
                     tempFloat = tempFOVDistance;
                     bestTargetSimTime = headPositions[bestTargetIndex][t].simtime;
                 }
@@ -99,7 +95,6 @@ inline void legitLagComp(CInput::CUserCmd* cmd, IClientEntity* pLocal)
             if (cmd->buttons & IN_ATTACK)
             {
                 cmd->tick_count = TIME_TO_TICKS(bestTargetSimTime);
-
             }
         }
     }
