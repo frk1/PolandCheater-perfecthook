@@ -1,75 +1,24 @@
 ﻿#include "MiscHacks.h"
 #include "Interfaces.h"
 #include "RenderManager.h"
-#include "DLLMain.h"
 #include <time.h>
 #include "BaseClient.h"
-void IMisc::Init()
-{
 
-	// Any init
-}
-void IMisc::PaintTraverse()
-{
-}
-void setclantag(const char* tag)
-{
-    static auto ClanTagOffset = U::FindPattern("engine.dll", (PBYTE)"\x53\x56\x57\x8B\xDA\x8B\xF9\xFF\x15", "xxxxxxxxx");
-    if (ClanTagOffset)
-    {
-        auto tag_ = std::string(tag);
-        if (strlen(tag) > 0) {
-            auto newline = tag_.find("\\n");
-            auto tab = tag_.find("\\t");
-            if (newline != std::string::npos) {
-                tag_.replace(newline, newline + 2, "\n");
-            }
-            if (tab != std::string::npos) {
-                tag_.replace(tab, tab + 2, "\t");
-            }
-        }
-        static auto dankesttSetClanTag = reinterpret_cast<void(__fastcall*)(const char*, const char*)>(ClanTagOffset);
-        dankesttSetClanTag(tag_.data(), tag_.data());
-    }
-}
-const char* tuxlist[] =
-{
-    "AimTux owns me and all",
-    "Your Windows p2c sucks my AimTux dry",
-    "It's free as in FREEDOM!",
-    "Tux only let me out so I could play this game, please be nice!",
-    "Tux nutted but you keep sucken",
-    ">tfw no vac on Linux",
-};
-const char* ezfragslist[] =
-{
-    "Think you could do better? Not without www.EZFrags.co.uk",
-    "If I was cheating, I'd use www.EZFrags.co.uk",
-    "I'm not using www.EZFrags.co.uk, you're just bad",
-    "Visit www.EZFrags.co.uk for the finest public & private CS:GO cheats",
-    "Stop being a noob! Get good with www.EZFrags.co.uk",
-    "You just got pwned by www.EZFrags.co.uk, the #1 CS:GO cheat",
-};
+
 std::string animatedclantag;
-Vector AutoStrafeView;
 int iLastTime;
-int topmemes123;
-int xdmemes123;
-char name[] = "xcheat.solutions";
 bool bDone=false;
-void IMisc::CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
+void misc::OnCreateMove(CInput::CUserCmd *cmd, IClientEntity *local)
 {
 
-	IClientEntity *local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
-    g_Engine->GetViewAngles(AutoStrafeView);
     if (menu.Misc.Bhop && local->IsAlive())
     {
-        if (pCmd->buttons & IN_JUMP && !(local->GetMoveType() & MOVETYPE_LADDER))
+        if (cmd->buttons & IN_JUMP && !(local->GetMoveType() & MOVETYPE_LADDER))
         {
 
-            int iFlags = hack.pLocal()->GetFlags();
+            int iFlags = local->GetFlags();
             if (!(iFlags & FL_ONGROUND))
-                pCmd->buttons &= ~IN_JUMP;
+                cmd->buttons &= ~IN_JUMP;
         }
     }
     if(menu.Misc.syncclantag)
@@ -120,28 +69,29 @@ void IMisc::CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
         }
     }
     static size_t lastTime = 0;
+    static int counter = 0;
     if (GetTickCount() > lastTime)
     {
 
-            xdmemes123 = xdmemes123 + 1;
-            if (xdmemes123 >= 6)
-                xdmemes123 = 0;
-            switch(menu.Misc.spammer)
-            {
-            case 1:
-                SayInChat(tuxlist[xdmemes123]);
-                break;
-            case 2:
-                SayInChat(ezfragslist[xdmemes123]);
-                break;
-            }
-            
-            lastTime = GetTickCount() + 850;
-      
+        counter = counter + 1;
+        if (counter >= 6)
+            counter = 0;
+        switch (menu.Misc.spammer)
+        {
+        case 1:
+            SayInChat(tuxlist[counter]);
+            break;
+        case 2:
+            SayInChat(ezfragslist[counter]);
+            break;
+        }
+
+        lastTime = GetTickCount() + 850;
+
 
     }
     if (menu.Misc.AutoStrafe)
-        AutoStrafe(pCmd);
+        AutoStrafe(cmd, local);
 
     if(menu.Misc.silentstealer)
     {
@@ -173,65 +123,40 @@ void IMisc::CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
     }
 }
 
-Vector GetAutostrafeView()
+
+
+
+void misc::AutoStrafe(CInput::CUserCmd *cmd, IClientEntity *local)
 {
-    return AutoStrafeView;
-}
 
-template<class T, class U>
-inline T clamp(T in, U low, U high)
-{
-    if (in <= low)
-        return low;
-    else if (in >= high)
-        return high;
-    else
-        return in;
-}
-
-inline float bitsToFloat(unsigned long i)
-{
-    return *reinterpret_cast<float*>(&i);
-}
-
-
-inline float FloatNegate(float f)
-{
-    return bitsToFloat(FloatBits(f) ^ 0x80000000);
-}
-
-
-void IMisc::AutoStrafe(CInput::CUserCmd *pCmd)
-{
-    IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 
     static float move = 450; //4?.f; // move = max(move, (abs(cmd->move.x) + abs(cmd->move.y)) * 0.5f);
     float s_move = move * 0.5065f;
-    if (pLocal->GetMoveType() & (MOVETYPE_NOCLIP | MOVETYPE_LADDER))
+    if (local->GetMoveType() & (MOVETYPE_NOCLIP | MOVETYPE_LADDER))
         return;
-    if (pCmd->buttons & (IN_FORWARD | IN_MOVERIGHT | IN_MOVELEFT | IN_BACK))
+    if (cmd->buttons & (IN_FORWARD | IN_MOVERIGHT | IN_MOVELEFT | IN_BACK))
         return;
 
-    if (pCmd->buttons & IN_JUMP || !(pLocal->GetFlags() & FL_ONGROUND))
+    if (cmd->buttons & IN_JUMP || !(local->GetFlags() & FL_ONGROUND))
     {
-        if (pLocal->GetVelocity().Length2D() >= menu.Misc.MinVel)
+        if (local->GetVelocity().Length2D() >= menu.Misc.MinVel)
         {
-            pCmd->forwardmove = move * 0.015f;
-            pCmd->sidemove += (float)(((pCmd->tick_count % 2) * 2) - 1) * s_move;
+            cmd->forwardmove = move * 0.015f;
+            cmd->sidemove += (float)(((cmd->tick_count % 2) * 2) - 1) * s_move;
 
-            if (pCmd->mousedx)
-                pCmd->sidemove = (float)clamp(pCmd->mousedx, -1, 1) * s_move;
+            if (cmd->mousedx)
+                cmd->sidemove = (float)clamp(cmd->mousedx, -1, 1) * s_move;
 
-            static float strafe = pCmd->viewangles.y;
+            static float strafe = cmd->viewangles.y;
 
-            float rt = pCmd->viewangles.y, rotation;
+            float rt = cmd->viewangles.y, rotation;
             rotation = strafe - rt;
 
             if (rotation < FloatNegate(g_Globals->interval_per_tick))
-                pCmd->sidemove = -s_move;
+                cmd->sidemove = -s_move;
 
             if (rotation > g_Globals->interval_per_tick)
-                pCmd->sidemove = s_move;
+                cmd->sidemove = s_move;
 
             strafe = rt;
         }

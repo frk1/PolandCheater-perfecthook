@@ -42,7 +42,7 @@ void dankestSetClanTag(const char* tag, const char* name)
 
 void RenderRageBot()
 {
-	ImGui::Checkbox(("Active"), &menu.Ragebot.b1g);
+	ImGui::Checkbox(("Active"), &menu.Ragebot.MainSwitch);
 
 	ImGui::Columns(3, NULL, true);
 	{
@@ -76,7 +76,7 @@ void RenderRageBot()
 		ImGui::Checkbox(("Hitchance"), &menu.Ragebot.Hitchance);
 		ImGui::SliderFloat(("Hitchance Amount"), &menu.Ragebot.HitchanceAmount, 0.f, 100.f, "%.1f");
 		ImGui::Checkbox(("Resolver"), &menu.Ragebot.Resolver);
-        ImGui::Checkbox("LBY Backtracking", &menu.Ragebot.FakeLagFix);
+        //ImGui::Checkbox("LBY Backtracking", &menu.Ragebot.FakeLagFix);
         ImGui::Hotkey(("BAIM key"), &menu.Ragebot.BAIMkey);
 
 
@@ -98,7 +98,7 @@ void RenderRageBot()
 
 void RenderLegit()
 {
-	ImGui::Checkbox(("Active"), &menu.Legitbot.b1g);
+	ImGui::Checkbox(("Active"), &menu.Legitbot.MainSwitch);
 	ImGui::Columns(5, nullptr, true);
 	{
 		ImGui::Text("General"); ImGui::NextColumn(); ImGui::Text("Rifles"); ImGui::NextColumn(); ImGui::Text("Pistol"); ImGui::NextColumn(); ImGui::Text("Sniper"); ImGui::NextColumn(); ImGui::Text("Triggerbot"); ImGui::NextColumn(); ImGui::Separator();
@@ -218,6 +218,7 @@ void RenderMisc()
 
 
     ImGui::Checkbox("Name Stealer", &menu.Misc.silentstealer);
+    ImGui::SameLine();
     if(ImGui::Button("Silent exploit"))
     {
         static ConVar* name = g_CVar->FindVar("name");
@@ -319,7 +320,7 @@ void RenderMisc()
     if (ImGui::Button("ragequit"))
     {
         g_Engine->ClientCmd_Unrestricted("cl_mouseenable 1");
-        DoUnload = true;
+        unload = true;
     }
 
 

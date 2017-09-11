@@ -1,5 +1,4 @@
 #include "SDK.h"
-#include "Hacks.h"
 
 
 #define SEQUENCE_DEFAULT_DRAW 0
@@ -237,16 +236,7 @@ void NetvarHook()
 	while (pClass)
 	{
 		const char *pszName = pClass->m_pRecvTable->m_pNetTableName;
-		if (!strcmp(pszName, "DT_CSPlayer"))
-		{
-			for (int i = 0; i < pClass->m_pRecvTable->m_nProps; i++)
-			{
-				RecvProp *pProp = &(pClass->m_pRecvTable->m_pProps[i]);
-				const char *name = pProp->m_pVarName;
-
-			}
-		}
-		else if (!strcmp(pszName, "DT_SmokeGrenadeProjectile"))
+		if (!strcmp(pszName, "DT_SmokeGrenadeProjectile"))
 		{
 			for (int i = 0; i < pClass->m_pRecvTable->m_nProps; i++)
 			{
@@ -273,6 +263,19 @@ void NetvarHook()
                 }
             }
         }
+        else if (!strcmp(pszName, "DT_BaseViewModel"))
+        {
+            for (int i = 0; i < pClass->m_pRecvTable->m_nProps; i++)
+            {
+                RecvProp *pProp = &(pClass->m_pRecvTable->m_pProps[i]);
+                const char *name = pProp->m_pVarName;
+                if (!strcmp(name, "m_nModelIndex"))
+                {
+                    fnSequenceProxyFn = (RecvVarProxyFn)pProp->m_ProxyFn;
+                    pProp->m_ProxyFn = SetViewModelSequence2;
+                }
+            }
+        }
         pClass = pClass->m_pNext;
 	}
 }
@@ -282,16 +285,7 @@ void UnloadProxy()
 	while (pClass)
 	{
 		const char *pszName = pClass->m_pRecvTable->m_pNetTableName;
-		if (!strcmp(pszName, "DT_CSPlayer"))
-		{
-			for (int i = 0; i < pClass->m_pRecvTable->m_nProps; i++)
-			{
-				RecvProp *pProp = &(pClass->m_pRecvTable->m_pProps[i]);
-				const char *name = pProp->m_pVarName;
-
-			}
-		}
-		else if (!strcmp(pszName, "DT_SmokeGrenadeProjectile"))
+		if (!strcmp(pszName, "DT_SmokeGrenadeProjectile"))
 		{
 			for (int i = 0; i < pClass->m_pRecvTable->m_nProps; i++)
 			{
@@ -319,57 +313,21 @@ void UnloadProxy()
                 }
             }
         }
+        else if (!strcmp(pszName, "DT_BaseViewModel"))
+        {
+            for (int i = 0; i < pClass->m_pRecvTable->m_nProps; i++)
+            {
+                RecvProp *pProp = &(pClass->m_pRecvTable->m_pProps[i]);
+                const char *name = pProp->m_pVarName;
+
+
+                // Knives
+                if (!strcmp(name, "m_nSequence"))
+                {
+                    pProp->m_ProxyFn = fnSequenceProxyFn;
+                }
+            }
+        }
 		pClass = pClass->m_pNext;
 	}
-}
-
-void AnimationFixHook()
-{
-    for (ClientClass* pClass = g_CHLClient->GetAllClasses(); pClass; pClass = pClass->m_pNext) {
-        if (!strcmp(pClass->m_pNetworkName, "CBaseViewModel")) {
-            // Search for the 'm_nModelIndex' property.
-            RecvTable* pClassTable = pClass->m_pRecvTable;
-
-            for (int nIndex = 0; nIndex < pClassTable->m_nProps; nIndex++) {
-                RecvProp* pProp = &pClassTable->m_pProps[nIndex];
-
-                if (!pProp || strcmp(pProp->m_pVarName, "m_nSequence"))
-                    continue;
-
-                // Store the original proxy function.
-                fnSequenceProxyFn = static_cast<RecvVarProxyFn>(pProp->m_ProxyFn);
-
-                // Replace the proxy function with our sequence changer.
-                pProp->m_ProxyFn = static_cast<RecvVarProxyFn>(SetViewModelSequence2);
-
-                break;
-            }
-
-            break;
-        }
-    }
-}
-
-void AnimationFixUnhook()
-{
-    for (ClientClass* pClass = g_CHLClient->GetAllClasses(); pClass; pClass = pClass->m_pNext) {
-        if (!strcmp(pClass->m_pNetworkName, "CBaseViewModel")) {
-            // Search for the 'm_nModelIndex' property.
-            RecvTable* pClassTable = pClass->m_pRecvTable;
-
-            for (int nIndex = 0; nIndex < pClassTable->m_nProps; nIndex++) {
-                RecvProp* pProp = &pClassTable->m_pProps[nIndex];
-
-                if (!pProp || strcmp(pProp->m_pVarName, "m_nSequence"))
-                    continue;
-
-                // Replace the proxy function with our sequence changer.
-                pProp->m_ProxyFn = fnSequenceProxyFn;
-
-                break;
-            }
-
-            break;
-        }
-    }
 }

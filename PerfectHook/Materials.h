@@ -1,11 +1,41 @@
 #pragma once
 
 #include "MiscDefinitions.h"
-#include "offsets.h"
 #include "Vector.h"
 #include "MiscClasses.h"
 #include "Vector2D.h"
+#define DECLARE_POINTER_HANDLE(name) struct name##__ { int unused; }; typedef struct name##__ *name
+#define MAXSTUDIOSKINS		32
 
+// These are given to FindMaterial to reference the texture groups that show up on the 
+#define TEXTURE_GROUP_LIGHTMAP						        "Lightmaps"
+#define TEXTURE_GROUP_WORLD							          "World textures"
+#define TEXTURE_GROUP_MODEL							          "Model textures"
+#define TEXTURE_GROUP_VGUI							          "VGUI textures"
+#define TEXTURE_GROUP_PARTICLE						        "Particle textures"
+#define TEXTURE_GROUP_DECAL							          "Decal textures"
+#define TEXTURE_GROUP_SKYBOX						          "SkyBox textures"
+#define TEXTURE_GROUP_CLIENT_EFFECTS				      "ClientEffect textures"
+#define TEXTURE_GROUP_OTHER							          "Other textures"
+#define TEXTURE_GROUP_PRECACHED						        "Precached"
+#define TEXTURE_GROUP_CUBE_MAP						        "CubeMap textures"
+#define TEXTURE_GROUP_RENDER_TARGET					      "RenderTargets"
+#define TEXTURE_GROUP_UNACCOUNTED					        "Unaccounted textures"
+#define TEXTURE_GROUP_STATIC_VERTEX_BUFFER		  "Static Vertex"
+#define TEXTURE_GROUP_STATIC_INDEX_BUFFER			    "Static Indices"
+#define TEXTURE_GROUP_STATIC_VERTEX_BUFFER_DISP		"Displacement Verts"
+#define TEXTURE_GROUP_STATIC_VERTEX_BUFFER_COLOR	"Lighting Verts"
+#define TEXTURE_GROUP_STATIC_VERTEX_BUFFER_WORLD	"World Verts"
+#define TEXTURE_GROUP_STATIC_VERTEX_BUFFER_MODELS	"Model Verts"
+#define TEXTURE_GROUP_STATIC_VERTEX_BUFFER_OTHER	"Other Verts"
+#define TEXTURE_GROUP_DYNAMIC_INDEX_BUFFER			  "Dynamic Indices"
+#define TEXTURE_GROUP_DYNAMIC_VERTEX_BUFFER			  "Dynamic Verts"
+#define TEXTURE_GROUP_DEPTH_BUFFER					      "DepthBuffer"
+#define TEXTURE_GROUP_VIEW_MODEL					        "ViewModel"
+#define TEXTURE_GROUP_PIXEL_SHADERS					      "Pixel Shaders"
+#define TEXTURE_GROUP_VERTEX_SHADERS				      "Vertex Shaders"
+#define TEXTURE_GROUP_RENDER_TARGET_SURFACE			  "RenderTarget Surfaces"
+#define TEXTURE_GROUP_MORPH_TARGETS					      "Morph Targets"
 typedef unsigned short MaterialHandle_t;
 
 class IMaterial
@@ -47,7 +77,98 @@ public:
 		call_vfunc<SetMaterialVarFlagFn>(this, 29)(this, flag, on);
 	}
 };
+enum ShaderStencilOp_t
+{
+#if !defined( _X360 )
+    SHADER_STENCILOP_KEEP = 1,
+    SHADER_STENCILOP_ZERO = 2,
+    SHADER_STENCILOP_SET_TO_REFERENCE = 3,
+    SHADER_STENCILOP_INCREMENT_CLAMP = 4,
+    SHADER_STENCILOP_DECREMENT_CLAMP = 5,
+    SHADER_STENCILOP_INVERT = 6,
+    SHADER_STENCILOP_INCREMENT_WRAP = 7,
+    SHADER_STENCILOP_DECREMENT_WRAP = 8,
+#else
+    SHADER_STENCILOP_KEEP = D3DSTENCILOP_KEEP,
+    SHADER_STENCILOP_ZERO = D3DSTENCILOP_ZERO,
+    SHADER_STENCILOP_SET_TO_REFERENCE = D3DSTENCILOP_REPLACE,
+    SHADER_STENCILOP_INCREMENT_CLAMP = D3DSTENCILOP_INCRSAT,
+    SHADER_STENCILOP_DECREMENT_CLAMP = D3DSTENCILOP_DECRSAT,
+    SHADER_STENCILOP_INVERT = D3DSTENCILOP_INVERT,
+    SHADER_STENCILOP_INCREMENT_WRAP = D3DSTENCILOP_INCR,
+    SHADER_STENCILOP_DECREMENT_WRAP = D3DSTENCILOP_DECR,
+#endif
+    SHADER_STENCILOP_FORCE_DWORD = 0x7fffffff
+};
 
+enum ShaderStencilFunc_t
+{
+#if !defined( _X360 )
+    SHADER_STENCILFUNC_NEVER = 1,
+    SHADER_STENCILFUNC_LESS = 2,
+    SHADER_STENCILFUNC_EQUAL = 3,
+    SHADER_STENCILFUNC_LEQUAL = 4,
+    SHADER_STENCILFUNC_GREATER = 5,
+    SHADER_STENCILFUNC_NOTEQUAL = 6,
+    SHADER_STENCILFUNC_GEQUAL = 7,
+    SHADER_STENCILFUNC_ALWAYS = 8,
+#else
+    SHADER_STENCILFUNC_NEVER = D3DCMP_NEVER,
+    SHADER_STENCILFUNC_LESS = D3DCMP_LESS,
+    SHADER_STENCILFUNC_EQUAL = D3DCMP_EQUAL,
+    SHADER_STENCILFUNC_LEQUAL = D3DCMP_LESSEQUAL,
+    SHADER_STENCILFUNC_GREATER = D3DCMP_GREATER,
+    SHADER_STENCILFUNC_NOTEQUAL = D3DCMP_NOTEQUAL,
+    SHADER_STENCILFUNC_GEQUAL = D3DCMP_GREATEREQUAL,
+    SHADER_STENCILFUNC_ALWAYS = D3DCMP_ALWAYS,
+#endif
+
+    SHADER_STENCILFUNC_FORCE_DWORD = 0x7fffffff
+};
+
+#if defined( _X360 )
+enum ShaderHiStencilFunc_t
+{
+    SHADER_HI_STENCILFUNC_EQUAL = D3DHSCMP_EQUAL,
+    SHADER_HI_STENCILFUNC_NOTEQUAL = D3DHSCMP_NOTEQUAL,
+
+    SHADER_HI_STENCILFUNC_FORCE_DWORD = 0x7fffffff
+};
+#endif
+struct ShaderStencilState_t
+{
+    bool m_bEnable;
+    ShaderStencilOp_t m_FailOp;
+    ShaderStencilOp_t m_ZFailOp;
+    ShaderStencilOp_t m_PassOp;
+    ShaderStencilFunc_t m_CompareFunc;
+    int m_nReferenceValue;
+    uint32_t m_nTestMask;
+    uint32_t m_nWriteMask;
+
+#if defined( _X360 )
+    bool m_bHiStencilEnable;
+    bool m_bHiStencilWriteEnable;
+    ShaderHiStencilFunc_t m_HiStencilCompareFunc;
+    int m_nHiStencilReferenceValue;
+#endif
+
+    ShaderStencilState_t()
+    {
+        m_bEnable = false;
+        m_PassOp = m_FailOp = m_ZFailOp = SHADER_STENCILOP_KEEP;
+        m_CompareFunc = SHADER_STENCILFUNC_ALWAYS;
+        m_nReferenceValue = 0;
+        m_nTestMask = m_nWriteMask = 0xFFFFFFFF;
+
+#if defined( _X360 )
+        m_bHiStencilEnable = false;
+        m_bHiStencilWriteEnable = false;
+        m_HiStencilCompareFunc = SHADER_HI_STENCILFUNC_EQUAL;
+        m_nHiStencilReferenceValue = 0;
+#endif
+    }
+};
 #define VirtualFn( cast )typedef cast( __thiscall* OriginalFn )
 class CMaterialSystem
 {
@@ -87,7 +208,11 @@ public:
 		VirtualFn(int)(PVOID);
 		return call_vfunc< OriginalFn >(this, 90)(this);
 	}
-
+    void SetStencilState(const ShaderStencilState_t &state)
+    {
+        typedef void(__thiscall* OriginalFn)(void*, const ShaderStencilState_t&);
+        call_vfunc<OriginalFn>(this, 127)(this, state);
+    }
 };
 
 class IVModelRender

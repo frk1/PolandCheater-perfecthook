@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Hacks.h"
+#include "SDK.h"
 
 struct FireBulletData
 {

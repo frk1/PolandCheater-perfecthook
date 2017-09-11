@@ -30,6 +30,7 @@ namespace hooks
         clientmode.setup(g_ClientMode);
         clientmode.hook_index(18, hkOverrideView);
         clientmode.hook_index(35, Hooked_GetViewModelFOV);
+        clientmode.hook_index(44, do_post_screen_space_effects);
 
         panel.setup(g_Panel);
         panel.hook_index(41, hkPaintTraverse);

@@ -13,29 +13,25 @@ using namespace std;
 #define TICK_INTERVAL			(g_Globals->interval_per_tick)
 #define TIME_TO_TICKS( dt )		( (int)( 0.5f + (float)(dt) / TICK_INTERVAL ) )
 
-void IRage::Init()
+ragebot::ragebot()
 {
-	IsAimStepping = false;
 	IsLocked = false;
 	TargetID = -1;
 	pTarget = nullptr;
-}
-
-void IRage::PaintTraverse()
-{
-
+    AimPoint = Vector(0,0,0);
+    HitBox = -1;
 }
 
 
 
 
-void IRage::CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
+
+void ragebot::OnCreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket, IClientEntity* local)
 {
-    if (!menu.Ragebot.b1g)
+    if (!menu.Ragebot.MainSwitch)
         return;
 
-    IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
-    if (pLocal && pLocal->IsAlive())
+    if (local && local->IsAlive())
     {
         if (menu.Ragebot.BAIMkey && G::PressedKeys[menu.Ragebot.BAIMkey] && menu.Ragebot.Hitscan != 4)
         {
@@ -46,7 +42,7 @@ void IRage::CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
             menu.Ragebot.Hitscan = 3;
         }
 
-        CBaseCombatWeapon* weapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
+        CBaseCombatWeapon* weapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(local->GetActiveWeaponHandle());
         if (weapon && weapon->m_AttributeManager()->m_Item()->GetItemDefinitionIndex() == 64)
         {
             if (!CanAttack() && weapon->GetAmmoInClip() > 0)
@@ -57,21 +53,15 @@ void IRage::CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
 
 
         if (menu.Ragebot.Enabled)
-            DoAimbot(pCmd, bSendPacket);
-
-        if (menu.Ragebot.AntiRecoil)
-            DoNoRecoil(pCmd);
-
+            DoAimbot(pCmd, bSendPacket, local);
 
 
         if (menu.Ragebot.EnabledAntiAim)
-            DoAntiAim(pCmd, bSendPacket);
-
-
+            DoAntiAim(pCmd, bSendPacket, local);
     }
-    LastAngle = pCmd->viewangles;
 }
-bool IRage::hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseCombatWeapon* weapon, IClientEntity* target)
+
+bool ragebot::hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseCombatWeapon* weapon, IClientEntity* target)
 {
     Vector forward, right, up;
 
@@ -105,7 +95,7 @@ bool IRage::hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseCombatW
 
         Vector viewAnglesSpread;
         VectorAngles(viewSpreadForward, viewAnglesSpread);
-        MiscFunctions::NormaliseViewAngle(viewAnglesSpread);
+        sanitize_angles(viewAnglesSpread);
 
         Vector viewForward;
         AngleVectors(viewAnglesSpread, &viewForward);
@@ -132,303 +122,177 @@ bool IRage::hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseCombatW
 
     return false;
 }
-template<class T, class U>
-T clamp(T in, U low, U high)
-{
-	if (in <= low)
-		return low;
 
-	if (in >= high)
-		return high;
-
-	return in;
-}
-float LagFix()
-{
-	float updaterate = g_CVar->FindVar("cl_updaterate")->fValue;
-	ConVar* minupdate = g_CVar->FindVar("sv_minupdaterate");
-	ConVar* maxupdate = g_CVar->FindVar("sv_maxupdaterate");
-
-	if (minupdate && maxupdate)
-		updaterate = maxupdate->fValue;
-
-	float ratio = g_CVar->FindVar("cl_interp_ratio")->fValue;
-
-	if (ratio == 0)
-		ratio = 1.0f;
-
-	float lerp = g_CVar->FindVar("cl_interp")->fValue;
-	ConVar* cmin = g_CVar->FindVar("sv_client_min_interp_ratio");
-	ConVar* cmax = g_CVar->FindVar("sv_client_max_interp_ratio");
-
-	if (cmin && cmax && cmin->fValue != 1)
-		ratio = clamp(ratio, cmin->fValue, cmax->fValue);
-
-
-	return max(lerp, ratio / updaterate);
-}
-
-// Functionality
-void IRage::DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket)
+void ragebot::DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket, IClientEntity* local)
 {
 
-	IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
-	bool FindNewTarget = true;
-	//IsLocked = false;
+    bool FindNewTarget = true;
+    CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(local->GetActiveWeaponHandle());
 
-	// Don't aimbot with the knife..
-	CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
+    if (!pWeapon) return;
+    if (pWeapon->GetAmmoInClip() == 0 || MiscFunctions::IsKnife(pWeapon) || MiscFunctions::IsGrenade(pWeapon))
+        return;
 
-	if (pWeapon != nullptr)
-	{
+    // Make sure we have a good target
+    if (IsLocked && TargetID >= 0 && HitBox >= 0)
+    {
+        pTarget = g_EntityList->GetClientEntity(TargetID);
+        if (pTarget  && TargetMeetsRequirements(pTarget, local))
+        {
+            HitBox = HitScan(pTarget);
+            if (HitBox >= 0)
+            {
+                Vector View; g_Engine->GetViewAngles(View);
+                Vector hitboxpos = GetHitboxPosition(pTarget, HitBox);
 
-		if (pWeapon->GetAmmoInClip() == 0 || MiscFunctions::IsKnife(pWeapon) || MiscFunctions::IsGrenade(pWeapon))
-		{
-			//TargetID = 0;
-			//pTarget = nullptr;
-			//HitBox = -1;
-			return;
-		}
-	}
-	else
-		return;
-
-	// Make sure we have a good target
-	if (IsLocked && TargetID >= 0 && HitBox >= 0)
-	{
-		pTarget = g_EntityList->GetClientEntity(TargetID);
-		if (pTarget  && TargetMeetsRequirements(pTarget))
-		{
-			HitBox = HitScan(pTarget);
-			if (HitBox >= 0)
-			{
-				Vector ViewOffset = pLocal->GetOrigin() + pLocal->GetViewOffset();
-				Vector View; g_Engine->GetViewAngles(View);
-				float FoV = FovToPlayer(ViewOffset, View, pTarget, HitBox);
-				if (FoV < menu.Ragebot.FOV)
-					FindNewTarget = false;
-			}
-		}
-	}
+                float FoV = FovToPlayer(View, compute_angle(local->GetEyePosition(), hitboxpos));
+                if (FoV < menu.Ragebot.FOV)
+                    FindNewTarget = false;
+            }
+        }
+    }
 
 
 
-	// Find a new target, apparently we need to
-	if (FindNewTarget)
-	{
-		TargetID = 0;
-		pTarget = nullptr;
-		HitBox = -1;
+    // Find a new target, apparently we need to
+    if (FindNewTarget)
+    {
+        TargetID = 0;
+        pTarget = nullptr;
+        HitBox = -1;
 
 
-		TargetID = GetTargetCrosshair();
+        TargetID = GetTargetCrosshair(local);
 
 
-		// Memesj
-		if (TargetID >= 0)
-		{
-			pTarget = g_EntityList->GetClientEntity(TargetID);
-		}
-	}
+        // Memesj
+        if (TargetID >= 0)
+        {
+            pTarget = g_EntityList->GetClientEntity(TargetID);
+        }
+    }
 
-	if (TargetID >= 0 && pTarget)
-	{
-		HitBox = HitScan(pTarget);
+    if (TargetID >= 0 && pTarget)
+    {
+        HitBox = HitScan(pTarget);
 
-		// Key
-		if (menu.Ragebot.KeyPress)
-		{
-			if (menu.Ragebot.KeyPress > 0 && !G::PressedKeys[menu.Ragebot.KeyPress])
-			{
-				TargetID = -1;
-				pTarget = nullptr;
-				HitBox = -1;
-				return;
-			}
-		}
+        // Key
+        if (menu.Ragebot.KeyPress)
+        {
+            if (menu.Ragebot.KeyPress > 0 && !G::PressedKeys[menu.Ragebot.KeyPress])
+            {
+                TargetID = -1;
+                pTarget = nullptr;
+                HitBox = -1;
+                return;
+            }
+        }
 
 
-		Vector AimPoint = GetHitboxPosition(pTarget, HitBox);
+        Vector AimPoint = GetHitboxPosition(pTarget, HitBox);
 
 
 
 
 
-
-        if (AimAtPoint(pLocal, AimPoint, pCmd))
+        if (AimAtPoint(local, AimPoint, pCmd))
         {
             if (menu.Ragebot.AutoFire && CanAttack() && MiscFunctions::IsSniper(pWeapon) && menu.Ragebot.AutoScope)
             {
-                if (pLocal->IsScoped()) if (!menu.Ragebot.Hitchance || hit_chance(pLocal, pCmd, pWeapon, pTarget)) pCmd->buttons |= IN_ATTACK;
-                if (!pLocal->IsScoped()) pCmd->buttons |= IN_ATTACK2;
+                if (local->IsScoped()) if (!menu.Ragebot.Hitchance || hit_chance(local, pCmd, pWeapon, pTarget)) pCmd->buttons |= IN_ATTACK;
+                if (!local->IsScoped()) pCmd->buttons |= IN_ATTACK2;
             }
             if (menu.Ragebot.AutoFire && CanAttack() && !(MiscFunctions::IsSniper(pWeapon)))
             {
-                if (!menu.Ragebot.Hitchance || hit_chance(pLocal, pCmd, pWeapon, pTarget)) pCmd->buttons |= IN_ATTACK;
+                if (!menu.Ragebot.Hitchance || hit_chance(local, pCmd, pWeapon, pTarget)) pCmd->buttons |= IN_ATTACK;
             }
             if (menu.Ragebot.AutoFire && CanAttack() && (MiscFunctions::IsSniper(pWeapon)) && !menu.Ragebot.AutoScope)
             {
-                if (!menu.Ragebot.Hitchance || hit_chance(pLocal, pCmd, pWeapon, pTarget)) if (pLocal->IsScoped()) pCmd->buttons |= IN_ATTACK;
+                if (!menu.Ragebot.Hitchance || hit_chance(local, pCmd, pWeapon, pTarget)) if (local->IsScoped()) pCmd->buttons |= IN_ATTACK;
             }
         }
 
 
 
 
-		if (menu.Ragebot.AutoStop)
-		{
-			pCmd->forwardmove = 0.f;
-			pCmd->sidemove = 0.f;
-		}
 
+        if (menu.Ragebot.AutoStop)
+        {
+            pCmd->forwardmove = 0.f;
+            pCmd->sidemove = 0.f;
+        }
+        if (menu.Ragebot.AutoCrouch)
+        {
+            pCmd->buttons |= IN_DUCK;
+        }
 
+    }
+    // Auto Pistol
+    static bool WasFiring = false;
+    if (pWeapon != nullptr)
+    {
+        CSWeaponInfo* WeaponInfo = pWeapon->GetCSWpnData();
+        if (MiscFunctions::IsPistol(pWeapon) && menu.Ragebot.AutoPistol && pWeapon->m_AttributeManager()->m_Item()->GetItemDefinitionIndex() != 64)
+        {
+            if (pCmd->buttons & IN_ATTACK && !MiscFunctions::IsKnife(pWeapon) && !MiscFunctions::IsGrenade(pWeapon))
+            {
+                if (WasFiring)
+                {
+                    pCmd->buttons &= ~IN_ATTACK;
+                }
+            }
 
-		if (menu.Ragebot.AutoCrouch)
-		{
-			pCmd->buttons |= IN_DUCK;
-		}
-
-	}
-
-	// Auto Pistol
-	static bool WasFiring = false;
-	if (pWeapon != nullptr)
-	{
-		CSWeaponInfo* WeaponInfo = pWeapon->GetCSWpnData();
-		if (MiscFunctions::IsPistol(pWeapon) && menu.Ragebot.AutoPistol && pWeapon->m_AttributeManager()->m_Item()->GetItemDefinitionIndex() != 64)
-		{
-			if (pCmd->buttons & IN_ATTACK && !MiscFunctions::IsKnife(pWeapon) && !MiscFunctions::IsGrenade(pWeapon))
-			{
-				if (WasFiring)
-				{
-					pCmd->buttons &= ~IN_ATTACK;
-				}
-			}
-
-			WasFiring = pCmd->buttons & IN_ATTACK ? true : false;
-		}
-	}
+            WasFiring = pCmd->buttons & IN_ATTACK ? true : false;
+        }
+    }
 
 
 }
 
 
 
-bool IRage::TargetMeetsRequirements(IClientEntity* pEntity)
+bool ragebot::TargetMeetsRequirements(IClientEntity* pEntity, IClientEntity* local)
 {
-	// Is a valid player
-	if (pEntity && pEntity->IsDormant() == false && pEntity->IsAlive() && pEntity->GetIndex() != hack.pLocal()->GetIndex())
-	{
-		// Entity Type checks
-		ClientClass *pClientClass = pEntity->GetClientClass();
-		player_info_t pinfo;
-		if (pClientClass->m_ClassID == (int)ClassID::CCSPlayer && g_Engine->GetPlayerInfo(pEntity->GetIndex(), &pinfo))
-		{
-			// Team Check
-			if (pEntity->GetTeamNum() != hack.pLocal()->GetTeamNum() || menu.Ragebot.FriendlyFire)
-			{
-				// Spawn Check
-				if (!pEntity->HasGunGameImmunity())
-				{
-					return true;
-				}
-			}
-		}
-	}
+    if (pEntity && pEntity->IsDormant() == false && pEntity->IsAlive() && pEntity->GetIndex() != local->GetIndex())
+    {
+        ClientClass *pClientClass = pEntity->GetClientClass();
+        player_info_t pinfo;
+        if (pClientClass->m_ClassID == (int)ClassID::CCSPlayer && g_Engine->GetPlayerInfo(pEntity->GetIndex(), &pinfo))
+            if (pEntity->GetTeamNum() != local->GetTeamNum() || menu.Ragebot.FriendlyFire)
+                if (!pEntity->HasGunGameImmunity())
+                    return true;
+    }
 
-	// They must have failed a requirement
 	return false;
 }
-bool IRage::IsValidTARGET(int iEnt, IClientEntity* pLocal)
+
+float ragebot::FovToPlayer(const Vector &viewAngles, const Vector &aimAngles)
 {
-	IClientEntity* pEnt = nullptr;
+    Vector ang, aim;
+    AngleVectors(viewAngles, &aim);
+    AngleVectors(aimAngles, &ang);
 
-	if ((pEnt = g_EntityList->GetClientEntity(iEnt)))
-		if (!(pEnt == pLocal))
-		{
-			if (pEnt->GetTeamNum() != pLocal->GetTeamNum())
-				if (!pEnt->IsDormant())
-					if (pEnt->GetHealth() > 0)
-						return true;
-		}
-	return false;
-}
-int IRage::AATARGE(CInput::CUserCmd *pCmd, IClientEntity* pLocal, CBaseCombatWeapon* pWeapon)
-{
-	int target = -1;
-	int minDist = 99999;
-
-
-	Vector ViewOffset = pLocal->GetEyePosition();
-	Vector View; g_Engine->GetViewAngles(View);
-
-	for (int i = 0; i < g_EntityList->GetHighestEntityIndex(); i++)
-	{
-		IClientEntity* pEntity = g_EntityList->GetClientEntity(i);
-		if (IsValidTARGET(i, pLocal))
-		{
-			//ValveVector Difference = pLocalEntity->GetAbsOrigin() - pEntity->GetAbsOrigin();
-			target = i;
-		}
-	}
-	return target;
-
+    return RAD2DEG(acos(aim.Dot(ang) / aim.LengthSqr()));
 }
 
-
-
-float IRage::FovToPlayer(Vector ViewOffSet, Vector View, IClientEntity* pEntity, int aHitBox)
+int ragebot::GetTargetCrosshair(IClientEntity* local)
 {
-	// Anything past 180 degrees is just going to wrap around
-	CONST FLOAT MaxDegrees = 180.0f;
-
-	// Get local angles
-	Vector Angles = View;
-
-	// Get local view / eye position
-	Vector Origin = ViewOffSet;
-
-	// Create and intiialize vectors for calculations below
-	Vector Delta(0, 0, 0);
-	//Vector Origin(0, 0, 0);
-	Vector Forward(0, 0, 0);
-
-	// Convert angles to normalized directional forward vector
-	AngleVectors(Angles, &Forward);
-	Vector AimPos = GetHitboxPosition(pEntity, aHitBox); //pvs fix disabled
-																// Get delta vector between our local eye position and passed vector
-	VectorSubtract(AimPos, Origin, Delta);
-	//Delta = AimPos - Origin;
-
-	// Normalize our delta vector
-	Normalize(Delta, Delta);
-
-	// Get dot product between delta position and directional forward vectors
-	FLOAT DotProduct = Forward.Dot(Delta);
-
-	// Time to calculate the field of view
-	return (acos(DotProduct) * (MaxDegrees / PI));
-}
-
-int IRage::GetTargetCrosshair()
-{
-	// Target selection
 	int target = -1;
 	float minFoV = menu.Ragebot.FOV;
 
-	IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
-	Vector ViewOffset = pLocal->GetOrigin() + pLocal->GetViewOffset();
+
 	Vector View; g_Engine->GetViewAngles(View);
 
 	for (int i = 0; i < g_EntityList->GetHighestEntityIndex(); i++)
 	{
 		IClientEntity *pEntity = g_EntityList->GetClientEntity(i);
-		if (TargetMeetsRequirements(pEntity))
+		if (TargetMeetsRequirements(pEntity, local))
 		{
 			int NewHitBox = HitScan(pEntity);
 			if (NewHitBox >= 0)
 			{
-				float fov = FovToPlayer(ViewOffset, View, pEntity, 0);
+                Vector hitboxpos = GetHitboxPosition(pEntity, 0);
+				float fov = FovToPlayer(View, compute_angle(local->GetEyePosition(), hitboxpos));
 				if (fov < minFoV)
 				{
 					minFoV = fov;
@@ -441,10 +305,9 @@ int IRage::GetTargetCrosshair()
 	return target;
 }
 
-int IRage::HitScan(IClientEntity* pEntity)
+int ragebot::HitScan(IClientEntity* pEntity)
 {
-    vector<int> HitBoxesToScan{ Head , Neck, Chest, Stomach };
-
+    vector<int> HitBoxesToScan{ };
 
     int HitScanMode = menu.Ragebot.Hitscan;
 
@@ -538,6 +401,7 @@ int IRage::HitScan(IClientEntity* pEntity)
 
     int bestHitbox = -1;
     float highestDamage = menu.Ragebot.MinimumDamage;
+    float health = pEntity->GetHealth();
     for (auto HitBoxID : HitBoxesToScan)
     {
 
@@ -546,7 +410,7 @@ int IRage::HitScan(IClientEntity* pEntity)
         float damage = 0.0f;
         if (CanHit(Point, &damage))
         {
-            if (damage > highestDamage || damage > pEntity->GetHealth())
+            if (damage > highestDamage || damage > health)
             {
                 bestHitbox = HitBoxID;
                 highestDamage = damage;
@@ -561,7 +425,7 @@ int IRage::HitScan(IClientEntity* pEntity)
         float damage = 0.0f;
         if (CanHit(Point, &damage))
         {
-            if (damage > highestDamage && damage > pEntity->GetHealth())
+            if (damage > highestDamage && damage > health)
             {
                 bestHitbox = HitBoxID;
                 highestDamage = damage;
@@ -572,64 +436,17 @@ int IRage::HitScan(IClientEntity* pEntity)
 
 }
 
-
-
-void IRage::DoNoRecoil(CInput::CUserCmd *pCmd)
+bool ragebot::AimAtPoint(IClientEntity* pLocal, Vector point, CInput::CUserCmd *pCmd)
 {
-	// Ghetto rcs shit, implement properly later
-	IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
-	if (pLocal != nullptr)
-	{
-		Vector AimPunch = pLocal->localPlayerExclusive()->GetAimPunchAngle();
-		if (AimPunch.Length2D() > 0 && AimPunch.Length2D() < 150)
-		{
-			pCmd->viewangles -= AimPunch * 2;
-			MiscFunctions::NormaliseViewAngle(pCmd->viewangles);
-		}
-	}
-}
 
-float FovToPoint(Vector ViewOffSet, Vector View, Vector Point)
-{
-	// Get local view / eye position
-	Vector Origin = ViewOffSet;
-
-	// Create and intiialize vectors for calculations below
-	Vector Delta(0, 0, 0);
-	Vector Forward(0, 0, 0);
-
-	// Convert angles to normalized directional forward vector
-	AngleVectors(View, &Forward);
-	Vector AimPos = Point;
-
-	// Get delta vector between our local eye position and passed vector
-	Delta = AimPos - Origin;
-	//Delta = AimPos - Origin;
-
-	// Normalize our delta vector
-	Normalize(Delta, Delta);
-
-	// Get dot product between delta position and directional forward vectors
-	FLOAT DotProduct = Forward.Dot(Delta);
-
-	// Time to calculate the field of view
-	return (acos(DotProduct) * (180.f / PI));
-}
-bool me123 = false;
-bool IRage::AimAtPoint(IClientEntity* pLocal, Vector point, CInput::CUserCmd *pCmd)
-{
-	bool ReturnValue = false;
-
-	if (point.Length() == 0) return ReturnValue;
+	if (point.Length() == 0) return false;
 
 	Vector angles;
 
 	Vector src = pLocal->GetOrigin() + pLocal->GetViewOffset();
 
-	//AngleVectors(angles, &src);
 	VectorAngles(point - src, angles);
-	//CalcAngle(src, point, angles);
-	MiscFunctions::NormaliseViewAngle(angles);
+    if (!sanitize_angles(angles)) return false;
 
 	CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
 	bool can_shoot = true;
@@ -643,49 +460,21 @@ bool IRage::AimAtPoint(IClientEntity* pLocal, Vector point, CInput::CUserCmd *pC
 		}
 	}
 
-
-
-
 	IsLocked = true;
-	Vector ViewOffset = pLocal->GetOrigin() + pLocal->GetViewOffset();
-	if (!IsAimStepping)
-		LastAimstepAngle = LastAngle; // Don't just use the viewangs because you need to consider aa
 
-	float fovLeft = FovToPlayer(ViewOffset, LastAimstepAngle, g_EntityList->GetClientEntity(TargetID), 0);
+    if(menu.Ragebot.AntiRecoil) 
+        angles -= pLocal->localPlayerExclusive()->GetAimPunchAngle() * 2;
 
-	if (fovLeft > 25.0f && me123)
-	{
-		Vector AddAngs = angles - LastAimstepAngle;
-		Normalize(AddAngs, AddAngs);
-		AddAngs *= 25;
-		LastAimstepAngle += AddAngs;
-		MiscFunctions::NormaliseViewAngle(LastAimstepAngle);
-		angles = LastAimstepAngle;
-	}
-	else
-	{
-		ReturnValue = true;
-	}
-
-
-
-	if (menu.Ragebot.Silent)
-	{
-		if (can_shoot) {
-			pCmd->viewangles = angles;
-		}
-	}
+	if (menu.Ragebot.Silent && can_shoot) 
+        pCmd->viewangles = angles;
+	
 
     if (!menu.Ragebot.Silent)
     {
         pCmd->viewangles = angles;
         g_Engine->SetViewAngles(pCmd->viewangles);
     }
-	if (menu.Ragebot.FakeLagFix)
-	{
-		pCmd->tick_count = TIME_TO_TICKS(LagFix());
-	}
-	return ReturnValue;
+	return true;
 }
 
 
@@ -729,16 +518,6 @@ void VectorAngles2(const Vector &vecForward, Vector &vecAngles)
 }
 
 
-void AtTarget(IClientEntity *Target, CInput::CUserCmd *pCmd) {
-	if (!Target)
-		return;
-
-	if ((Target->GetTeamNum() == hack.pLocal()->GetTeamNum()) || Target->IsDormant() || !Target->IsAlive() || Target->GetHealth() <= 0)
-		return;
-
-	Vector TargetPosition = Target->GetEyePosition();
-	CalcAngle(hack.pLocal()->GetEyePosition(), TargetPosition, pCmd->viewangles);
-}
 
 bool EdgeAntiAim(IClientEntity* pLocalBaseEntity, CInput::CUserCmd* cmd, float flWall, float flCornor)
 {
@@ -810,10 +589,9 @@ bool EdgeAntiAim(IClientEntity* pLocalBaseEntity, CInput::CUserCmd* cmd, float f
 }
 
 // AntiAim
-void IRage::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket)
+void ragebot::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket, IClientEntity* local)
 {
-	IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
-	CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
+	CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(local->GetActiveWeaponHandle());
 
 
 
@@ -823,7 +601,7 @@ void IRage::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket)
 		return;
 	if ((pCmd->buttons & IN_USE))
 		return;
-	if (pLocal->GetMoveType() == MOVETYPE_LADDER)
+	if (local->GetMoveType() == MOVETYPE_LADDER)
 		return;
 	// Weapon shit
 
@@ -844,15 +622,11 @@ void IRage::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket)
 	// if (DoExit) return;
 
 	if (menu.Ragebot.Edge) {
-		auto bEdge = EdgeAntiAim(hack.pLocal(), pCmd, 360.f, 89.f);
+		auto bEdge = EdgeAntiAim(local, pCmd, 360.f, 89.f);
 		if (bEdge)
 			return;
 	}
 
-	if (menu.Ragebot.AtTarget) {
-		IClientEntity *Target = g_EntityList->GetClientEntity(TargetID);
-		AtTarget(Target, pCmd);
-	}
 
 	
 
@@ -894,7 +668,7 @@ void IRage::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket)
 
 	Vector SpinAngles;
 	Vector FakeAngles;
-    float server_time = pLocal->GetTickBase() * g_Globals->interval_per_tick;
+    float server_time = local->GetTickBase() * g_Globals->interval_per_tick;
 	static int ticks;
 	static bool flip;
 	if (ticks < 15 + rand() % 20)
@@ -934,7 +708,7 @@ void IRage::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket)
 		break;
 	case 5:
 	{
-		SpinAngles.y = pLocal->GetLowerBodyYaw();
+		SpinAngles.y = local->GetLowerBodyYaw();
 	}
 		break;
 	}
@@ -967,7 +741,7 @@ void IRage::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket)
 			g_Engine->GetViewAngles(StartAngles);
 			static bool llamaflip;
 			static float oldLBY = 0.0f;
-			float LBY = pLocal->GetLowerBodyYaw();
+			float LBY = local->GetLowerBodyYaw();
 			if (LBY != oldLBY) // did lowerbody update?
 			{
 				llamaflip = !llamaflip;

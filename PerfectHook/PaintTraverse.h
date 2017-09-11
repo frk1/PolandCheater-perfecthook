@@ -2,7 +2,7 @@
 #include "HookIncludes.h"
 #include "Interfaces.h"
 #include <ctime>
-#include "MovementRecorder.h"
+#include "ESP.h"
 typedef void(__thiscall* paint_traverse_t)(PVOID, unsigned int, bool, bool);
 
 
@@ -13,8 +13,8 @@ int height1 = 0;
 void __fastcall hkPaintTraverse(PVOID pPanels, int edx, unsigned int vguiPanel, bool forceRepaint, bool allowForce)
 {
     static auto ofunc = hooks::panel.get_original<paint_traverse_t>(41);
-	IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
-	if (pLocal != nullptr && pLocal->IsAlive() && menu.Visuals.noscopeborder && !strcmp("HudZoom", g_Panel->GetName(vguiPanel)))
+	IClientEntity* local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+	if (local != nullptr && local->IsAlive() && menu.Visuals.noscopeborder && !strcmp("HudZoom", g_Panel->GetName(vguiPanel)))
 	{
 		return;
 	}
@@ -37,25 +37,20 @@ void __fastcall hkPaintTraverse(PVOID pPanels, int edx, unsigned int vguiPanel, 
             static auto linegoesthrusmoke = U::FindPattern("client.dll", (PBYTE)"\x55\x8B\xEC\x83\xEC\x08\x8B\x15\x00\x00\x00\x00\x0F\x57\xC0", "xxxxxxxx????xxx");
             static auto smokecout = *(DWORD*)(linegoesthrusmoke + 0x8);
             if (menu.Visuals.NoSmoke) *(int*)(smokecout) = 0;
-			Hacks::DrawHacks();
 
+            visuals::instance().OnPaintTraverse(local);
 
 			auto m_flFlashDuration = NetVarManager->GetOffset("DT_CSPlayer", "m_flFlashDuration");
 			auto m_flFlashMaxAlpha = NetVarManager->GetOffset("DT_CSPlayer", "m_flFlashMaxAlpha");
-			if (pLocal != nullptr)
+			if (local != nullptr)
 			{
-				CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
+				CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(local->GetActiveWeaponHandle());
 				if (menu.Visuals.NoFlash) 
 				{
-					*MakePtr(float*, pLocal, m_flFlashDuration) = 0.3f;
-					*MakePtr(float*, pLocal, m_flFlashMaxAlpha) = 0.4f;
+					*MakePtr(float*, local, m_flFlashDuration) = 0.f;
+					*MakePtr(float*, local, m_flFlashMaxAlpha) = 0.f;
 				}
-				else
-				{
-					*MakePtr(float*, pLocal, m_flFlashDuration) = 5100.f;
-					*MakePtr(float*, pLocal, m_flFlashMaxAlpha) = 255.f;
-				}
-				if (pLocal != nullptr && pLocal->IsScoped() && menu.Visuals.noscopeborder && MiscFunctions::IsSniper(pWeapon))
+				if (local && local->IsScoped() && menu.Visuals.noscopeborder && MiscFunctions::IsSniper(pWeapon))
 				{
 					int width = 0;
 					int height = 0;
@@ -63,8 +58,8 @@ void __fastcall hkPaintTraverse(PVOID pPanels, int edx, unsigned int vguiPanel, 
 
 					int centerX = static_cast<int>(width * 0.5f);
 					int centerY = static_cast<int>(height * 0.5f);
-					Render::Line(0, centerY, width, centerY, Color(0, 0, 0, 255));
-					Render::Line(centerX, 0, centerX, height, Color(0, 0, 0, 255));
+                    g_Render->Line(0, centerY, width, centerY, Color(0, 0, 0, 255));
+                    g_Render->Line(centerX, 0, centerX, height, Color(0, 0, 0, 255));
 				}
 			}
 		}
@@ -74,14 +69,14 @@ void __fastcall hkPaintTraverse(PVOID pPanels, int edx, unsigned int vguiPanel, 
 			menu.Misc.NoName = false;
 			menu.Misc.ChatSpamMode = false;
 		}
-		if (menu.Ragebot.b1g && !once)
+		if (menu.Ragebot.MainSwitch && !once)
 		{
-			menu.Legitbot.b1g = false;
+			menu.Legitbot.MainSwitch = false;
 			once = !once;
 		}
-		if (menu.Legitbot.b1g && once)
+		if (menu.Legitbot.MainSwitch && once)
 		{
-			menu.Ragebot.b1g = false;
+			menu.Ragebot.MainSwitch = false;
 			once = !once;
 		}
 
@@ -95,7 +90,7 @@ void __fastcall hkPaintTraverse(PVOID pPanels, int edx, unsigned int vguiPanel, 
 		if (menu.Visuals.Time)
 		{
 			std::time_t result = std::time(nullptr);
-			Render::Text(1, 1, Color(255, 255, 255, 255), Render::Fonts::Time, std::asctime(std::localtime(&result)));
+			g_Render->Text(1, 1, Color(255, 255, 255, 255), g_Render->font.Time, std::asctime(std::localtime(&result)));
 		}
 
 

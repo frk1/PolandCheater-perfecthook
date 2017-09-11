@@ -36,9 +36,6 @@
     <ClCompile Include="Global.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Hacks.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Hooks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -58,9 +55,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NetVarManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Offsets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RageBot.cpp">
@@ -125,9 +119,6 @@
     <ClInclude Include="CreateMove.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DLLMain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DrawModelExecute.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -156,9 +147,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GloveChanger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Hacks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="HookIncludes.h">
@@ -210,9 +198,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NetVarManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Offsets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="OnScreenSizeChanged.h">

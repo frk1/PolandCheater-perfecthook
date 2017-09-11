@@ -31,7 +31,9 @@ void  __stdcall hkFrameStageNotify(ClientFrameStage_t curStage)
         {
             GloveChanger();
             SkinChanger();
+
         }
+        backtracking->Update(g_Globals->tickcount);
 	}
 
 }

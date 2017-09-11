@@ -45,7 +45,7 @@ void grenade_prediction::Paint()
         Vector prev = path[0];
         for (auto it = path.begin(), end = path.end(); it != end; ++it)
         {
-            if (Render::WorldToScreen(prev, nadeStart) && Render::WorldToScreen(*it, nadeEnd))
+            if (g_Render->WorldToScreen(prev, nadeStart) && g_Render->WorldToScreen(*it, nadeEnd))
             {
                 g_Surface->DrawSetColor(lineColor);
                 g_Surface->DrawLine((int)nadeStart.x, (int)nadeStart.y, (int)nadeEnd.x, (int)nadeEnd.y);
@@ -53,7 +53,7 @@ void grenade_prediction::Paint()
             prev = *it;
         }
 
-        if (Render::WorldToScreen(prev, nadeEnd))
+        if (g_Render->WorldToScreen(prev, nadeEnd))
         {
             g_Surface->DrawSetColor(Color(255, 0, 0, 255));
             g_Surface->DrawOutlinedCircle((int)nadeEnd.x, (int)nadeEnd.y, 10, 48);

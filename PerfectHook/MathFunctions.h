@@ -6,7 +6,6 @@
 #include "Vector.h"
 #include <algorithm>
 #include <stdint.h>
-
 #define PI 3.14159265358979323846f
 #define DEG2RAD( x ) ( ( float )( x ) * ( float )( ( float )( PI ) / 180.0f ) )
 #define RAD2DEG( x ) ( ( float )( x ) * ( float )( 180.0f / ( float )( PI ) ) )
@@ -33,6 +32,20 @@ inline void compute_angle(const Vector &source, const Vector &destination, QAngl
 
     if (delta.x >= 0.0f)
         angles.y += 180.0f;
+}
+inline QAngle compute_angle(const Vector &source, const Vector &destination)
+{
+    QAngle angles;
+
+    Vector delta = source - destination;
+    angles.x = static_cast< float >(asin(delta.z / delta.Length()) * M_RADPI);
+    angles.y = static_cast< float >(atan(delta.y / delta.x) * M_RADPI);
+    angles.z = 0.0f;
+
+    if (delta.x >= 0.0f)
+        angles.y += 180.0f;
+
+    return angles;
 }
 inline float get_distance(const Vector &start, const Vector &end)
 {
@@ -75,6 +88,7 @@ inline bool sanitize_angles(QAngle &angles)
 
     return true;
 }
+
 inline Vector angle_vector(Vector meme)
 {
     auto sy = sin(meme.y / 180.f * static_cast<float>(PI));

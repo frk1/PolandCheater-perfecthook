@@ -1,14 +1,15 @@
 #pragma once
 #include "HookIncludes.h"
 using do_post_screen_space_effects_t = bool(__thiscall*)(void*, CViewSetup*);
-do_post_screen_space_effects_t odo_post_screen_space_effects;
-CGlowObjectManager*   g_GlowObjManager = nullptr;
+
+
 
 bool _fastcall do_post_screen_space_effects(void* ecx, void* edx, CViewSetup* pSetup)
 {
+    static auto ofunc = hooks::clientmode.get_original<do_post_screen_space_effects_t>(44);
 
-    g_GlowObjManager = *(CGlowObjectManager**)(U::pattern_scan(GetModuleHandleW(L"client.dll"), "0F 11 05 ? ? ? ? 83 C8 01 C7 05 ? ? ? ? 00 00 00 00") + 3);
-
+    IMaterial *pMatGlowColor = g_MaterialSystem->FindMaterial("dev/glow_color", TEXTURE_GROUP_OTHER, true);
+    g_ModelRender->ForcedMaterialOverride(pMatGlowColor);
 
     if (menu.Visuals.Glow && g_GlowObjManager && g_Engine->IsConnected())
     {
@@ -37,9 +38,9 @@ bool _fastcall do_post_screen_space_effects(void* ecx, void* edx, CViewSetup* pS
                             break;
 
                         if (glowEnt->getEnt()->GetTeamNum() == local->GetTeamNum())
-                            glowEnt->set(0.23921f, 0.55294f, 0.89019f, 0.8f);
+                            glowEnt->set(0.23921f, 0.55294f, 0.89019f, 0.7f);
                         else if (glowEnt->getEnt()->GetTeamNum() != local->GetTeamNum())
-                            glowEnt->set(0.89019f, 0.23137f, 0.23137f, 0.8f);
+                            glowEnt->set(0.89019f, 0.23137f, 0.23137f, 0.7f);
                     break;
                 case 39:
                         glowEnt->set(1.0f, 1.0f, 0.0f, 0.6f);
@@ -48,5 +49,5 @@ bool _fastcall do_post_screen_space_effects(void* ecx, void* edx, CViewSetup* pS
             }
         }
     }
-    return odo_post_screen_space_effects(ecx, pSetup);
+    return ofunc(ecx, pSetup);
 }

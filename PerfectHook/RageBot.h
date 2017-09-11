@@ -1,7 +1,34 @@
 
 #pragma once
 
-#include "Hacks.h"
+#include "SDK.h"
+#include "singleton.hpp"
+
+class ragebot
+    : public singleton<ragebot>
+{
+public:
+
+    ragebot();
+
+    void OnCreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket, IClientEntity* local);
+	bool hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseCombatWeapon* weapon, IClientEntity* target);
+private:
+	int GetTargetCrosshair(IClientEntity* local);
+	bool TargetMeetsRequirements(IClientEntity* pEntity, IClientEntity* local);
+    float FovToPlayer(const QAngle &viewAngles, const QAngle &aimAngles);
+	int HitScan(IClientEntity* pEntity);
+	bool AimAtPoint(IClientEntity* pLocal, Vector point, CInput::CUserCmd *pCmd);
+	void DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket, IClientEntity* local);
+	void DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket, IClientEntity* local);
+private:
+	bool IsLocked;
+	int TargetID;
+	int HitBox;
+	Vector AimPoint;
+	IClientEntity* pTarget;
+};
+
 inline bool CanAttack()
 {
     auto local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
@@ -29,50 +56,3 @@ inline bool CanAttack()
 
     return false;
 }
-
-class IRage : public CHack
-{
-public:
-	void Init();
-	void PaintTraverse();
-	bool hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseCombatWeapon* weapon);
-	bool hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseCombatWeapon* weapon, IClientEntity* target);
-	void CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket);
-
-private:
-	// Targetting
-	int GetTargetCrosshair();
-	void AngleVectors2(const Vector& qAngles, Vector& vecForward);
-	int GetTargetDistance();
-	int GetTargetHealth();
-	bool TargetMeetsRequirements(IClientEntity* pEntity);
-	float FovToPlayer(Vector ViewOffSet, Vector View, IClientEntity* pEntity, int HitBox);
-	Vector pointScanEdge(IClientEntity* pEntity, int HitboxID, float& damage);
-	int HitScan(IClientEntity* pEntity);
-	bool AimAtPoint(IClientEntity* pLocal, Vector point, CInput::CUserCmd *pCmd);
-	void PosAdjust(CInput::CUserCmd *pCmd);
-	void AntiAfk(CInput::CUserCmd *pCmd);
-	bool IsValidTARGET(int iEnt, IClientEntity* pLocal);
-	int AATARGE(CInput::CUserCmd *pCmd, IClientEntity* pLocal, CBaseCombatWeapon* pWeapon);
-	// Functionality
-	void DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket);
-	//	void DoNoSpread(CInput::CUserCmd *pCmd);
-	void DoNoRecoil(CInput::CUserCmd *pCmd);
-	void DoAntiAim2(CInput::CUserCmd* Cmd, bool& bSendPacket);
-	//	void Resolver(const CRecvProxyData *pData, void *pStruct, void *pOut);
-	// AntiAim
-	void DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket);
-	//	void FakeLagFix();
-
-	// AimStep
-	bool IsAimStepping;
-	Vector LastAimstepAngle;
-	Vector LastAngle;
-
-	// Aimbot
-	bool IsLocked;
-	int TargetID;
-	int HitBox;
-	Vector AimPoint;
-	IClientEntity* pTarget;
-};

@@ -28,7 +28,7 @@ HRESULT __stdcall hkReset(IDirect3DDevice9* thisptr, D3DPRESENT_PARAMETERS* para
 	ImGui_ImplDX9_CreateDeviceObjects();
 
 	renderer->Initialize(FindWindowA("Valve001", NULL), thisptr);
-    Render::Initialise();
+    g_Render->SetupFonts();
 	return result;
 }
 

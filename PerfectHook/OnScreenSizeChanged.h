@@ -9,5 +9,5 @@ void __stdcall OnScreenSizeChanged(int oldWidth, int oldHeight)
 {
 	oOnScreenSizeChanged(g_Surface, oldWidth, oldHeight);
 
-	Render::Initialise();
+    g_Render->SetupFonts();
 }

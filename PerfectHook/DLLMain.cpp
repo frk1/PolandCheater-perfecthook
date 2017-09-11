@@ -1,55 +1,27 @@
-// General shit
-#include "DLLMain.h"
-#include "Utilities.h"
-
-#include <iostream>
-#include <chrono>
-#include <ratio>
-#include <thread>
-
-// Stuff to initialise
-#include "Offsets.h"
 #include "Interfaces.h"
 #include "Hooks.h"
 #include "RenderManager.h"
-#include "Hacks.h"
+#include "SDK.h"
 
 #include "recvproxy.h"
 #include "MiscHacks.h"
 
-
-
-bool DoUnload;
-
-
+bool unload;
 
 bool on_dll_attach(void* base)
 {
-
-    Offsets::Initialise();
     InitialiseInterfaces();
-    NetVarManager->Initialize();
-
-
-    Offsetz::GetOffsets();
-    Render::Initialise();
-    Hacks::SetupHacks();
+    g_Netvars->GetNetvars();
+    g_Render->SetupFonts();
     hooks::initialize();
     NetvarHook();
-    AnimationFixHook();
 
-
-
-
-
-
-    while (DoUnload == false)
+    while (unload == false)
     {
         Sleep(1000);
     }
 
 
-    AnimationFixUnhook();
     UnloadProxy();
     hooks::cleanup();
 
@@ -57,18 +29,10 @@ bool on_dll_attach(void* base)
     FreeLibraryAndExitThread((HMODULE)base, 0);
 }
 
-
-
-
-
-
 bool on_dll_detach()
 {
-
-    AnimationFixUnhook();
     UnloadProxy();
     hooks::cleanup();
-
     return 1;
 }
 

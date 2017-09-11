@@ -9,7 +9,7 @@ void CConfig::Setup()
 {
 
 
-    SetupValue(menu.Ragebot.b1g, false, ("Ragebot"), ("RageToggle"));
+    SetupValue(menu.Ragebot.MainSwitch, false, ("Ragebot"), ("RageToggle"));
     SetupValue(menu.Ragebot.Enabled, false, ("Ragebot"), ("Enabled"));
     SetupValue(menu.Ragebot.AutoFire, false, ("Ragebot"), ("AutoFire"));
     SetupValue(menu.Ragebot.FOV, 0.f, ("Ragebot"), ("FOV"));
@@ -44,7 +44,7 @@ void CConfig::Setup()
 
 
 
-	SetupValue(menu.Legitbot.b1g, false, ("Legitbot"), ("LegitToggle"));
+	SetupValue(menu.Legitbot.MainSwitch, false, ("Legitbot"), ("LegitToggle"));
 	SetupValue(menu.Legitbot.Aimbot.Enabled, false, ("Legitbot"), ("Enabled"));
     SetupValue(menu.Legitbot.backtrack, false, ("Legitbot"), ("Backtrack"));
 

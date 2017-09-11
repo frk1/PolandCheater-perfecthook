@@ -5,5 +5,3 @@
 
 void NetvarHook();
 void UnloadProxy();
-void AnimationFixHook();
-void AnimationFixUnhook();

@@ -4,7 +4,6 @@
 
 #include "MiscDefinitions.h"
 
-#include "offsets.h"
 #include "Vector.h"
 #include "bspflags.h"
 

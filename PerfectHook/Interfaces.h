@@ -34,6 +34,8 @@ extern IViewRender* g_ViewRender;
 extern IGameConsole* g_GameConsole;
 extern IMDLCache* g_MdlCache;
 extern CHudChat* g_ChatElement;
+extern CGlowObjectManager* g_GlowObjManager;
+
 template<class T>
 static T* FindHudElement(const char* name)
 {

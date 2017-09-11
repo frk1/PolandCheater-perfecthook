@@ -1,6 +1,5 @@
 
 #include "SDK.h"
-#include "Hacks.h"
 float m_flOldCurtime;
 float m_flOldFrametime;
 CMoveData m_MoveData;

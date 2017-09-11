@@ -112,7 +112,6 @@
     <ClCompile Include="ESP.cpp" />
     <ClCompile Include="Global.cpp" />
     <ClCompile Include="GrenadePrediction.cpp" />
-    <ClCompile Include="Hacks.cpp" />
     <ClCompile Include="Hooks.cpp" />
     <ClCompile Include="imgui\examples\directx9_example\imgui_impl_dx9.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
@@ -124,7 +123,6 @@
     <ClCompile Include="memesets.cpp" />
     <ClCompile Include="MiscHacks.cpp" />
     <ClCompile Include="NetVarManager.cpp" />
-    <ClCompile Include="Offsets.cpp" />
     <ClCompile Include="RageBot.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RenderManager.cpp" />
@@ -147,7 +145,6 @@
     <ClInclude Include="CommonIncludes.h" />
     <ClInclude Include="Configuration.hpp" />
     <ClInclude Include="CreateMove.h" />
-    <ClInclude Include="DLLMain.h" />
     <ClInclude Include="DrawModelExecute.h" />
     <ClInclude Include="EngineClient.h" />
     <ClInclude Include="EnginePrediction.h" />
@@ -159,7 +156,6 @@
     <ClInclude Include="Global.h" />
     <ClInclude Include="GloveChanger.h" />
     <ClInclude Include="GrenadePrediction.h" />
-    <ClInclude Include="Hacks.h" />
     <ClInclude Include="HookIncludes.h" />
     <ClInclude Include="Hooks.h" />
     <ClInclude Include="HooksList.h" />
@@ -185,7 +181,6 @@
     <ClInclude Include="MiscHacks.h" />
     <ClInclude Include="MovementRecorder.h" />
     <ClInclude Include="NetVarManager.h" />
-    <ClInclude Include="Offsets.h" />
     <ClInclude Include="OnScreenSizeChanged.h" />
     <ClInclude Include="OverrideView.h" />
     <ClInclude Include="PaintTraverse.h" />

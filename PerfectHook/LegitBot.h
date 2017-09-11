@@ -3,14 +3,15 @@
 
 #pragma once
 
-#include "Hacks.h"
+#include "SDK.h"
+#include "singleton.hpp"
 
-class ILegit : public CHack
+class legitbot 
+    : public singleton<legitbot>
 {
 public:
-	void Init();
-	void PaintTraverse();
-	void CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket);
+    legitbot();
+	void OnCreateMove(CInput::CUserCmd *pCmd, IClientEntity* local);
 private:
 	// Targetting
 

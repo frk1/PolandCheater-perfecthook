@@ -1,9 +1,10 @@
 #include "memesets.h"
 #include "SDK.h"
-COffsetz offsetz;
 
-void Offsetz::GetOffsets()
+
+void Offsetz::GetNetvars()
 {
+    NetVarManager->Initialize();
 	offsetz.DT_BasePlayer.m_Local = NetVarManager->GetOffset("DT_BasePlayer", "m_Local");
 	offsetz.DT_BasePlayer.m_aimPunchAngle = NetVarManager->GetOffset("DT_BasePlayer", "m_aimPunchAngle");
 	offsetz.DT_BasePlayer.m_aimPunchAngleVel = NetVarManager->GetOffset("DT_BasePlayer", "m_aimPunchAngleVel");
@@ -229,3 +230,6 @@ void Offsetz::GetOffsets()
     offsetz.DT_BaseAnimating.m_nHitboxSet = NetVarManager->GetOffset("DT_BaseAnimating", "m_nHitboxSet");
 
 }
+
+Offsetz* g_Netvars = new(Offsetz);
+COffsetz offsetz;

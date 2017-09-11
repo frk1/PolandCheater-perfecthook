@@ -90,7 +90,7 @@ void Resolver3()
                 IClientEntity* pEnt = g_EntityList->GetClientEntity(i);
                 if (!pEnt) continue;
 
-                if ((pEnt == pLocal)) continue;
+                if (pEnt == pLocal) continue;
 
                 if (pEnt->IsDormant()) continue;
 
@@ -99,11 +99,8 @@ void Resolver3()
                 if (!g_Engine->GetPlayerInfo(i, &pTemp))
                     continue;
 
-
-
-                if (pEnt->GetVelocity().Length2D() > 31)
+                if (pEnt->GetVelocity().Length2D() > 36)
                 {
-
                     pEnt->GetEyeAngles()->y = pEnt->GetLowerBodyYaw();
                 }
                 else
@@ -126,8 +123,6 @@ void Resolver3()
                     }
 
                 }
-
-
             }
         }
     }

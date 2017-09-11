@@ -11,7 +11,7 @@ struct Variables
 
 	struct Ragebot_s
 	{
-		bool b1g;
+		bool MainSwitch;
 		bool 	Enabled;
 		bool 	AutoFire;
 		float 	FOV;
@@ -54,7 +54,7 @@ struct Variables
 
 	struct
 	{
-		bool b1g;
+		bool MainSwitch;
         bool backtrack;
 		struct
 		{

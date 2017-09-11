@@ -1,33 +1,6 @@
 #include "Interfaces.h"
 #include "Utilities.h"
 
-IBaseClientDLL* g_CHLClient;
-IVEngineClient* g_Engine;
-IPanel* g_Panel;
-IClientEntityList* g_EntityList;
-ISurface* g_Surface;
-IVDebugOverlay* g_DebugOverlay;
-IClientMode* g_ClientMode;
-CGlobalVarsBase* g_Globals;
-IPrediction *g_Prediction;
-CMaterialSystem* g_MaterialSystem;
-CVRenderView* g_RenderView;
-IVModelRender* g_ModelRender;
-CModelInfo* g_ModelInfo;
-IEngineTrace* g_Trace;
-IPhysicsSurfaceProps* g_PhysProps;
-ICVar* g_CVar;
-IVEffects* g_Dlight;
-IMoveHelper* g_MoveHelper;
-IGameMovement* g_GameMovement;
-CInput* g_Input;
-IGameEventManager2* g_EventManager;
-C_CSPlayerResource* g_PlayerResource;
-C_CSGameRules* g_GameRules;
-IViewRender* g_ViewRender;
-IGameConsole* g_GameConsole;
-IMDLCache* g_MdlCache;
-CHudChat* g_ChatElement;
 void InitialiseInterfaces()
 {
     auto EnginePointer = get_module_factory(GetModuleHandleW(L"engine.dll"));
@@ -66,8 +39,36 @@ void InitialiseInterfaces()
     g_ChatElement    = FindHudElement<CHudChat>("CHudChat");
     g_ClientMode     = **(IClientMode***)((*(DWORD**)g_CHLClient)[10] + 0x5);
     g_Globals        = **(CGlobalVarsBase***)((*(DWORD**)g_CHLClient)[0] + 0x1B);
+    g_GlowObjManager = *(CGlowObjectManager**)(U::pattern_scan(GetModuleHandleW(L"client.dll"), "0F 11 05 ? ? ? ? 83 C8 01 C7 05 ? ? ? ? 00 00 00 00") + 3);
 
 }
 
 
-
+IBaseClientDLL* g_CHLClient;
+IVEngineClient* g_Engine;
+IPanel* g_Panel;
+IClientEntityList* g_EntityList;
+ISurface* g_Surface;
+IVDebugOverlay* g_DebugOverlay;
+IClientMode* g_ClientMode;
+CGlobalVarsBase* g_Globals;
+IPrediction *g_Prediction;
+CMaterialSystem* g_MaterialSystem;
+CVRenderView* g_RenderView;
+IVModelRender* g_ModelRender;
+CModelInfo* g_ModelInfo;
+IEngineTrace* g_Trace;
+IPhysicsSurfaceProps* g_PhysProps;
+ICVar* g_CVar;
+IVEffects* g_Dlight;
+IMoveHelper* g_MoveHelper;
+IGameMovement* g_GameMovement;
+CInput* g_Input;
+IGameEventManager2* g_EventManager;
+C_CSPlayerResource* g_PlayerResource;
+C_CSGameRules* g_GameRules;
+IViewRender* g_ViewRender;
+IGameConsole* g_GameConsole;
+IMDLCache* g_MdlCache;
+CHudChat* g_ChatElement;
+CGlowObjectManager* g_GlowObjManager;

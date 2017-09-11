@@ -2,15 +2,15 @@
 
 #pragma once
 
-#include "Hacks.h"
-
-class IESP : public CHack
+#include "SDK.h"
+#include "singleton.hpp"
+class visuals
+    :public singleton<visuals>
 {
 public:
-	void Init();
-	void CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket);
-	void PaintTraverse();
-	void DrawPlayer(IClientEntity* pEntity, player_info_t pinfo, IClientEntity* pLocal);
+    visuals();
+	void OnPaintTraverse(IClientEntity* local);
+	void DrawPlayer(IClientEntity* entity, player_info_t pinfo, IClientEntity* local);
 private:
 	struct playerlist_t
 	{
@@ -28,55 +28,139 @@ private:
 	{
 		int x, y, w, h, gay;
 	};
-
-	// Draw a player
-	void DrawPlayer(IClientEntity* pEntity, player_info_t pinfo);
-	void DrawPlayer2(IClientEntity* pEntity, player_info_t pinfo);
+    void DLight(IClientEntity* local, IClientEntity* entity);
 
 	// Get player info
-	Color GetPlayerColor(IClientEntity* pEntity);
+	Color GetPlayerColor(IClientEntity* pEntity, IClientEntity* local);
 	bool GetBox(IClientEntity* pEntity, ESPBox &result);
 	void BoxAndText(IClientEntity* pEntity, std::string text);
-	void BoxAndText(IClientEntity* pEntity, const char* text);
-	void HealthBar(Vector bot, Vector top, float health);
 
 	// Draw shit about player
 	void DrawBox(ESPBox size, Color color);
 	void PlayerBox(float x, float y, float w, float h, Color clr);
-	void DrawName(player_info_t pinfo, ESPBox size);
-	void DrawName2(player_info_t pinfo, Vector pos);
 	void DrawHealth(Vector bot, Vector top, float health);
-	void DrawHealth(IClientEntity* pEntity, Vector bot, Vector top);
-	void DrawWeapon(player_info_t pinfo, IESP::ESPBox size);
 	void DrawHealth(IClientEntity* pEntity, ESPBox size);
-	void DrawHealthBar(IClientEntity* pEntity, IESP::ESPBox size);
-	void DrawGrenades(IClientEntity* pEntity);
-	void DrawInfo(IClientEntity* pEntity, ESPBox size);
-	void DrawInfo3(Vector bot, Vector top, IClientEntity* pEntity);
-	void DrawWeapon2(IClientEntity* pEntity, IESP::ESPBox size);
-	void DrawCross(IClientEntity* pEntity);
-	void DrawSkeleton(IClientEntity* pEntity);
-
-	void DrawChicken(IClientEntity* pEntity, ClientClass* cClass);
 
 
 	void DrawDrop(IClientEntity* pEntity);
-	void DrawBombPlanted(IClientEntity* pEntity, ClientClass* cClass);
+	void DrawBombPlanted(IClientEntity* entity, IClientEntity* local);
 	void DrawBomb(IClientEntity* pEntity, ClientClass* cClass);
-	void Molotov(IClientEntity* pEntity, ClientClass* cClass, float x, float y, float w, float h);
-	void Smoke(IClientEntity* pEntity, ClientClass* cClass, float x, float y, float w, float h);
-	void Flash(IClientEntity* pEntity, ClientClass* cClass, float x, float y, float w, float h);
-	void Decoy(IClientEntity* pEntity, ClientClass* cClass, float x, float y, float w, float h);
-	void DrawGlow();
-	void DrawNade2(IClientEntity* pEntity, ClientClass* cClass);
-	void Molotov(IClientEntity* pEntity, ClientClass* cClass);
-	void Smoke(IClientEntity* pEntity, ClientClass* cClass);
-	void Flash(IClientEntity* pEntity, ClientClass* cClass);
-	void Decoy(IClientEntity* pEntity, ClientClass* cClass);
-	void DrawEntity(IClientEntity* entity, const char* string);
 	void DrawThrowable(IClientEntity* throwable);
-	void DrawScoreboard();
-	void DrawScoreboard(IClientEntity* local);
-	void HEGrenade(IClientEntity* pEntity, ClientClass* cClass);
+    void NightMode();
+    void SpecList(IClientEntity *local);
 };
 
+inline float CSGO_Armor(float flDamage, int ArmorValue)
+{
+    float flArmorRatio = 0.5f;
+    float flArmorBonus = 0.5f;
+    if (ArmorValue > 0) {
+        float flNew = flDamage * flArmorRatio;
+        float flArmor = (flDamage - flNew) * flArmorBonus;
+
+        if (flArmor > static_cast<float>(ArmorValue)) {
+            flArmor = static_cast<float>(ArmorValue) * (1.f / flArmorBonus);
+            flNew = flDamage - flArmor;
+        }
+
+        flDamage = flNew;
+    }
+    return flDamage;
+}
+
+template <typename T, std::size_t N> T* end_(T(&arr)[N]) { return arr + N; }
+
+template <typename T, std::size_t N> T* begin_(T(&arr)[N]) { return arr; }
+
+char* const itemNames[] =
+{
+    "knife", //0 - default
+    "deagle",
+    "elite",
+    "fiveseven",
+    "glock",
+    "none",
+    "none",
+    "ak47",
+    "aug",
+    "awp",
+
+    "famas", //10
+    "g3sg1",
+    "none",
+    "galil",
+    "m249",
+    "none",
+    "m4a4",
+    "mac-10",
+    "none",
+    "p90",
+
+    "none", //20
+    "none",
+    "none",
+    "none",
+    "ump45",
+    "xm1014",
+    "bizon",
+    "mag7",
+    "negev",
+    "sawed-off",
+
+    "tec9", //30
+    "taser",
+    "p2000",
+    "mp7",
+    "mp9",
+    "nova",
+    "p250",
+    "none",
+    "scar20",
+    "sg556",
+
+    "ssg08", //40
+    "knife",
+    "knife",
+    "flash",
+    "nade",
+    "smoke",
+    "molotov",
+    "decoy",
+    "incendiary",
+    "c4",
+
+    "none", //50
+    "none",
+    "none",
+    "none",
+    "none",
+    "none",
+    "none",
+    "none",
+    "none",
+    "knife",
+
+    "m4a1", //60
+    "usp",
+    "none",
+    "cz75",
+    "revolver"
+};
+
+
+
+
+inline const char* ItemDefinitionIndexToString(int index)
+{
+    if (index < 0 || index > 64)
+        index = 0;
+
+    return itemNames[index];
+}
+inline float flGetDistance(Vector from, Vector to)
+{
+    Vector angle;
+    angle.x = to.x - from.x;	angle.y = to.y - from.y;	angle.z = to.z - from.z;
+
+    return sqrt(angle.x*angle.x + angle.y*angle.y + angle.z*angle.z);
+}

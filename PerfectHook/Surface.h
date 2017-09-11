@@ -2,7 +2,6 @@
 
 #include "MiscDefinitions.h"
 
-#include "offsets.h"
 #include "Vector.h"
 #include "MiscClasses.h"
 #include "Vector2D.h"

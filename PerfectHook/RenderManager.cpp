@@ -6,21 +6,7 @@
 
 
 
-// Font Instances
-namespace Render
-{
-	// Text functions
-	namespace Fonts
-	{
-		DWORD Default;
-		DWORD ESP;
-		DWORD Guns;
-		DWORD DroppedGuns;
-		DWORD Defuse;
-		DWORD Time;
 
-	};
-};
 
 // We don't use these anywhere else, no reason for them to be
 // available anywhere else
@@ -42,23 +28,23 @@ enum EFontFlags
 };
 
 // Initialises the rendering system, setting up fonts etc
-void Render::Initialise()
+void Render::SetupFonts()
 {
-	Fonts::Default = 0x1D; // MainMenu Font from vgui_spew_fonts 
-	Fonts::ESP = g_Surface->FontCreate();
-	Fonts::Guns = g_Surface->FontCreate();
-	Fonts::Defuse = g_Surface->FontCreate();
-	Fonts::Time = g_Surface->FontCreate();
-	Fonts::DroppedGuns = g_Surface->FontCreate();
+	font.Default = 0x1D; // MainMenu Font from vgui_spew_fonts 
+    font.ESP = g_Surface->FontCreate();
+    font.Guns = g_Surface->FontCreate();
+    font.Defuse = g_Surface->FontCreate();
+    font.Time = g_Surface->FontCreate();
+    font.DroppedGuns = g_Surface->FontCreate();
 
 
 
 
-	g_Surface->SetFontGlyphSet(Fonts::ESP, "Tahoma", 11, 700, 0, 0, FONTFLAG_DROPSHADOW);
-	g_Surface->SetFontGlyphSet(Fonts::Defuse, "Tahoma", 15, 700, 0, 0, FONTFLAG_DROPSHADOW);
-	g_Surface->SetFontGlyphSet(Fonts::Guns, "Tahoma", 10, 700, 0, 0, FONTFLAG_DROPSHADOW);
-	g_Surface->SetFontGlyphSet(Fonts::Time, "Arial", 13, 550, 0, 0, FONTFLAG_NONE);
-	g_Surface->SetFontGlyphSet(Fonts::DroppedGuns, "Tahoma", 8, 700, 0, 0, FONTFLAG_DROPSHADOW);
+	g_Surface->SetFontGlyphSet(font.ESP, "Tahoma", 11, 700, 0, 0, FONTFLAG_DROPSHADOW);
+	g_Surface->SetFontGlyphSet(font.Defuse, "Tahoma", 15, 700, 0, 0, FONTFLAG_DROPSHADOW);
+	g_Surface->SetFontGlyphSet(font.Guns, "Tahoma", 10, 700, 0, 0, FONTFLAG_DROPSHADOW);
+	g_Surface->SetFontGlyphSet(font.Time, "Arial", 13, 550, 0, 0, FONTFLAG_NONE);
+	g_Surface->SetFontGlyphSet(font.DroppedGuns, "Tahoma", 8, 700, 0, 0, FONTFLAG_DROPSHADOW);
 
 
 }
@@ -132,7 +118,7 @@ void Render::OutlineRainbow(int x, int y, int width, int height, float flSpeed, 
 		if (hue < 0.f) hue += 1.f;
 
 		Color colRainbow = colColor.FromHSB(hue, 1.f, 1.f);
-		Render::Outline(x + i, y, 1, height, colRainbow);
+		Outline(x + i, y, 1, height, colRainbow);
 	}
 }
 
@@ -186,7 +172,6 @@ void Render::Text(int x, int y, Color color, DWORD font, const char* text, ...)
 	g_Surface->DrawSetTextColor(color);
 	g_Surface->DrawSetTextPos(x, y);
 	g_Surface->DrawPrintText(wcstring, wcslen(wcstring));
-	return;
 }
 
 void Render::Text(int x, int y, Color color, DWORD font, const wchar_t* text)
@@ -283,7 +268,7 @@ void Render::PolygonOutline(int count, Vertex_t* Vertexs, Color color, Color col
 	static int x[128];
 	static int y[128];
 
-	Render::Polygon(count, Vertexs, color);
+	Polygon(count, Vertexs, color);
 
 	for (int i = 0; i < count; i++)
 	{
@@ -291,7 +276,7 @@ void Render::PolygonOutline(int count, Vertex_t* Vertexs, Color color, Color col
 		y[i] = int(Vertexs[i].m_Position.y);
 	}
 
-	Render::PolyLine(x, y, count, colorLine);
+	PolyLine(x, y, count, colorLine);
 }
 
 void Render::PolyLine(int count, Vertex_t* Vertexs, Color colorLine)
@@ -305,7 +290,7 @@ void Render::PolyLine(int count, Vertex_t* Vertexs, Color colorLine)
 		y[i] = int(Vertexs[i].m_Position.y);
 	}
 
-	Render::PolyLine(x, y, count, colorLine);
+	PolyLine(x, y, count, colorLine);
 }
 
 void Render::OutlineCircle(int x, int y, int r, int seg, Color color)
@@ -316,3 +301,5 @@ void Render::OutlineCircle(int x, int y, int r, int seg, Color color)
 	g_Surface->DrawSetColor(color);
 	g_Surface->DrawOutlinedCircle(x, y, r, seg);
 }
+
+Render* g_Render = new(Render);

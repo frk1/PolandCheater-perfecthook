@@ -8,9 +8,10 @@
 void Quad();
 
 
-namespace Render
+class Render
 {
-	void Initialise();
+public:
+	void SetupFonts();
 
 	// Normal Drawing functions
 	void Clear(int x, int y, int w, int h, Color color);
@@ -31,15 +32,7 @@ namespace Render
 	void GradientH(int x, int y, int w, int h, Color c1, Color c2);
 
 	// Text functions
-	namespace Fonts
-	{
-		extern DWORD Default;
-		extern DWORD ESP;
-		extern DWORD Guns;
-		extern DWORD Defuse;
-		extern DWORD Time;
-		extern DWORD DroppedGuns;
-	};
+
 
 	void Text(int x, int y, Color color, DWORD font, const char* text, ...);
 	void Textf(int x, int y, Color color, DWORD font, const char* fmt, ...);
@@ -50,5 +43,18 @@ namespace Render
 	// Other rendering functions
 	bool WorldToScreen(Vector &in, Vector &out);
 	RECT GetViewport();
+    class Fonts
+    {
+    public:
+        DWORD Default;
+        DWORD ESP;
+        DWORD Guns;
+        DWORD Defuse;
+        DWORD Time;
+        DWORD DroppedGuns;
+    } font;
+
+
 };
 
+extern Render* g_Render;

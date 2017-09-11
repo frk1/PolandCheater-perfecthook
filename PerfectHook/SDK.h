@@ -1,6 +1,5 @@
 #pragma once
 #include "Entities.h"
-#include "offsets.h"
 
 #include "BaseClient.h"
 #include "EngineClient.h"

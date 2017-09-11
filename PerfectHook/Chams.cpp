@@ -1,12 +1,15 @@
 #include "Chams.h"
-#include "offsets.h"
+
 #include "SDK.h"
 #include "Interfaces.h"
 #include <sstream>
 #define RandomInt(nMin, nMax) (rand() % (nMax - nMin + 1) + nMin);
 void InitKeyValues(KeyValues* keyValues, const char* name)
 {
-	DWORD dwFunction = (DWORD)Offsets::Functions::KeyValues_KeyValues;
+    static DWORD sig = U::FindPattern("client.dll", (PBYTE)"\x68\x00\x00\x00\x00\x8B\xC8\xE8\x00\x00\x00\x00\x89\x45\xFC\xEB\x07\xC7\x45\x00\x00\x00\x00\x00\x8B\x03\x56", "x????xxx????xxxxxxx?????xxx");
+    sig += 7;
+    sig = sig + *reinterpret_cast< PDWORD_PTR >(sig + 1) + 5;
+	DWORD dwFunction = sig;
 	__asm
 	{
 		push name
@@ -17,7 +20,8 @@ void InitKeyValues(KeyValues* keyValues, const char* name)
 
 void LoadFromBuffer(KeyValues* keyValues, char const* resourceName, const char* pBuffer)
 {
-	DWORD dwFunction = (DWORD)Offsets::Functions::KeyValues_LoadFromBuffer;
+    static DWORD sig  = (DWORD)U::pattern_scan(GetModuleHandleW(L"client.dll"), "55 8B EC 83 E4 F8 83 EC 34 53 8B 5D 0C 89 4C 24 04");
+	DWORD dwFunction = sig;
 
 	__asm
 	{

@@ -3,7 +3,6 @@
 #pragma once
 
 #include "MiscDefinitions.h"
-#include "offsets.h"
 #include "Vector.h"
 #include "Utilities.h"
 

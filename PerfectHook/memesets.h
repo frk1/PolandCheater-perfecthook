@@ -271,9 +271,12 @@ struct COffsetz
 	} DT_CSGameRulesProxy;
 };
 
-namespace Offsetz
+class Offsetz
 {
-	void GetOffsets();
-}
+public:
+	void GetNetvars();
+};
+
+extern Offsetz* g_Netvars;
 
 extern COffsetz offsetz;

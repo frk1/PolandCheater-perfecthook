@@ -3,7 +3,7 @@
 
 #include "MiscDefinitions.h"
 
-#include "offsets.h"
+
 #include "Vector.h"
 class INetChannelInfo
 {

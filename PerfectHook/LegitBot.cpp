@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-void ILegit::Init()
+legitbot::legitbot()
 {
     best_target = -1;
 
@@ -39,20 +39,6 @@ float get_fov(const QAngle &viewAngles, const QAngle &aimAngles)
 
     return RAD2DEG(acos(aim.Dot(ang) / aim.LengthSqr()));
 }
-QAngle compute_angle(const Vector &source, const Vector &destination)
-{
-    QAngle angles;
-
-    Vector delta = source - destination;
-    angles.x = static_cast< float >(asin(delta.z / delta.Length()) * M_RADPI);
-    angles.y = static_cast< float >(atan(delta.y / delta.x) * M_RADPI);
-    angles.z = 0.0f;
-
-    if (delta.x >= 0.0f)
-        angles.y += 180.0f;
-
-    return angles;
-}
 float random_number_range(float min, float max)
 {
     std::random_device device;
@@ -60,39 +46,30 @@ float random_number_range(float min, float max)
     std::uniform_real_distribution<> distribution(min, max);
     return static_cast< float >(distribution(engine));
 }
-void ILegit::PaintTraverse()
-{
 
-}
-static size_t topkekd = GetTickCount() + 2000;
+
 bool shoot;
 static int custom_delay = 0;
 
-void ILegit::CreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
+void legitbot::OnCreateMove(CInput::CUserCmd *pCmd, IClientEntity *local)
 {
-
-	if (!menu.Legitbot.b1g)
+	if (!menu.Legitbot.MainSwitch)
 		return;
-	IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
-    CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
-	
-	if (pLocal && pLocal->IsAlive() && pWeapon)
-	{
-		
 
-        do_aimbot(pLocal, pWeapon, pCmd);
+    CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(local->GetActiveWeaponHandle());
+	
+	if (local && local->IsAlive() && pWeapon)
+	{
+        do_aimbot(local, pWeapon, pCmd);
 
 		if (!G::PressedKeys[menu.Legitbot.Triggerbot.Key]) custom_delay = 0;
 
 		if (menu.Legitbot.Triggerbot.Enabled && menu.Legitbot.Triggerbot.Key != 0 && G::PressedKeys[menu.Legitbot.Triggerbot.Key])
-            triggerbot(pCmd, pLocal, pWeapon);
-
-		
+            triggerbot(pCmd, local, pWeapon);
 	}
-
 }
 
-void ILegit::triggerbot(CInput::CUserCmd *cmd, IClientEntity* local, CBaseCombatWeapon* weapon)
+void legitbot::triggerbot(CInput::CUserCmd *cmd, IClientEntity* local, CBaseCombatWeapon* weapon)
 {
     if (!local->IsAlive())
         return;
@@ -172,9 +149,9 @@ void ILegit::triggerbot(CInput::CUserCmd *cmd, IClientEntity* local, CBaseCombat
 
 }
 
-void ILegit::do_aimbot(IClientEntity *local, CBaseCombatWeapon *weapon, CInput::CUserCmd *cmd)
+void legitbot::do_aimbot(IClientEntity *local, CBaseCombatWeapon *weapon, CInput::CUserCmd *cmd)
 {
-    if (!menu.Legitbot.b1g)
+    if (!menu.Legitbot.MainSwitch)
         return;
 
     if (!weapon)
@@ -218,7 +195,7 @@ void ILegit::do_aimbot(IClientEntity *local, CBaseCombatWeapon *weapon, CInput::
 
 
     compute_angle(local->GetEyePosition(), hitbox_position, aim_angle);
-    MiscFunctions::NormaliseViewAngle(aim_angle);
+    sanitize_angles(aim_angle);
 
     if (hitbox_position == Vector(0, 0, 0))
         return;
@@ -226,10 +203,10 @@ void ILegit::do_aimbot(IClientEntity *local, CBaseCombatWeapon *weapon, CInput::
     aim_angle -= get_randomized_recoil(local);
     aim_angle += get_randomized_angles(local);
 
-    MiscFunctions::NormaliseViewAngle(view_angle);
+    sanitize_angles(view_angle);
 
     delta_angle = view_angle - aim_angle;
-    MiscFunctions::NormaliseViewAngle(delta_angle);
+    sanitize_angles(delta_angle);
 
     float randomSmoothing = 1.0f;
 
@@ -237,7 +214,7 @@ void ILegit::do_aimbot(IClientEntity *local, CBaseCombatWeapon *weapon, CInput::
         randomSmoothing = random_number_range(randomized_smooth / 10.0f, 1.0f);
 
     final_angle = view_angle - delta_angle / aim_smooth * randomSmoothing;
-    MiscFunctions::NormaliseViewAngle(final_angle);
+    sanitize_angles(final_angle);
 
     if (!sanitize_angles(final_angle))
         return;
@@ -246,7 +223,7 @@ void ILegit::do_aimbot(IClientEntity *local, CBaseCombatWeapon *weapon, CInput::
     g_Engine->SetViewAngles(cmd->viewangles);
 }
 
-bool ILegit::hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseCombatWeapon* weapon, IClientEntity* target)
+bool legitbot::hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseCombatWeapon* weapon, IClientEntity* target)
 {
     Vector forward, right, up;
 
@@ -280,8 +257,7 @@ bool ILegit::hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseCombat
 
         QAngle viewAnglesSpread;
         VectorAngles(viewSpreadForward, viewAnglesSpread);
-        MiscFunctions::NormaliseViewAngle(viewAnglesSpread);
-        clamp_angles(viewAnglesSpread);
+        sanitize_angles(viewAnglesSpread);
 
         Vector viewForward;
         AngleVectors(viewAnglesSpread, &viewForward);
@@ -309,7 +285,7 @@ bool ILegit::hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseCombat
     return false;
 }
 
-void ILegit::weapon_settings(CBaseCombatWeapon* weapon)
+void legitbot::weapon_settings(CBaseCombatWeapon* weapon)
 {
     if (!weapon)
         return;
@@ -348,15 +324,15 @@ void ILegit::weapon_settings(CBaseCombatWeapon* weapon)
     }
 }
 
-QAngle ILegit::get_randomized_recoil(IClientEntity *local)
+QAngle legitbot::get_randomized_recoil(IClientEntity *local)
 {
     QAngle compensatedAngles = (local->localPlayerExclusive()->GetAimPunchAngle() * 2.0f) * (random_number_range(recoil_min, recoil_max) / 100.0f);
-    MiscFunctions::NormaliseViewAngle(compensatedAngles);
+    sanitize_angles(compensatedAngles);
 
     return (local->m_iShotsFired() > 1 ? compensatedAngles : QAngle(0.0f, 0.0f, 0.0f));
 }
 
-QAngle ILegit::get_randomized_angles(IClientEntity *local)
+QAngle legitbot::get_randomized_angles(IClientEntity *local)
 {
     QAngle randomizedValue = QAngle(0.0f, 0.0f, 0.0f);
 
@@ -377,7 +353,7 @@ QAngle ILegit::get_randomized_angles(IClientEntity *local)
         break;
     }
 
-    MiscFunctions::NormaliseViewAngle(randomizedValue);
+    sanitize_angles(randomizedValue);
 
     return (local->m_iShotsFired() > 1 ? randomizedValue : QAngle(0.0f, 0.0f, 0.0f));
 }
@@ -411,7 +387,7 @@ bool get_hitbox_pos(IClientEntity* entity, int hitbox, Vector &output)
 
     return true;
 }
-bool ILegit::get_hitbox(IClientEntity *local, IClientEntity *entity, Vector &destination)
+bool legitbot::get_hitbox(IClientEntity *local, IClientEntity *entity, Vector &destination)
 {
     int bestHitbox = -1;
     float best_fov = aim_fov;
@@ -442,7 +418,7 @@ bool ILegit::get_hitbox(IClientEntity *local, IClientEntity *entity, Vector &des
 }
 
 
-int ILegit::get_target(IClientEntity *local, CBaseCombatWeapon *weapon, CInput::CUserCmd *cmd, Vector &destination)
+int legitbot::get_target(IClientEntity *local, CBaseCombatWeapon *weapon, CInput::CUserCmd *cmd, Vector &destination)
 {
     int best_target = -1;
     float best_fov = aim_fov;

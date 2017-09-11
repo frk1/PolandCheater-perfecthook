@@ -1,5 +1,5 @@
 #pragma once
-extern bool DoUnload;
+extern bool unload;
 #include "Utilities.h"
 #include "vmthook.h"
 
