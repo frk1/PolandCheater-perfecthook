@@ -2,7 +2,7 @@
 #include "HookIncludes.h"
 using is_hltv_t = bool(__thiscall*)(void*);
 
-bool __fastcall is_hltv(void* ecx, void* edx)
+bool __fastcall hkIsHltv(void* ecx, void* edx)
 {
     static auto ofunc = hooks::engine.get_original<is_hltv_t>(93);
     uintptr_t pvs_entity;

@@ -2,7 +2,7 @@
 
 void BackTrack::Update(int tick_count)
 {
-    if (!menu.Ragebot.FakeLagFix)
+    if (!g_Options.Ragebot.FakeLagFix)
         return;
 
     latest_tick = tick_count;
@@ -51,7 +51,7 @@ bool BackTrack::RunLBYBackTrack(int i, CInput::CUserCmd* cmd, Vector& aimPoint)
 
 void BackTrack::legitBackTrack(CInput::CUserCmd* cmd, IClientEntity* pLocal)
 {
-    if (menu.Legitbot.backtrack)
+    if (g_Options.Legitbot.backtrack)
     {
         int bestTargetIndex = -1;
         float bestFov = FLT_MAX;

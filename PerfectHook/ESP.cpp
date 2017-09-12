@@ -1,7 +1,7 @@
 
 #include "ESP.h"
 #include "Interfaces.h"
-#include "RenderManager.h"
+#include "Render.h"
 #include <ctime>
 #include <iostream>
 #include <algorithm>
@@ -30,7 +30,7 @@ void visuals::OnPaintTraverse(IClientEntity* local)
         player_info_t pinfo;
         if (entity == local && local->IsAlive() && g_Engine->GetPlayerInfo(g_Engine->GetLocalPlayer(), &pinfo))
         {
-            if (g_Input->m_fCameraInThirdPerson && menu.Visuals.Enabled)
+            if (g_Input->m_fCameraInThirdPerson && g_Options.Visuals.Enabled)
             {
                 Vector max = entity->GetCollideable()->OBBMaxs();
                 Vector pos, pos3D;
@@ -43,16 +43,16 @@ void visuals::OnPaintTraverse(IClientEntity* local)
 
                 float height = (pos.y - top.y);
                 float width = height / 4.f;
-                if (menu.Visuals.Box)
+                if (g_Options.Visuals.Box)
                 {
                     Color color;
                     color = GetPlayerColor(entity, local);
                     PlayerBox(top.x, top.y, width, height, color);
                 }
-                if (menu.Visuals.HP)
+                if (g_Options.Visuals.HP)
                     DrawHealth(pos, top, local->GetHealth());
 
-                if (menu.Visuals.Name)
+                if (g_Options.Visuals.Name)
                     g_Render->DrawString2(g_Render->font.ESP, (int)top.x, (int)top.y - 6, Color::White(), FONT_CENTER, pinfo.name);
 
             }
@@ -61,7 +61,7 @@ void visuals::OnPaintTraverse(IClientEntity* local)
         {
             if (g_Engine->GetPlayerInfo(i, &pinfo) && entity->IsAlive())
             {
-                if (menu.Legitbot.backtrack)
+                if (g_Options.Legitbot.backtrack)
                 {
                     if (local->IsAlive())
                     {
@@ -86,7 +86,7 @@ void visuals::OnPaintTraverse(IClientEntity* local)
                         memset(&headPositions[0][0], 0, sizeof(headPositions));
                     }
                 }
-                if (menu.Ragebot.FakeLagFix)
+                if (g_Options.Ragebot.FakeLagFix)
                 {
                     if (local->IsAlive())
                     {
@@ -108,9 +108,9 @@ void visuals::OnPaintTraverse(IClientEntity* local)
                         memset(&backtracking->records[0], 0, sizeof(backtracking->records));
                     }
                 }
-                if (menu.Visuals.Enabled && menu.Visuals.Filter.Players)
+                if (g_Options.Visuals.Enabled && g_Options.Visuals.Filter.Players)
                 {
-                    if (menu.Visuals.DLight)
+                    if (g_Options.Visuals.DLight)
                         DLight(local, entity);
 
                     DrawPlayer(entity, pinfo, local);
@@ -118,14 +118,14 @@ void visuals::OnPaintTraverse(IClientEntity* local)
                 }
 
             }
-            if (menu.Visuals.Enabled)
+            if (g_Options.Visuals.Enabled)
             {
                 ClientClass* cClass = (ClientClass*)entity->GetClientClass();
-                if (menu.Visuals.WeaponsWorld && cClass->m_ClassID != (int)ClassID::CBaseWeaponWorldModel && ((strstr(cClass->m_pNetworkName, "Weapon") || cClass->m_ClassID == (int)ClassID::CDEagle || cClass->m_ClassID == (int)ClassID::CAK47)))
+                if (g_Options.Visuals.WeaponsWorld && cClass->m_ClassID != (int)ClassID::CBaseWeaponWorldModel && ((strstr(cClass->m_pNetworkName, "Weapon") || cClass->m_ClassID == (int)ClassID::CDEagle || cClass->m_ClassID == (int)ClassID::CAK47)))
                 {
                     DrawDrop(entity);
                 }
-                if (menu.Visuals.C4World)
+                if (g_Options.Visuals.C4World)
                 {
                     if (cClass->m_ClassID == (int)ClassID::CPlantedC4)
                         DrawBombPlanted(entity, local);
@@ -133,19 +133,19 @@ void visuals::OnPaintTraverse(IClientEntity* local)
 
                 if (cClass->m_ClassID == (int)ClassID::CC4)
                     DrawBomb(entity, cClass);
-                if (menu.Visuals.GrenadeESP && strstr(cClass->m_pNetworkName, "Projectile"))
+                if (g_Options.Visuals.GrenadeESP && strstr(cClass->m_pNetworkName, "Projectile"))
                 {
                     DrawThrowable(entity);
                 }
             }
         }
     }
-    if (menu.Misc.SpecList) SpecList(local);
+    if (g_Options.Misc.SpecList) SpecList(local);
         
     NightMode();
     grenade_prediction::instance().Paint();
 
-    if (menu.Visuals.SpreadCrosshair)
+    if (g_Options.Visuals.SpreadCrosshair)
     {
         g_Engine->GetScreenSize(width, height);
         if (local  && local->IsAlive())
@@ -222,17 +222,17 @@ void visuals::DrawPlayer(IClientEntity* entity, player_info_t pinfo, IClientEnti
 
 	Color color;
 
-	if (menu.Visuals.Filter.EnemyOnly && (entity->GetTeamNum() == local->GetTeamNum()))
+	if (g_Options.Visuals.Filter.EnemyOnly && (entity->GetTeamNum() == local->GetTeamNum()))
 		return;
 	color = GetPlayerColor(entity, local);
 
-	if (menu.Visuals.Box)
+	if (g_Options.Visuals.Box)
 		PlayerBox(top.x, top.y, width, height, color);
 
-	if (menu.Visuals.HP)
+	if (g_Options.Visuals.HP)
 		DrawHealth(pos, top, entity->GetHealth());
 
-	if (menu.Visuals.Name)
+	if (g_Options.Visuals.Name)
 		g_Render->DrawString2(g_Render->font.ESP, (int)top.x, (int)top.y - 6, Color::White(), FONT_CENTER, pinfo.name);
 
 	int bottom = 0;
@@ -243,7 +243,7 @@ void visuals::DrawPlayer(IClientEntity* entity, player_info_t pinfo, IClientEnti
 	std::vector<std::string> wins;
 
 	CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(entity->GetActiveWeaponHandle());
-    if (menu.Visuals.Weapon && pWeapon)
+    if (g_Options.Visuals.Weapon && pWeapon)
     {
         int weapon_id = pWeapon->m_AttributeManager()->m_Item()->GetItemDefinitionIndex();
 
@@ -253,13 +253,13 @@ void visuals::DrawPlayer(IClientEntity* entity, player_info_t pinfo, IClientEnti
 
 
 
-	if (menu.Visuals.C4 && entity == BombCarrier)
+	if (g_Options.Visuals.C4 && entity == BombCarrier)
 	{
 		bomb.push_back("Bomb");
 	}
 
 	int i = 0;
-	if (menu.Visuals.Weapon)
+	if (g_Options.Visuals.Weapon)
 	{
 
 		for (auto Text : weapon)
@@ -268,7 +268,7 @@ void visuals::DrawPlayer(IClientEntity* entity, player_info_t pinfo, IClientEnti
 			i++;
 		}
 	}
-	if (menu.Visuals.C4)
+	if (g_Options.Visuals.C4)
 	{
 		for (auto Text : bomb)
 		{
@@ -471,7 +471,7 @@ void visuals::DrawBomb(IClientEntity* entity, ClientClass* cClass)
 			adopted = false;
 		}
 	}
-	if (menu.Visuals.C4World)
+	if (g_Options.Visuals.C4World)
 	{
 		if (adopted)
 		{
@@ -556,7 +556,7 @@ void visuals::BoxAndText(IClientEntity* entity, std::string text)
 	if (GetBox(entity, Box))
 	{
 		Info.push_back(text);
-		if (menu.Visuals.GrenadeESP)
+		if (g_Options.Visuals.GrenadeESP)
 		{
 			DrawBox(Box, Color(255, 255, 255, 255));
 			int i = 0;
@@ -659,7 +659,7 @@ void visuals::DLight(IClientEntity *local, IClientEntity* entity)
 
 void visuals::NightMode()
 {
-    if (menu.Misc.nightMode)
+    if (g_Options.Misc.nightMode)
     {
         if (!done)
         {

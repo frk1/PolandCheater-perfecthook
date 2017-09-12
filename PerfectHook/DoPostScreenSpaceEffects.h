@@ -4,14 +4,14 @@ using do_post_screen_space_effects_t = bool(__thiscall*)(void*, CViewSetup*);
 
 
 
-bool _fastcall do_post_screen_space_effects(void* ecx, void* edx, CViewSetup* pSetup)
+bool _fastcall hkDoPostScreenSpaceEffects(void* ecx, void* edx, CViewSetup* pSetup)
 {
     static auto ofunc = hooks::clientmode.get_original<do_post_screen_space_effects_t>(44);
 
     IMaterial *pMatGlowColor = g_MaterialSystem->FindMaterial("dev/glow_color", TEXTURE_GROUP_OTHER, true);
     g_ModelRender->ForcedMaterialOverride(pMatGlowColor);
 
-    if (menu.Visuals.Glow && g_GlowObjManager && g_Engine->IsConnected())
+    if (g_Options.Visuals.Glow && g_GlowObjManager && g_Engine->IsConnected())
     {
         auto local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
         if (local)
@@ -34,7 +34,7 @@ bool _fastcall do_post_screen_space_effects(void* ecx, void* edx, CViewSetup* pS
                     break;
                 case 35:
 
-                        if (menu.Visuals.Filter.EnemyOnly && glowEnt->getEnt()->GetTeamNum() == local->GetTeamNum())
+                        if (g_Options.Visuals.Filter.EnemyOnly && glowEnt->getEnt()->GetTeamNum() == local->GetTeamNum())
                             break;
 
                         if (glowEnt->getEnt()->GetTeamNum() == local->GetTeamNum())

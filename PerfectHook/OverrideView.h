@@ -6,11 +6,11 @@ typedef float(__thiscall *get_fov_t)(void*);
 
 
 
-float __fastcall Hooked_GetViewModelFOV(void* ecx, void* edx)
+float __fastcall hkGetViewModelFOV(void* ecx, void* edx)
 {
     static auto ofunc = hooks::clientmode.get_original<get_fov_t>(35);
     float viewmodelFOV = ofunc(ecx);
-    return menu.Visuals.viewmodelChanger;
+    return g_Options.Visuals.viewmodelChanger;
 }
 
 void __fastcall hkOverrideView(void* _this, void* _edx, CViewSetup* setup)
@@ -20,8 +20,8 @@ void __fastcall hkOverrideView(void* _this, void* _edx, CViewSetup* setup)
 	if (pLocal && g_Engine->IsInGame())
 	{
 		if (!pLocal->IsScoped())
-			setup->fov += menu.Visuals.FOVChanger;
-        if (menu.Visuals.ThirdPerson && pLocal->IsAlive())
+			setup->fov += g_Options.Visuals.FOVChanger;
+        if (g_Options.Visuals.ThirdPerson && pLocal->IsAlive())
         {
             if (!g_Input->m_fCameraInThirdPerson)
             {

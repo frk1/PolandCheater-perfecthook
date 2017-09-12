@@ -14,15 +14,15 @@ void SkinChanger() {
         if (pEntity)
         {
             CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)pEntity;
-            if (menu.Skinchanger.Enabled)
+            if (g_Options.Skinchanger.Enabled)
             {
-                int Model = menu.Skinchanger.Knife;
+                int Model = g_Options.Skinchanger.Knife;
                 int weapon = *pWeapon->m_AttributeManager()->m_Item()->ItemDefinitionIndex();
                 switch (weapon)
                 {
                 case 7: // AK47 
                 {
-                    switch (menu.Skinchanger.AK47Skin)
+                    switch (g_Options.Skinchanger.AK47Skin)
                     {
                     case 0:
                         *pWeapon->FallbackPaintKit() = 180;//fire serpent
@@ -76,7 +76,7 @@ void SkinChanger() {
                 break;
                 case 16: // M4A4
                 {
-                    switch (menu.Skinchanger.M4A4Skin)
+                    switch (g_Options.Skinchanger.M4A4Skin)
                     {
                     case 0:
                         *pWeapon->FallbackPaintKit() = 255;//Asiimov
@@ -117,7 +117,7 @@ void SkinChanger() {
                 break;
                 case 60: // M4A1
                 {
-                    switch (menu.Skinchanger.M4A1SSkin)
+                    switch (g_Options.Skinchanger.M4A1SSkin)
                     {
                     case 0:
                         *pWeapon->FallbackPaintKit() = 644;//Decimator
@@ -159,7 +159,7 @@ void SkinChanger() {
                 break;
                 case 9: // AWP
                 {
-                    switch (menu.Skinchanger.AWPSkin)
+                    switch (g_Options.Skinchanger.AWPSkin)
                     {
                     case 0:
                         *pWeapon->FallbackPaintKit() = 279;//asiimov
@@ -207,7 +207,7 @@ void SkinChanger() {
                 break;
                 case 61: // USP
                 {
-                    switch (menu.Skinchanger.USPSkin)
+                    switch (g_Options.Skinchanger.USPSkin)
                     {
                     case 0:
                         *pWeapon->FallbackPaintKit() = 653;//Neo-Noir
@@ -243,7 +243,7 @@ void SkinChanger() {
                 break;
                 case 4: // Glock
                 {
-                    switch (menu.Skinchanger.GlockSkin)
+                    switch (g_Options.Skinchanger.GlockSkin)
                     {
                     case 0:
                         *pWeapon->FallbackPaintKit() = 38;
@@ -267,7 +267,7 @@ void SkinChanger() {
                 break;
                 case 1: // Deagle
                 {
-                    switch (menu.Skinchanger.DeagleSkin)
+                    switch (g_Options.Skinchanger.DeagleSkin)
                     {
                     case 0:
                         *pWeapon->FallbackPaintKit() = 37;
@@ -290,7 +290,7 @@ void SkinChanger() {
                 break;
                 case 8: // AUG
                 {
-                    switch (menu.Skinchanger.AUGSkin)
+                    switch (g_Options.Skinchanger.AUGSkin)
                     {
                     case 0:
                         *pWeapon->FallbackPaintKit() = 9;
@@ -311,7 +311,7 @@ void SkinChanger() {
                 break;
                 case 10: // Famas
                 {
-                    switch (menu.Skinchanger.FAMASSkin)
+                    switch (g_Options.Skinchanger.FAMASSkin)
                     {
                     case 0:
                         *pWeapon->FallbackPaintKit() = 429;
@@ -352,7 +352,7 @@ void SkinChanger() {
                 break;
                 case 19: // P90
                 {
-                    switch (menu.Skinchanger.P90Skin)
+                    switch (g_Options.Skinchanger.P90Skin)
                     {
                     case 1:
                         *pWeapon->FallbackPaintKit() = 156;
@@ -400,7 +400,7 @@ void SkinChanger() {
                 break;
                 case 24: // UMP-45
                 {
-                    switch (menu.Skinchanger.UMP45Skin)
+                    switch (g_Options.Skinchanger.UMP45Skin)
                     {
                     case 0:
                         *pWeapon->FallbackPaintKit() = 37;
@@ -446,7 +446,7 @@ void SkinChanger() {
                 break;
                 case 30: // Tec 9
                 {
-                    switch (menu.Skinchanger.tec9Skin)
+                    switch (g_Options.Skinchanger.tec9Skin)
                     {
                     case 0:
                         *pWeapon->FallbackPaintKit() = 179;
@@ -482,7 +482,7 @@ void SkinChanger() {
                 break;
                 case 32: // P2000
                 {
-                    switch (menu.Skinchanger.P2000Skin)
+                    switch (g_Options.Skinchanger.P2000Skin)
                     {
                     case 0:
                         *pWeapon->FallbackPaintKit() = 485;
@@ -536,7 +536,7 @@ void SkinChanger() {
                 break;
                 case 36: // P250
                 {
-                    switch (menu.Skinchanger.P250Skin)
+                    switch (g_Options.Skinchanger.P250Skin)
                     {
                     case 0:
                         *pWeapon->FallbackPaintKit() = 102;
@@ -560,7 +560,7 @@ void SkinChanger() {
                 break;
                 case 38: // Scar 20
                 {
-                    switch (menu.Skinchanger.SCAR20Skin)
+                    switch (g_Options.Skinchanger.SCAR20Skin)
                     {
                     case 0:
                         *pWeapon->FallbackPaintKit() = 642;
@@ -595,7 +595,7 @@ void SkinChanger() {
                 break;
                 case 40: // SSG08
                 {
-                    switch (menu.Skinchanger.SSG08Skin)
+                    switch (g_Options.Skinchanger.SSG08Skin)
                     {
                     case 0:
                         *pWeapon->FallbackPaintKit() = 26;
@@ -675,7 +675,7 @@ void SkinChanger() {
                         killIcons.clear();
                         killIcons["knife_default_ct"] = "bayonet";
                         killIcons["knife_t"] = "bayonet";
-                        int Skin = menu.Skinchanger.KnifeSkin;
+                        int Skin = g_Options.Skinchanger.KnifeSkin;
                         if (Skin == 0)
                         {
                             *pWeapon->FallbackPaintKit() = 0; // Forest DDPAT
@@ -820,7 +820,7 @@ void SkinChanger() {
                         killIcons.clear();
                         killIcons["knife_default_ct"] = "knife_survival_bowie";
                         killIcons["knife_t"] = "knife_survival_bowie";
-                        int Skin = menu.Skinchanger.KnifeSkin;
+                        int Skin = g_Options.Skinchanger.KnifeSkin;
                         if (Skin == 0)
                         {
                             *pWeapon->FallbackPaintKit() = 0; // Forest DDPAT
@@ -966,7 +966,7 @@ void SkinChanger() {
                         killIcons.clear();
                         killIcons["knife_default_ct"] = "knife_butterfly";
                         killIcons["knife_t"] = "knife_butterfly";
-                        int Skin = menu.Skinchanger.KnifeSkin;
+                        int Skin = g_Options.Skinchanger.KnifeSkin;
                         if (Skin == 0)
                         {
                             *pWeapon->FallbackPaintKit() = 0; // Forest DDPAT
@@ -1112,7 +1112,7 @@ void SkinChanger() {
                         killIcons.clear();
                         killIcons["knife_default_ct"] = "knife_falchion";
                         killIcons["knife_t"] = "knife_falchion";
-                        int Skin = menu.Skinchanger.KnifeSkin;
+                        int Skin = g_Options.Skinchanger.KnifeSkin;
                         if (Skin == 0)
                         {
                             *pWeapon->FallbackPaintKit() = 0; // Forest DDPAT
@@ -1257,7 +1257,7 @@ void SkinChanger() {
                         killIcons.clear();
                         killIcons["knife_default_ct"] = "knife_flip";
                         killIcons["knife_t"] = "knife_flip";
-                        int Skin = menu.Skinchanger.KnifeSkin;
+                        int Skin = g_Options.Skinchanger.KnifeSkin;
                         if (Skin == 0)
                         {
                             *pWeapon->FallbackPaintKit() = 0; // Forest DDPAT
@@ -1403,7 +1403,7 @@ void SkinChanger() {
                         killIcons.clear();
                         killIcons["knife_default_ct"] = "knife_gut";
                         killIcons["knife_t"] = "knife_gut";
-                        int Skin = menu.Skinchanger.KnifeSkin;
+                        int Skin = g_Options.Skinchanger.KnifeSkin;
                         if (Skin == 0)
                         {
                             *pWeapon->FallbackPaintKit() = 0; // Forest DDPAT
@@ -1548,7 +1548,7 @@ void SkinChanger() {
                         killIcons.clear();
                         killIcons["knife_default_ct"] = "knife_tactical";
                         killIcons["knife_t"] = "knife_tactical";
-                        int Skin = menu.Skinchanger.KnifeSkin;
+                        int Skin = g_Options.Skinchanger.KnifeSkin;
                         if (Skin == 0)
                         {
                             *pWeapon->FallbackPaintKit() = 0; // Forest DDPAT
@@ -1693,7 +1693,7 @@ void SkinChanger() {
                         killIcons.clear();
                         killIcons["knife_default_ct"] = "knife_karambit";
                         killIcons["knife_t"] = "knife_karambit";
-                        int Skin = menu.Skinchanger.KnifeSkin;
+                        int Skin = g_Options.Skinchanger.KnifeSkin;
                         if (Skin == 0)
                         {
                             *pWeapon->FallbackPaintKit() = 0; // Forest DDPAT
@@ -1846,7 +1846,7 @@ void SkinChanger() {
                         killIcons.clear();
                         killIcons["knife_default_ct"] = "knife_m9_bayonet";
                         killIcons["knife_t"] = "knife_m9_bayonet";
-                        int Skin = menu.Skinchanger.KnifeSkin;
+                        int Skin = g_Options.Skinchanger.KnifeSkin;
                         if (Skin == 0)
                         {
                             *pWeapon->FallbackPaintKit() = 0; // Forest DDPAT
@@ -1999,7 +1999,7 @@ void SkinChanger() {
                         killIcons.clear();
                         killIcons["knife_default_ct"] = "knife_push";
                         killIcons["knife_t"] = "knife_push";
-                        int Skin = menu.Skinchanger.KnifeSkin;
+                        int Skin = g_Options.Skinchanger.KnifeSkin;
                         if (Skin == 0)
                         {
                             *pWeapon->FallbackPaintKit() = 5; // Forest DDPAT

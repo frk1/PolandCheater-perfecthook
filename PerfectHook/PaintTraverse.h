@@ -14,7 +14,7 @@ void __fastcall hkPaintTraverse(PVOID pPanels, int edx, unsigned int vguiPanel, 
 {
     static auto ofunc = hooks::panel.get_original<paint_traverse_t>(41);
 	IClientEntity* local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
-	if (local != nullptr && local->IsAlive() && menu.Visuals.noscopeborder && !strcmp("HudZoom", g_Panel->GetName(vguiPanel)))
+	if (local != nullptr && local->IsAlive() && g_Options.Visuals.noscopeborder && !strcmp("HudZoom", g_Panel->GetName(vguiPanel)))
 	{
 		return;
 	}
@@ -36,7 +36,7 @@ void __fastcall hkPaintTraverse(PVOID pPanels, int edx, unsigned int vguiPanel, 
 		{
             static auto linegoesthrusmoke = U::FindPattern("client.dll", (PBYTE)"\x55\x8B\xEC\x83\xEC\x08\x8B\x15\x00\x00\x00\x00\x0F\x57\xC0", "xxxxxxxx????xxx");
             static auto smokecout = *(DWORD*)(linegoesthrusmoke + 0x8);
-            if (menu.Visuals.NoSmoke) *(int*)(smokecout) = 0;
+            if (g_Options.Visuals.NoSmoke) *(int*)(smokecout) = 0;
 
             visuals::instance().OnPaintTraverse(local);
 
@@ -45,12 +45,12 @@ void __fastcall hkPaintTraverse(PVOID pPanels, int edx, unsigned int vguiPanel, 
 			if (local != nullptr)
 			{
 				CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(local->GetActiveWeaponHandle());
-				if (menu.Visuals.NoFlash) 
+				if (g_Options.Visuals.NoFlash) 
 				{
 					*MakePtr(float*, local, m_flFlashDuration) = 0.f;
 					*MakePtr(float*, local, m_flFlashMaxAlpha) = 0.f;
 				}
-				if (local && local->IsScoped() && menu.Visuals.noscopeborder && MiscFunctions::IsSniper(pWeapon))
+				if (local && local->IsScoped() && g_Options.Visuals.noscopeborder && MiscFunctions::IsSniper(pWeapon))
 				{
 					int width = 0;
 					int height = 0;
@@ -64,19 +64,19 @@ void __fastcall hkPaintTraverse(PVOID pPanels, int edx, unsigned int vguiPanel, 
 			}
 		}
 		if (!g_Engine->IsInGame()) {
-			menu.Misc.NameChangerFix = false; 
-			menu.Misc.NameSpammer = 0;
-			menu.Misc.NoName = false;
-			menu.Misc.ChatSpamMode = false;
+			g_Options.Misc.NameChangerFix = false; 
+			g_Options.Misc.NameSpammer = 0;
+			g_Options.Misc.NoName = false;
+			g_Options.Misc.ChatSpamMode = false;
 		}
-		if (menu.Ragebot.MainSwitch && !once)
+		if (g_Options.Ragebot.MainSwitch && !once)
 		{
-			menu.Legitbot.MainSwitch = false;
+			g_Options.Legitbot.MainSwitch = false;
 			once = !once;
 		}
-		if (menu.Legitbot.MainSwitch && once)
+		if (g_Options.Legitbot.MainSwitch && once)
 		{
-			menu.Ragebot.MainSwitch = false;
+			g_Options.Ragebot.MainSwitch = false;
 			once = !once;
 		}
 
@@ -87,7 +87,7 @@ void __fastcall hkPaintTraverse(PVOID pPanels, int edx, unsigned int vguiPanel, 
 			printf("csPlayerResource offset: %p", g_PlayerResource - reinterpret_cast<DWORD>(GetModuleHandleA("client.dll")));
 			once1 = true;
 		}*/
-		if (menu.Visuals.Time)
+		if (g_Options.Visuals.Time)
 		{
 			std::time_t result = std::time(nullptr);
 			g_Render->Text(1, 1, Color(255, 255, 255, 255), g_Render->font.Time, std::asctime(std::localtime(&result)));

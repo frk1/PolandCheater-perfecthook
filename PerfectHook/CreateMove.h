@@ -1,6 +1,6 @@
 #pragma once
 #include "HookIncludes.h"
-#include "MiscHacks.h"
+#include "Misc.h"
 #include "MovementRecorder.h"
 #include "RageBot.h"
 #include "LegitBot.h"
@@ -44,16 +44,12 @@ void __stdcall CHLCreateMove(int sequence_number, float input_sample_frametime, 
 
     grenade_prediction::instance().Tick(cmd->buttons);
 
-    sanitize_angles(cmd->viewangles);
-
-    if (!bSendPacket && menu.Ragebot.YawFake)
-    {
-        qLastTickAngles = cmd->viewangles;
-    }
-    else if(!menu.Ragebot.YawFake && bSendPacket) qLastTickAngles = cmd->viewangles;
+    if (!bSendPacket && g_Options.Ragebot.YawFake) qLastTickAngles = cmd->viewangles;
+    else qLastTickAngles = cmd->viewangles;
         
     if (!sanitize_angles(cmd->viewangles))
         return;
+
     movementfix(oldAngle, cmd, oldForward, oldSideMove);
     clampMovement(cmd);
 

@@ -8,7 +8,7 @@ void __fastcall hkDrawModelExecute(void* thisptr, int edx, void* ctx, void* stat
 {
     static bool DontDraw = false;
     static auto ofunc = hooks::modelrender.get_original<dme_t>(21);
-    if (menu.Visuals.Enabled && menu.Visuals.Chams)
+    if (g_Options.Visuals.Enabled && g_Options.Visuals.Chams)
     {
         static IMaterial* ignorez = CreateMaterial("VertexLitGeneric", "vgui/white_additive", true, true, true, true, true);
         static IMaterial* notignorez = CreateMaterial("VertexLitGeneric", "vgui/white_additive", false, true, true, true, true);
@@ -22,11 +22,11 @@ void __fastcall hkDrawModelExecute(void* thisptr, int edx, void* ctx, void* stat
 
 
         
-        if (ModelName && menu.Visuals.Chams && menu.Visuals.Filter.Players && strstr(ModelName, "models/player"))
+        if (ModelName && g_Options.Visuals.Chams && g_Options.Visuals.Filter.Players && strstr(ModelName, "models/player"))
         {
             if (pModelEntity && pLocal)
             {
-                if (!menu.Visuals.Filter.EnemyOnly ||
+                if (!g_Options.Visuals.Filter.EnemyOnly ||
                     pModelEntity->GetTeamNum() != pLocal->GetTeamNum())
                 {
                     pModelEntity = g_EntityList->GetClientEntity(pInfo.entity_index);
@@ -60,13 +60,13 @@ void __fastcall hkDrawModelExecute(void* thisptr, int edx, void* ctx, void* stat
                 }
             }
         }
-        else if (menu.Visuals.Hands && strstr(ModelName, "arms"))
+        else if (g_Options.Visuals.Hands && strstr(ModelName, "arms"))
         {
-            if (menu.Visuals.Hands == 1)
+            if (g_Options.Visuals.Hands == 1)
             {
                 DontDraw = true;
             }
-            if (menu.Visuals.Hands == 2)
+            if (g_Options.Visuals.Hands == 2)
             {
                 IMaterial* Hands = g_MaterialSystem->FindMaterial(ModelName, "Model textures");
                 if (!g_Input->m_fCameraInThirdPerson)
@@ -81,7 +81,7 @@ void __fastcall hkDrawModelExecute(void* thisptr, int edx, void* ctx, void* stat
                 }
             }
         }
-        else if (menu.Visuals.Chams && menu.Visuals.WeaponsWorld && strstr(ModelName, "_dropped.mdl"))
+        else if (g_Options.Visuals.Chams && g_Options.Visuals.WeaponsWorld && strstr(ModelName, "_dropped.mdl"))
         {
             ForceMaterial(Color(255, 255, 255), ignorez);
         }

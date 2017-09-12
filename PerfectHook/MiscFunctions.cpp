@@ -3,12 +3,13 @@
 #include "MiscFunctions.h"
 #include "Utilities.h"
 #include "Autowall.h"
-#include "RenderManager.h"
+#include "Render.h"
 
 void UTIL_TraceLine(const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask,
-	const IClientEntity *ignore, int collisionGroup, trace_t *ptr)
+    const IClientEntity *ignore, int collisionGroup, trace_t *ptr)
 {
-	typedef int(__fastcall* UTIL_TraceLine_t)(const Vector&, const Vector&, unsigned int, const IClientEntity*, int, trace_t*);
+	typedef void(__fastcall* UTIL_TraceLine_t)(const Vector& , const Vector& , unsigned int ,
+        const IClientEntity *, int , trace_t *);
 	static UTIL_TraceLine_t TraceLine = (UTIL_TraceLine_t)U::FindPattern("client.dll", (PBYTE)"\x55\x8B\xEC\x83\xE4\xF0\x83\xEC\x7C\x56\x52", "xxxxxxxxxxx");
 	TraceLine(vecAbsStart, vecAbsEnd, mask, ignore, collisionGroup, ptr);
 }

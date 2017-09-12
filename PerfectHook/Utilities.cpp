@@ -1,6 +1,3 @@
-/*
-dankmeme
-*/
 #pragma once
 
 
@@ -159,27 +156,21 @@ DWORD U::FindTextPattern(std::string moduleName, char* string)
 }
 
 DWORD	VMTSize;
+
 bool  U::VMT::Initialize(DWORD* InstancePointer)
 {
-	/*Instance = InstancePointer;
-	OriginalTable = (DWORD*)*InstancePointer;
-	int VMTSize = MethodCount(InstancePointer);
-	size_t TableBytes = VMTSize * 4;
-	CustomTable = (DWORD*)malloc(TableBytes + 8);
-	if (!CustomTable) return false;
-	memcpy((void*)CustomTable, (void*)OriginalTable, VMTSize * 4);
-	*InstancePointer = (DWORD)CustomTable;*/
 
-	Instance = InstancePointer;
-	OriginalTable = (DWORD*)*InstancePointer;
-	VMTSize = MethodCount(InstancePointer);
-	CustomTable = new DWORD[VMTSize + 1];
-	memcpy(&CustomTable[1], OriginalTable, sizeof(DWORD)* VMTSize);
-	CustomTable[0] = (uintptr_t)OriginalTable[-1];
-	*InstancePointer = (DWORD)&CustomTable[1];
 
-	initComplete = true;
-	return true;
+    Instance = InstancePointer;
+    OriginalTable = (DWORD*)*InstancePointer;
+    VMTSize = MethodCount(InstancePointer);
+    CustomTable = new DWORD[VMTSize + 1];
+    memcpy(&CustomTable[1], OriginalTable, sizeof(DWORD)* VMTSize);
+    CustomTable[0] = (uintptr_t)OriginalTable[-1];
+    *InstancePointer = (DWORD)&CustomTable[1];
+
+    initComplete = true;
+    return true;
 }
 
 int		 U::VMT::MethodCount(DWORD* InstancePointer)
@@ -384,6 +375,7 @@ vfunc_hook::~vfunc_hook()
     delete[] new_vftbl;
 }
 
+
 bool vfunc_hook::setup(void* base /*= nullptr*/)
 {
     if (base != nullptr)
@@ -398,13 +390,15 @@ bool vfunc_hook::setup(void* base /*= nullptr*/)
     if (vftbl_len == 0)
         return false;
 
-    new_vftbl = new std::uintptr_t[vftbl_len]();
+    new_vftbl = new std::uintptr_t[vftbl_len + 1]();
 
-    std::memcpy(new_vftbl, old_vftbl, vftbl_len * sizeof(std::uintptr_t));
+    std::memcpy(&new_vftbl[1], old_vftbl, vftbl_len * sizeof(std::uintptr_t));
+
 
     try {
         auto guard = detail::protect_guard{ class_base, sizeof(std::uintptr_t), PAGE_READWRITE };
-        *(std::uintptr_t**)class_base = new_vftbl;
+        new_vftbl[0] = old_vftbl[-1];
+        *(std::uintptr_t**)class_base = &new_vftbl[1];
     }
     catch (...) {
         delete[] new_vftbl;

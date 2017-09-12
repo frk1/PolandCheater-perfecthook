@@ -26,8 +26,8 @@ void  __stdcall hkFrameStageNotify(ClientFrameStage_t curStage)
     }
 	ofunc(curStage);
 	if (curStage == FRAME_NET_UPDATE_POSTDATAUPDATE_START) {
-        if(menu.Ragebot.Resolver) Resolver3();
-        if (menu.Skinchanger.Enabled)
+        if(g_Options.Ragebot.Resolver) Resolver3();
+        if (g_Options.Skinchanger.Enabled)
         {
             GloveChanger();
             SkinChanger();

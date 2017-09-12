@@ -122,7 +122,7 @@ void GloveChanger()
 
     if (glove)
     {
-        switch (menu.Skinchanger.gloves)
+        switch (g_Options.Skinchanger.gloves)
         {
         case 1: //bloodhound
         {

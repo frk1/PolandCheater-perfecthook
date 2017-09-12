@@ -2,7 +2,7 @@
 #include "HookIncludes.h"
 typedef void(__thiscall* play_sound_t)(void*, const char*);
 
-void __stdcall Hooked_PlaySound(const char* szFileName)
+void __stdcall hkPlaySound(const char* szFileName)
 {
     static auto ofunc = hooks::surface.get_original<play_sound_t>(82);
 	//Call original PlaySound

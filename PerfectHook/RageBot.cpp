@@ -1,6 +1,6 @@
 
 #include "RageBot.h"
-#include "RenderManager.h"
+#include "Render.h"
 #include "Autowall.h"
 #include <iostream>
 #include "MathFunctions.h"
@@ -24,19 +24,19 @@ ragebot::ragebot()
 
 void ragebot::OnCreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
 {
-    if (!menu.Ragebot.MainSwitch)
+    if (!g_Options.Ragebot.MainSwitch)
         return;
 
     IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
     if (pLocal && pLocal->IsAlive())
     {
-        if (menu.Ragebot.BAIMkey && G::PressedKeys[menu.Ragebot.BAIMkey] && menu.Ragebot.Hitscan != 4)
+        if (g_Options.Ragebot.BAIMkey && G::PressedKeys[g_Options.Ragebot.BAIMkey] && g_Options.Ragebot.Hitscan != 4)
         {
-            menu.Ragebot.Hitscan = 4;
+            g_Options.Ragebot.Hitscan = 4;
         }
-        else if (menu.Ragebot.BAIMkey && !G::PressedKeys[menu.Ragebot.BAIMkey] && menu.Ragebot.Hitscan != 3)
+        else if (g_Options.Ragebot.BAIMkey && !G::PressedKeys[g_Options.Ragebot.BAIMkey] && g_Options.Ragebot.Hitscan != 3)
         {
-            menu.Ragebot.Hitscan = 3;
+            g_Options.Ragebot.Hitscan = 3;
         }
 
         CBaseCombatWeapon* weapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
@@ -49,15 +49,15 @@ void ragebot::OnCreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
         }
 
 
-        if (menu.Ragebot.Enabled)
+        if (g_Options.Ragebot.Enabled)
             DoAimbot(pCmd, bSendPacket);
 
-        if (menu.Ragebot.AntiRecoil)
+        if (g_Options.Ragebot.AntiRecoil)
             DoNoRecoil(pCmd);
 
 
 
-        if (menu.Ragebot.EnabledAntiAim)
+        if (g_Options.Ragebot.EnabledAntiAim)
             DoAntiAim(pCmd, bSendPacket);
 
 
@@ -72,7 +72,7 @@ bool ragebot::hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseComba
     AngleVectors(cmd->viewangles, &forward, &right, &up);
 
     int total_hits = 0;
-    int needed_hits = static_cast<int>(max_traces * (menu.Ragebot.HitchanceAmount / 100.f));
+    int needed_hits = static_cast<int>(max_traces * (g_Options.Ragebot.HitchanceAmount / 100.f));
 
     weapon->UpdateAccuracyPenalty(weapon);
 
@@ -134,33 +134,9 @@ T clamp(T in, U low, U high)
         return high;
 
     return in;
-}
-float LagFix()
-{
-    float updaterate = g_CVar->FindVar("cl_updaterate")->fValue;
-    ConVar* minupdate = g_CVar->FindVar("sv_minupdaterate");
-    ConVar* maxupdate = g_CVar->FindVar("sv_maxupdaterate");
 
-    if (minupdate && maxupdate)
-        updaterate = maxupdate->fValue;
-
-    float ratio = g_CVar->FindVar("cl_interp_ratio")->fValue;
-
-    if (ratio == 0)
-        ratio = 1.0f;
-
-    float lerp = g_CVar->FindVar("cl_interp")->fValue;
-    ConVar* cmin = g_CVar->FindVar("sv_client_min_interp_ratio");
-    ConVar* cmax = g_CVar->FindVar("sv_client_max_interp_ratio");
-
-    if (cmin && cmax && cmin->fValue != 1)
-        ratio = clamp(ratio, cmin->fValue, cmax->fValue);
-
-
-    return max(lerp, ratio / updaterate);
 }
 
-// Functionality
 void ragebot::DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket)
 {
 
@@ -197,7 +173,7 @@ void ragebot::DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket)
                 Vector ViewOffset = pLocal->GetOrigin() + pLocal->GetViewOffset();
                 Vector View; g_Engine->GetViewAngles(View);
                 float FoV = FovToPlayer(ViewOffset, View, pTarget, HitBox);
-                if (FoV < menu.Ragebot.FOV)
+                if (FoV < g_Options.Ragebot.FOV)
                     FindNewTarget = false;
             }
         }
@@ -228,9 +204,9 @@ void ragebot::DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket)
         HitBox = HitScan(pTarget);
 
         // Key
-        if (menu.Ragebot.KeyPress)
+        if (g_Options.Ragebot.KeyPress)
         {
-            if (menu.Ragebot.KeyPress > 0 && !G::PressedKeys[menu.Ragebot.KeyPress])
+            if (g_Options.Ragebot.KeyPress > 0 && !G::PressedKeys[g_Options.Ragebot.KeyPress])
             {
                 TargetID = -1;
                 pTarget = nullptr;
@@ -249,25 +225,25 @@ void ragebot::DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket)
 
         if (AimAtPoint(pLocal, AimPoint, pCmd))
         {
-            if (menu.Ragebot.AutoFire && CanAttack() && MiscFunctions::IsSniper(pWeapon) && menu.Ragebot.AutoScope)
+            if (g_Options.Ragebot.AutoFire && CanAttack() && MiscFunctions::IsSniper(pWeapon) && g_Options.Ragebot.AutoScope)
             {
-                if (pLocal->IsScoped()) if (!menu.Ragebot.Hitchance || hit_chance(pLocal, pCmd, pWeapon, pTarget)) pCmd->buttons |= IN_ATTACK;
+                if (pLocal->IsScoped()) if (!g_Options.Ragebot.Hitchance || hit_chance(pLocal, pCmd, pWeapon, pTarget)) pCmd->buttons |= IN_ATTACK;
                 if (!pLocal->IsScoped()) pCmd->buttons |= IN_ATTACK2;
             }
-            if (menu.Ragebot.AutoFire && CanAttack() && !(MiscFunctions::IsSniper(pWeapon)))
+            if (g_Options.Ragebot.AutoFire && CanAttack() && !(MiscFunctions::IsSniper(pWeapon)))
             {
-                if (!menu.Ragebot.Hitchance || hit_chance(pLocal, pCmd, pWeapon, pTarget)) pCmd->buttons |= IN_ATTACK;
+                if (!g_Options.Ragebot.Hitchance || hit_chance(pLocal, pCmd, pWeapon, pTarget)) pCmd->buttons |= IN_ATTACK;
             }
-            if (menu.Ragebot.AutoFire && CanAttack() && (MiscFunctions::IsSniper(pWeapon)) && !menu.Ragebot.AutoScope)
+            if (g_Options.Ragebot.AutoFire && CanAttack() && (MiscFunctions::IsSniper(pWeapon)) && !g_Options.Ragebot.AutoScope)
             {
-                if (!menu.Ragebot.Hitchance || hit_chance(pLocal, pCmd, pWeapon, pTarget)) if (pLocal->IsScoped()) pCmd->buttons |= IN_ATTACK;
+                if (!g_Options.Ragebot.Hitchance || hit_chance(pLocal, pCmd, pWeapon, pTarget)) if (pLocal->IsScoped()) pCmd->buttons |= IN_ATTACK;
             }
         }
 
 
 
 
-        if (menu.Ragebot.AutoStop)
+        if (g_Options.Ragebot.AutoStop)
         {
             pCmd->forwardmove = 0.f;
             pCmd->sidemove = 0.f;
@@ -275,7 +251,7 @@ void ragebot::DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket)
 
 
 
-        if (menu.Ragebot.AutoCrouch)
+        if (g_Options.Ragebot.AutoCrouch)
         {
             pCmd->buttons |= IN_DUCK;
         }
@@ -287,7 +263,7 @@ void ragebot::DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket)
     if (pWeapon != nullptr)
     {
         CSWeaponInfo* WeaponInfo = pWeapon->GetCSWpnData();
-        if (MiscFunctions::IsPistol(pWeapon) && menu.Ragebot.AutoPistol && pWeapon->m_AttributeManager()->m_Item()->GetItemDefinitionIndex() != 64)
+        if (MiscFunctions::IsPistol(pWeapon) && g_Options.Ragebot.AutoPistol && pWeapon->m_AttributeManager()->m_Item()->GetItemDefinitionIndex() != 64)
         {
             if (pCmd->buttons & IN_ATTACK && !MiscFunctions::IsKnife(pWeapon) && !MiscFunctions::IsGrenade(pWeapon))
             {
@@ -318,7 +294,7 @@ bool ragebot::TargetMeetsRequirements(IClientEntity* pEntity)
         if (pClientClass->m_ClassID == (int)ClassID::CCSPlayer && g_Engine->GetPlayerInfo(pEntity->GetIndex(), &pinfo))
         {
             // Team Check
-            if (pEntity->GetTeamNum() != local->GetTeamNum() || menu.Ragebot.FriendlyFire)
+            if (pEntity->GetTeamNum() != local->GetTeamNum() || g_Options.Ragebot.FriendlyFire)
             {
                 // Spawn Check
                 if (!pEntity->HasGunGameImmunity())
@@ -373,7 +349,7 @@ int ragebot::GetTargetCrosshair()
 {
     // Target selection
     int target = -1;
-    float minFoV = menu.Ragebot.FOV;
+    float minFoV = g_Options.Ragebot.FOV;
 
     IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
     Vector ViewOffset = pLocal->GetOrigin() + pLocal->GetViewOffset();
@@ -405,11 +381,11 @@ int ragebot::HitScan(IClientEntity* pEntity)
     vector<int> HitBoxesToScan{ Head , Neck, Chest, Stomach };
 
 
-    int HitScanMode = menu.Ragebot.Hitscan;
+    int HitScanMode = g_Options.Ragebot.Hitscan;
 
     if (HitScanMode == 0)
     {
-        switch (menu.Ragebot.Hitbox)
+        switch (g_Options.Ragebot.Hitbox)
         {
         case 0:
             HitBoxesToScan.push_back(Head);
@@ -496,7 +472,7 @@ int ragebot::HitScan(IClientEntity* pEntity)
     static vector<int> baim{ UpperChest ,Chest ,Stomach ,Pelvis ,LeftUpperArm ,RightUpperArm ,LeftThigh,RightThigh ,LeftHand ,RightHand, LeftFoot, RightFoot, LeftShin, RightShin,LeftLowerArm,RightLowerArm };
 
     int bestHitbox = -1;
-    float highestDamage = menu.Ragebot.MinimumDamage;
+    float highestDamage = g_Options.Ragebot.MinimumDamage;
     for (auto HitBoxID : HitBoxesToScan)
     {
 
@@ -596,21 +572,17 @@ bool ragebot::AimAtPoint(IClientEntity* pLocal, Vector point, CInput::CUserCmd *
 
 
 
-    if (menu.Ragebot.Silent)
+    if (g_Options.Ragebot.Silent)
     {
         if (CanAttack()) {
             pCmd->viewangles = angles;
         }
     }
 
-    if (!menu.Ragebot.Silent)
+    if (!g_Options.Ragebot.Silent)
     {
         pCmd->viewangles = angles;
         g_Engine->SetViewAngles(pCmd->viewangles);
-    }
-    if (menu.Ragebot.FakeLagFix)
-    {
-        pCmd->tick_count = TIME_TO_TICKS(LagFix());
     }
     return ReturnValue;
 }
@@ -751,7 +723,7 @@ void ragebot::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket)
         CCSGrenade* csGrenade = (CCSGrenade*)pWeapon;
 
 
-        if (MiscFunctions::IsKnife(pWeapon) && !menu.Ragebot.KnifeAA)
+        if (MiscFunctions::IsKnife(pWeapon) && !g_Options.Ragebot.KnifeAA)
             return;
 
         if (csGrenade->GetThrowTime() > 0.f)
@@ -761,7 +733,7 @@ void ragebot::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket)
     // Don't do antiaim
     // if (DoExit) return;
 
-    if (menu.Ragebot.Edge) {
+    if (g_Options.Ragebot.Edge) {
         auto bEdge = EdgeAntiAim(pLocal, pCmd, 360.f, 89.f);
         if (bEdge)
             return;
@@ -800,7 +772,7 @@ void ragebot::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket)
 
     static bool ySwitch;
 
-    if (menu.Ragebot.YawFake != 0)
+    if (g_Options.Ragebot.YawFake != 0)
         ySwitch = !ySwitch;
     else
         ySwitch = true;
@@ -824,7 +796,7 @@ void ragebot::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket)
     double yaw = fmod(static_cast<double>(server_time)*rate, 360.0);
     double factor = 360.0 / M_PI;
     factor *= 25;
-    switch (menu.Ragebot.YawTrue)
+    switch (g_Options.Ragebot.YawTrue)
     {
     case 1: //sideways
     {
@@ -856,7 +828,7 @@ void ragebot::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket)
 
 
 
-    switch (menu.Ragebot.YawFake)
+    switch (g_Options.Ragebot.YawFake)
     {
     case 1://sideways
     {
@@ -895,13 +867,13 @@ void ragebot::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket)
 
 
     {
-        if (ySwitch && menu.Ragebot.YawTrue != 0)
+        if (ySwitch && g_Options.Ragebot.YawTrue != 0)
             pCmd->viewangles = SpinAngles;
-        else if (!ySwitch && menu.Ragebot.YawFake != 0)
+        else if (!ySwitch && g_Options.Ragebot.YawFake != 0)
             pCmd->viewangles = FakeAngles;
     }
 
-    switch (menu.Ragebot.Pitch)
+    switch (g_Options.Ragebot.Pitch)
     {
     case 0:
         // No Pitch AA

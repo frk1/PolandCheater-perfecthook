@@ -242,4 +242,4 @@ struct Variables
 	} Menu;
 };
 
-extern Variables menu;
+extern Variables g_Options;

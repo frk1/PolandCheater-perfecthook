@@ -1,6 +1,6 @@
 
 #include "LegitBot.h"
-#include "RenderManager.h"
+#include "Render.h"
 #include "SDK.h"
 #include "EnginePrediction.h"
 #include "Global.h"
@@ -53,7 +53,7 @@ static int custom_delay = 0;
 
 void legitbot::OnCreateMove(CInput::CUserCmd *pCmd, IClientEntity *local)
 {
-	if (!menu.Legitbot.MainSwitch)
+	if (!g_Options.Legitbot.MainSwitch)
 		return;
 
     CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(local->GetActiveWeaponHandle());
@@ -62,9 +62,9 @@ void legitbot::OnCreateMove(CInput::CUserCmd *pCmd, IClientEntity *local)
 	{
         do_aimbot(local, pWeapon, pCmd);
 
-		if (!G::PressedKeys[menu.Legitbot.Triggerbot.Key]) custom_delay = 0;
+		if (!G::PressedKeys[g_Options.Legitbot.Triggerbot.Key]) custom_delay = 0;
 
-		if (menu.Legitbot.Triggerbot.Enabled && menu.Legitbot.Triggerbot.Key != 0 && G::PressedKeys[menu.Legitbot.Triggerbot.Key])
+		if (g_Options.Legitbot.Triggerbot.Enabled && g_Options.Legitbot.Triggerbot.Key != 0 && G::PressedKeys[g_Options.Legitbot.Triggerbot.Key])
             triggerbot(pCmd, local, pWeapon);
 	}
 }
@@ -121,18 +121,18 @@ void legitbot::triggerbot(CInput::CUserCmd *cmd, IClientEntity* local, CBaseComb
         return;
 
     bool didHit = false;
-    if ((menu.Legitbot.Triggerbot.Filter.Head && Trace.hitgroup == 1)
-        || (menu.Legitbot.Triggerbot.Filter.Chest && Trace.hitgroup == 2)
-        || (menu.Legitbot.Triggerbot.Filter.Stomach && Trace.hitgroup == 3)
-        || (menu.Legitbot.Triggerbot.Filter.Arms && (Trace.hitgroup == 4 || Trace.hitgroup == 5))
-        || (menu.Legitbot.Triggerbot.Filter.Legs && (Trace.hitgroup == 6 || Trace.hitgroup == 7)))
+    if ((g_Options.Legitbot.Triggerbot.Filter.Head && Trace.hitgroup == 1)
+        || (g_Options.Legitbot.Triggerbot.Filter.Chest && Trace.hitgroup == 2)
+        || (g_Options.Legitbot.Triggerbot.Filter.Stomach && Trace.hitgroup == 3)
+        || (g_Options.Legitbot.Triggerbot.Filter.Arms && (Trace.hitgroup == 4 || Trace.hitgroup == 5))
+        || (g_Options.Legitbot.Triggerbot.Filter.Legs && (Trace.hitgroup == 6 || Trace.hitgroup == 7)))
     {
         didHit = true;
     }
 
-    if (menu.Legitbot.Triggerbot.Delay >= 1)
+    if (g_Options.Legitbot.Triggerbot.Delay >= 1)
     {
-        if (custom_delay >= menu.Legitbot.Triggerbot.Delay / 30)
+        if (custom_delay >= g_Options.Legitbot.Triggerbot.Delay / 30)
         {
             if (didHit)
             {
@@ -151,7 +151,7 @@ void legitbot::triggerbot(CInput::CUserCmd *cmd, IClientEntity* local, CBaseComb
 
 void legitbot::do_aimbot(IClientEntity *local, CBaseCombatWeapon *weapon, CInput::CUserCmd *cmd)
 {
-    if (!menu.Legitbot.MainSwitch)
+    if (!g_Options.Legitbot.MainSwitch)
         return;
 
     if (!weapon)
@@ -232,7 +232,7 @@ bool legitbot::hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseComb
     AngleVectors(cmd->viewangles, &forward, &right, &up);
 
     int total_hits = 0;
-    int needed_hits = static_cast<int>(max_traces * (menu.Legitbot.Triggerbot.hitchance / 100.f));
+    int needed_hits = static_cast<int>(max_traces * (g_Options.Legitbot.Triggerbot.hitchance / 100.f));
 
     weapon->UpdateAccuracyPenalty(weapon);
 
@@ -293,33 +293,33 @@ void legitbot::weapon_settings(CBaseCombatWeapon* weapon)
 
     if (MiscFunctions::IsSniper(weapon))
     {
-        aim_key = menu.Legitbot.SniperKey;
-        aim_smooth = menu.Legitbot.SniperSmooth;
-        aim_fov = menu.Legitbot.Sniperfov;
+        aim_key = g_Options.Legitbot.SniperKey;
+        aim_smooth = g_Options.Legitbot.SniperSmooth;
+        aim_fov = g_Options.Legitbot.Sniperfov;
         randomized_smooth = 1;
-        recoil_min = menu.Legitbot.sniper_recoil_min;
-        recoil_max = menu.Legitbot.sniper_recoil_max;
+        recoil_min = g_Options.Legitbot.sniper_recoil_min;
+        recoil_max = g_Options.Legitbot.sniper_recoil_max;
         randomized_angle = 1;
 
     }
     else if (MiscFunctions::IsPistol(weapon))
     {
-        aim_key = menu.Legitbot.PistolKey;
-        aim_smooth = menu.Legitbot.PistolSmooth;
-        aim_fov = menu.Legitbot.Pistolfov;
+        aim_key = g_Options.Legitbot.PistolKey;
+        aim_smooth = g_Options.Legitbot.PistolSmooth;
+        aim_fov = g_Options.Legitbot.Pistolfov;
         randomized_smooth = 1;
-        recoil_min = menu.Legitbot.pistol_recoil_min;
-        recoil_max = menu.Legitbot.pistol_recoil_max;
+        recoil_min = g_Options.Legitbot.pistol_recoil_min;
+        recoil_max = g_Options.Legitbot.pistol_recoil_max;
         randomized_angle = 1;
     }
     else
     {
-        aim_key = menu.Legitbot.MainKey;
-        aim_smooth = menu.Legitbot.MainSmooth;
-        aim_fov = menu.Legitbot.Mainfov;
+        aim_key = g_Options.Legitbot.MainKey;
+        aim_smooth = g_Options.Legitbot.MainSmooth;
+        aim_fov = g_Options.Legitbot.Mainfov;
         randomized_smooth = 1;
-        recoil_min = menu.Legitbot.main_recoil_min;
-        recoil_max = menu.Legitbot.main_recoil_max;
+        recoil_min = g_Options.Legitbot.main_recoil_min;
+        recoil_max = g_Options.Legitbot.main_recoil_max;
         randomized_angle = 1;
     }
 }

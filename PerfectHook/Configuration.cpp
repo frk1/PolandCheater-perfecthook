@@ -9,142 +9,142 @@ void CConfig::Setup()
 {
 
 
-    SetupValue(menu.Ragebot.MainSwitch, false, ("Ragebot"), ("RageToggle"));
-    SetupValue(menu.Ragebot.Enabled, false, ("Ragebot"), ("Enabled"));
-    SetupValue(menu.Ragebot.AutoFire, false, ("Ragebot"), ("AutoFire"));
-    SetupValue(menu.Ragebot.FOV, 0.f, ("Ragebot"), ("FOV"));
-    SetupValue(menu.Ragebot.Silent, false, ("Ragebot"), ("Silent"));
-    SetupValue(menu.Ragebot.AutoPistol, false, ("Ragebot"), ("AutoPistol"));
-    SetupValue(menu.Ragebot.KeyPress, 0, ("Ragebot"), ("Key"));
+    SetupValue(g_Options.Ragebot.MainSwitch, false, ("Ragebot"), ("RageToggle"));
+    SetupValue(g_Options.Ragebot.Enabled, false, ("Ragebot"), ("Enabled"));
+    SetupValue(g_Options.Ragebot.AutoFire, false, ("Ragebot"), ("AutoFire"));
+    SetupValue(g_Options.Ragebot.FOV, 0.f, ("Ragebot"), ("FOV"));
+    SetupValue(g_Options.Ragebot.Silent, false, ("Ragebot"), ("Silent"));
+    SetupValue(g_Options.Ragebot.AutoPistol, false, ("Ragebot"), ("AutoPistol"));
+    SetupValue(g_Options.Ragebot.KeyPress, 0, ("Ragebot"), ("Key"));
 
 
-    SetupValue(menu.Ragebot.EnabledAntiAim, false, ("Ragebot"), ("AntiaimEnabled"));
-    SetupValue(menu.Ragebot.Pitch, 0, ("Ragebot"), ("AntiaimPitch"));
-    SetupValue(menu.Ragebot.YawTrue, 0, ("Ragebot"), ("AntiaimYaw-true"));
-    SetupValue(menu.Ragebot.YawFake, 0, ("Ragebot"), ("AntiaimYaw-fake"));
-    SetupValue(menu.Ragebot.AtTarget, false, ("Ragebot"), ("attargets"));
-    SetupValue(menu.Ragebot.Edge, false, ("Ragebot"), ("edge"));
-    SetupValue(menu.Ragebot.KnifeAA, false, ("Ragebot"), ("KnifeAA"));
+    SetupValue(g_Options.Ragebot.EnabledAntiAim, false, ("Ragebot"), ("AntiaimEnabled"));
+    SetupValue(g_Options.Ragebot.Pitch, 0, ("Ragebot"), ("AntiaimPitch"));
+    SetupValue(g_Options.Ragebot.YawTrue, 0, ("Ragebot"), ("AntiaimYaw-true"));
+    SetupValue(g_Options.Ragebot.YawFake, 0, ("Ragebot"), ("AntiaimYaw-fake"));
+    SetupValue(g_Options.Ragebot.AtTarget, false, ("Ragebot"), ("attargets"));
+    SetupValue(g_Options.Ragebot.Edge, false, ("Ragebot"), ("edge"));
+    SetupValue(g_Options.Ragebot.KnifeAA, false, ("Ragebot"), ("KnifeAA"));
 
-    SetupValue(menu.Ragebot.FriendlyFire, false, ("Ragebot"), ("FriendlyFire"));
-    SetupValue(menu.Ragebot.Hitbox, 0, ("Ragebot"), ("Hitbox"));
-    SetupValue(menu.Ragebot.Hitscan, 0, ("Ragebot"), ("Hitscan"));
+    SetupValue(g_Options.Ragebot.FriendlyFire, false, ("Ragebot"), ("FriendlyFire"));
+    SetupValue(g_Options.Ragebot.Hitbox, 0, ("Ragebot"), ("Hitbox"));
+    SetupValue(g_Options.Ragebot.Hitscan, 0, ("Ragebot"), ("Hitscan"));
 
-    SetupValue(menu.Ragebot.AntiRecoil, false, ("Ragebot"), ("AntiRecoil"));
-    SetupValue(menu.Ragebot.AutoStop, false, ("Ragebot"), ("AutoStop"));
-    SetupValue(menu.Ragebot.AutoCrouch, false, ("Ragebot"), ("AutoCrouch"));
-    SetupValue(menu.Ragebot.AutoScope, false, ("Ragebot"), ("AutoScope"));
-    SetupValue(menu.Ragebot.MinimumDamage, 0.f, ("Ragebot"), ("AutoWallDamage"));
-    SetupValue(menu.Ragebot.Hitchance, false, ("Ragebot"), ("HitChance"));
-    SetupValue(menu.Ragebot.HitchanceAmount, 0.f, ("Ragebot"), ("HitChanceAmount"));
-    SetupValue(menu.Ragebot.Resolver, false, ("Ragebot"), ("Resolver"));
-    SetupValue(menu.Ragebot.FakeLagFix, false, ("Ragebot"), ("Backtrack-lby"));
-    SetupValue(menu.Ragebot.BAIMkey, 0, ("Ragebot"), ("BAIMKey"));
-
-
-
-
-	SetupValue(menu.Legitbot.MainSwitch, false, ("Legitbot"), ("LegitToggle"));
-	SetupValue(menu.Legitbot.Aimbot.Enabled, false, ("Legitbot"), ("Enabled"));
-    SetupValue(menu.Legitbot.backtrack, false, ("Legitbot"), ("Backtrack"));
-
-
-	SetupValue(menu.Legitbot.MainKey, 1, ("Legitbot"), ("Key"));
-	SetupValue(menu.Legitbot.Mainfov, 0.f, ("Legitbot"), ("FOV"));
-	SetupValue(menu.Legitbot.MainSmooth, 1.f, ("Legitbot"), ("Speed"));
-	SetupValue(menu.Legitbot.main_recoil_min, 0, ("Legitbot"), ("RCS-min"));
-    SetupValue(menu.Legitbot.main_recoil_max, 0, ("Legitbot"), ("RCS-max"));
-
-	SetupValue(menu.Legitbot.PistolKey, 6, ("Legitbot"), ("Key-Pistol"));
-	SetupValue(menu.Legitbot.Pistolfov, 0.f, ("Legitbot"), ("FOV-Pistol"));
-	SetupValue(menu.Legitbot.PistolSmooth, 1.f, ("Legitbot"), ("Speed-Pistol"));
-    SetupValue(menu.Legitbot.pistol_recoil_min, 0, ("Legitbot"), ("RCS-min-pistol"));
-    SetupValue(menu.Legitbot.pistol_recoil_max, 0, ("Legitbot"), ("RCS-max-pistol"));
-
-	SetupValue(menu.Legitbot.SniperKey, 6, ("Legitbot"), ("Key-Sniper"));
-	SetupValue(menu.Legitbot.Sniperfov, 0.f, ("Legitbot"), ("FOV-Sniper"));
-	SetupValue(menu.Legitbot.SniperSmooth, 0.f, ("Legitbot"), ("Speed-Sniper"));
-    SetupValue(menu.Legitbot.sniper_recoil_min, 0, ("Legitbot"), ("RCS-min-sniper"));
-    SetupValue(menu.Legitbot.sniper_recoil_max, 0, ("Legitbot"), ("RCS-max-sniper"));
-
-	SetupValue(menu.Legitbot.Triggerbot.Enabled, false, ("Triggerbot"), ("Enabled"));
-	SetupValue(menu.Legitbot.Triggerbot.Key, 6, ("Triggerbot"), ("Key"));
-	SetupValue(menu.Legitbot.Triggerbot.Delay, 0.f, ("Triggerbot"), ("Delay"));
-	SetupValue(menu.Legitbot.Triggerbot.hitchance, 0.f, ("Triggerbot"), ("Hitchance"));
-
-	SetupValue(menu.Legitbot.Triggerbot.Filter.Head, false, ("Triggerbot"), ("FilterHead"));
-	SetupValue(menu.Legitbot.Triggerbot.Filter.Chest, false, ("Triggerbot"), ("FilterChest"));
-	SetupValue(menu.Legitbot.Triggerbot.Filter.Stomach, false, ("Triggerbot"), ("FilterStomach"));
-	SetupValue(menu.Legitbot.Triggerbot.Filter.Arms, false, ("Triggerbot"), ("FilterArms"));
-	SetupValue(menu.Legitbot.Triggerbot.Filter.Legs, false, ("Triggerbot"), ("FilterLegs"));
+    SetupValue(g_Options.Ragebot.AntiRecoil, false, ("Ragebot"), ("AntiRecoil"));
+    SetupValue(g_Options.Ragebot.AutoStop, false, ("Ragebot"), ("AutoStop"));
+    SetupValue(g_Options.Ragebot.AutoCrouch, false, ("Ragebot"), ("AutoCrouch"));
+    SetupValue(g_Options.Ragebot.AutoScope, false, ("Ragebot"), ("AutoScope"));
+    SetupValue(g_Options.Ragebot.MinimumDamage, 0.f, ("Ragebot"), ("AutoWallDamage"));
+    SetupValue(g_Options.Ragebot.Hitchance, false, ("Ragebot"), ("HitChance"));
+    SetupValue(g_Options.Ragebot.HitchanceAmount, 0.f, ("Ragebot"), ("HitChanceAmount"));
+    SetupValue(g_Options.Ragebot.Resolver, false, ("Ragebot"), ("Resolver"));
+    SetupValue(g_Options.Ragebot.FakeLagFix, false, ("Ragebot"), ("Backtrack-lby"));
+    SetupValue(g_Options.Ragebot.BAIMkey, 0, ("Ragebot"), ("BAIMKey"));
 
 
 
 
+	SetupValue(g_Options.Legitbot.MainSwitch, false, ("Legitbot"), ("LegitToggle"));
+	SetupValue(g_Options.Legitbot.Aimbot.Enabled, false, ("Legitbot"), ("Enabled"));
+    SetupValue(g_Options.Legitbot.backtrack, false, ("Legitbot"), ("Backtrack"));
 
-	SetupValue(menu.Visuals.Enabled, false, ("Visuals"), ("VisualsEnabled"));
-	SetupValue(menu.Visuals.Box, false, ("Visuals"), ("Box"));
-	SetupValue(menu.Visuals.Name, false, ("Visuals"), ("Name"));
-	SetupValue(menu.Visuals.HP, false, ("Visuals"), ("HP"));
-	SetupValue(menu.Visuals.Weapon, false, ("Visuals"), ("Weapon"));
-	SetupValue(menu.Visuals.Chams, false, ("Visuals"), ("Chams"));
-	SetupValue(menu.Visuals.DLight, false, ("Visuals"), ("DLight"));
-	SetupValue(menu.Visuals.SpreadCrosshair, false, ("Visuals"), ("SpreadCrosshair"));
-	SetupValue(menu.Visuals.GrenadeESP, false, ("Visuals"), ("GrenadeESP"));
-    SetupValue(menu.Visuals.Glow, false, ("Visuals"), ("Glow"));
 
-	SetupValue(menu.Visuals.NoVisualRecoil, false, ("Visuals"), ("NoVisualRecoil"));
-	SetupValue(menu.Visuals.Hands, 0, ("Visuals"), ("Hands"));
-    SetupValue(menu.Visuals.FOVChanger, 0.f, ("Visuals"), ("fovchanger"));
-	SetupValue(menu.Visuals.viewmodelChanger, 68.f, ("Visuals"), ("viewmodel_fov"));
-	SetupValue(menu.Visuals.NoFlash, false, ("Visuals"), ("NoFlash"));
-	SetupValue(menu.Visuals.NoSmoke, false, ("Visuals"), ("NoSmoke"));
-	SetupValue(menu.Visuals.Time, false, ("Visuals"), ("Time"));
-	SetupValue(menu.Visuals.noscopeborder, false, ("Visuals"), ("noscopeborder"));
-	SetupValue(menu.Visuals.C4, false, ("Visuals"), ("C4"));
-    SetupValue(menu.Visuals.GrenadePrediction, false, ("Visuals"), ("GrenadePrediction"));
-    SetupValue(menu.Visuals.ThirdPerson, false, ("Visuals"), ("thirdperson"));
+	SetupValue(g_Options.Legitbot.MainKey, 1, ("Legitbot"), ("Key"));
+	SetupValue(g_Options.Legitbot.Mainfov, 0.f, ("Legitbot"), ("FOV"));
+	SetupValue(g_Options.Legitbot.MainSmooth, 1.f, ("Legitbot"), ("Speed"));
+	SetupValue(g_Options.Legitbot.main_recoil_min, 0, ("Legitbot"), ("RCS-min"));
+    SetupValue(g_Options.Legitbot.main_recoil_max, 0, ("Legitbot"), ("RCS-max"));
 
-	SetupValue(menu.Visuals.Filter.Players, false, ("Visuals"), ("Players"));
-	SetupValue(menu.Visuals.Filter.EnemyOnly, false, ("Visuals"), ("EnemyOnly"));
-	SetupValue(menu.Visuals.WeaponsWorld, false, ("Visuals"), ("WeaponsWorld"));
-	SetupValue(menu.Visuals.C4World, false, ("Visuals"), ("C4World"));
+	SetupValue(g_Options.Legitbot.PistolKey, 6, ("Legitbot"), ("Key-Pistol"));
+	SetupValue(g_Options.Legitbot.Pistolfov, 0.f, ("Legitbot"), ("FOV-Pistol"));
+	SetupValue(g_Options.Legitbot.PistolSmooth, 1.f, ("Legitbot"), ("Speed-Pistol"));
+    SetupValue(g_Options.Legitbot.pistol_recoil_min, 0, ("Legitbot"), ("RCS-min-pistol"));
+    SetupValue(g_Options.Legitbot.pistol_recoil_max, 0, ("Legitbot"), ("RCS-max-pistol"));
+
+	SetupValue(g_Options.Legitbot.SniperKey, 6, ("Legitbot"), ("Key-Sniper"));
+	SetupValue(g_Options.Legitbot.Sniperfov, 0.f, ("Legitbot"), ("FOV-Sniper"));
+	SetupValue(g_Options.Legitbot.SniperSmooth, 0.f, ("Legitbot"), ("Speed-Sniper"));
+    SetupValue(g_Options.Legitbot.sniper_recoil_min, 0, ("Legitbot"), ("RCS-min-sniper"));
+    SetupValue(g_Options.Legitbot.sniper_recoil_max, 0, ("Legitbot"), ("RCS-max-sniper"));
+
+	SetupValue(g_Options.Legitbot.Triggerbot.Enabled, false, ("Triggerbot"), ("Enabled"));
+	SetupValue(g_Options.Legitbot.Triggerbot.Key, 6, ("Triggerbot"), ("Key"));
+	SetupValue(g_Options.Legitbot.Triggerbot.Delay, 0.f, ("Triggerbot"), ("Delay"));
+	SetupValue(g_Options.Legitbot.Triggerbot.hitchance, 0.f, ("Triggerbot"), ("Hitchance"));
+
+	SetupValue(g_Options.Legitbot.Triggerbot.Filter.Head, false, ("Triggerbot"), ("FilterHead"));
+	SetupValue(g_Options.Legitbot.Triggerbot.Filter.Chest, false, ("Triggerbot"), ("FilterChest"));
+	SetupValue(g_Options.Legitbot.Triggerbot.Filter.Stomach, false, ("Triggerbot"), ("FilterStomach"));
+	SetupValue(g_Options.Legitbot.Triggerbot.Filter.Arms, false, ("Triggerbot"), ("FilterArms"));
+	SetupValue(g_Options.Legitbot.Triggerbot.Filter.Legs, false, ("Triggerbot"), ("FilterLegs"));
 
 
 
 
 
-	SetupValue(menu.Misc.Bhop, false, ("Misc"), ("Bhop"));
-    SetupValue(menu.Misc.AutoStrafe, false, ("Misc"), ("Autostrafe"));
-    SetupValue(menu.Misc.SpecList, false, ("Misc"), ("speclist"));
-    SetupValue(menu.Misc.ragequit, 0, ("Misc"), ("ragequit-key"));
+	SetupValue(g_Options.Visuals.Enabled, false, ("Visuals"), ("VisualsEnabled"));
+	SetupValue(g_Options.Visuals.Box, false, ("Visuals"), ("Box"));
+	SetupValue(g_Options.Visuals.Name, false, ("Visuals"), ("Name"));
+	SetupValue(g_Options.Visuals.HP, false, ("Visuals"), ("HP"));
+	SetupValue(g_Options.Visuals.Weapon, false, ("Visuals"), ("Weapon"));
+	SetupValue(g_Options.Visuals.Chams, false, ("Visuals"), ("Chams"));
+	SetupValue(g_Options.Visuals.DLight, false, ("Visuals"), ("DLight"));
+	SetupValue(g_Options.Visuals.SpreadCrosshair, false, ("Visuals"), ("SpreadCrosshair"));
+	SetupValue(g_Options.Visuals.GrenadeESP, false, ("Visuals"), ("GrenadeESP"));
+    SetupValue(g_Options.Visuals.Glow, false, ("Visuals"), ("Glow"));
+
+	SetupValue(g_Options.Visuals.NoVisualRecoil, false, ("Visuals"), ("NoVisualRecoil"));
+	SetupValue(g_Options.Visuals.Hands, 0, ("Visuals"), ("Hands"));
+    SetupValue(g_Options.Visuals.FOVChanger, 0.f, ("Visuals"), ("fovchanger"));
+	SetupValue(g_Options.Visuals.viewmodelChanger, 68.f, ("Visuals"), ("viewmodel_fov"));
+	SetupValue(g_Options.Visuals.NoFlash, false, ("Visuals"), ("NoFlash"));
+	SetupValue(g_Options.Visuals.NoSmoke, false, ("Visuals"), ("NoSmoke"));
+	SetupValue(g_Options.Visuals.Time, false, ("Visuals"), ("Time"));
+	SetupValue(g_Options.Visuals.noscopeborder, false, ("Visuals"), ("noscopeborder"));
+	SetupValue(g_Options.Visuals.C4, false, ("Visuals"), ("C4"));
+    SetupValue(g_Options.Visuals.GrenadePrediction, false, ("Visuals"), ("GrenadePrediction"));
+    SetupValue(g_Options.Visuals.ThirdPerson, false, ("Visuals"), ("thirdperson"));
+
+	SetupValue(g_Options.Visuals.Filter.Players, false, ("Visuals"), ("Players"));
+	SetupValue(g_Options.Visuals.Filter.EnemyOnly, false, ("Visuals"), ("EnemyOnly"));
+	SetupValue(g_Options.Visuals.WeaponsWorld, false, ("Visuals"), ("WeaponsWorld"));
+	SetupValue(g_Options.Visuals.C4World, false, ("Visuals"), ("C4World"));
 
 
-    SetupValue(menu.Skinchanger.Enabled, false, ("Skinchanger"), ("Enabled"));
-    SetupValue(menu.Skinchanger.Knife, 0, ("SkinChanger"), ("Knife"));
-    SetupValue(menu.Skinchanger.KnifeSkin, 0, ("SkinChanger"), ("KnifeSkin"));
-    SetupValue(menu.Skinchanger.gloves, 0, ("SkinChanger"), ("gloves"));
 
-    SetupValue(menu.Skinchanger.AK47Skin, 0, ("SkinChanger"), ("AK47Skin"));
-    SetupValue(menu.Skinchanger.M4A1SSkin, 0, ("SkinChanger"), ("M4A1SSkin"));
-    SetupValue(menu.Skinchanger.M4A4Skin, 0, ("SkinChanger"), ("M4A4Skin"));
-    SetupValue(menu.Skinchanger.AUGSkin, 0, ("SkinChanger"), ("AUGSkin"));
-    SetupValue(menu.Skinchanger.FAMASSkin, 0, ("SkinChanger"), ("FAMASSkin"));
 
-    SetupValue(menu.Skinchanger.AWPSkin, 0, ("SkinChanger"), ("AWPSkin"));
-    SetupValue(menu.Skinchanger.SSG08Skin, 0, ("SkinChanger"), ("SSG08Skin"));
-    SetupValue(menu.Skinchanger.SCAR20Skin, 0, ("SkinChanger"), ("SCAR20Skin"));
 
-    SetupValue(menu.Skinchanger.P90Skin, 0, ("SkinChanger"), ("P90Skin"));
-    SetupValue(menu.Skinchanger.UMP45Skin, 0, ("SkinChanger"), ("UMP45Skin"));
+	SetupValue(g_Options.Misc.Bhop, false, ("Misc"), ("Bhop"));
+    SetupValue(g_Options.Misc.AutoStrafe, false, ("Misc"), ("Autostrafe"));
+    SetupValue(g_Options.Misc.SpecList, false, ("Misc"), ("speclist"));
+    SetupValue(g_Options.Misc.ragequit, 0, ("Misc"), ("ragequit-key"));
 
-    SetupValue(menu.Skinchanger.GlockSkin, 0, ("SkinChanger"), ("GlockSkin"));
-    SetupValue(menu.Skinchanger.USPSkin, 0, ("SkinChanger"), ("USPSkin"));
-    SetupValue(menu.Skinchanger.DeagleSkin, 0, ("SkinChanger"), ("DeagleSkin"));
 
-    SetupValue(menu.Skinchanger.tec9Skin, 0, ("SkinChanger"), ("tec9Skin"));
-    SetupValue(menu.Skinchanger.P2000Skin, 0, ("SkinChanger"), ("P2000Skin"));
-    SetupValue(menu.Skinchanger.P250Skin, 0, ("SkinChanger"), ("P250Skin"));
+    SetupValue(g_Options.Skinchanger.Enabled, false, ("Skinchanger"), ("Enabled"));
+    SetupValue(g_Options.Skinchanger.Knife, 0, ("SkinChanger"), ("Knife"));
+    SetupValue(g_Options.Skinchanger.KnifeSkin, 0, ("SkinChanger"), ("KnifeSkin"));
+    SetupValue(g_Options.Skinchanger.gloves, 0, ("SkinChanger"), ("gloves"));
+
+    SetupValue(g_Options.Skinchanger.AK47Skin, 0, ("SkinChanger"), ("AK47Skin"));
+    SetupValue(g_Options.Skinchanger.M4A1SSkin, 0, ("SkinChanger"), ("M4A1SSkin"));
+    SetupValue(g_Options.Skinchanger.M4A4Skin, 0, ("SkinChanger"), ("M4A4Skin"));
+    SetupValue(g_Options.Skinchanger.AUGSkin, 0, ("SkinChanger"), ("AUGSkin"));
+    SetupValue(g_Options.Skinchanger.FAMASSkin, 0, ("SkinChanger"), ("FAMASSkin"));
+
+    SetupValue(g_Options.Skinchanger.AWPSkin, 0, ("SkinChanger"), ("AWPSkin"));
+    SetupValue(g_Options.Skinchanger.SSG08Skin, 0, ("SkinChanger"), ("SSG08Skin"));
+    SetupValue(g_Options.Skinchanger.SCAR20Skin, 0, ("SkinChanger"), ("SCAR20Skin"));
+
+    SetupValue(g_Options.Skinchanger.P90Skin, 0, ("SkinChanger"), ("P90Skin"));
+    SetupValue(g_Options.Skinchanger.UMP45Skin, 0, ("SkinChanger"), ("UMP45Skin"));
+
+    SetupValue(g_Options.Skinchanger.GlockSkin, 0, ("SkinChanger"), ("GlockSkin"));
+    SetupValue(g_Options.Skinchanger.USPSkin, 0, ("SkinChanger"), ("USPSkin"));
+    SetupValue(g_Options.Skinchanger.DeagleSkin, 0, ("SkinChanger"), ("DeagleSkin"));
+
+    SetupValue(g_Options.Skinchanger.tec9Skin, 0, ("SkinChanger"), ("tec9Skin"));
+    SetupValue(g_Options.Skinchanger.P2000Skin, 0, ("SkinChanger"), ("P2000Skin"));
+    SetupValue(g_Options.Skinchanger.P250Skin, 0, ("SkinChanger"), ("P250Skin"));
 }
 
 void CConfig::SetupValue(int &value, int def, std::string category, std::string name)
@@ -175,7 +175,7 @@ void CConfig::Save()
 
 
 		folder = std::string(path) + ("\\autismhack\\");
-		switch (menu.Menu.ConfigFile)
+		switch (g_Options.Menu.ConfigFile)
 		{
 		case 0:
 			file = std::string(path) + ("\\autismhack\\legit.ini");
@@ -207,7 +207,7 @@ void CConfig::Load()
 	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, path)))
 	{
 		folder = std::string(path) + ("\\autismhack\\");
-		switch (menu.Menu.ConfigFile)
+		switch (g_Options.Menu.ConfigFile)
 		{
 		case 0:
 			file = std::string(path) + ("\\autismhack\\legit.ini");
@@ -242,4 +242,4 @@ void CConfig::Load()
 }
 
 CConfig* Config = new CConfig();
-Variables menu;
+Variables g_Options;

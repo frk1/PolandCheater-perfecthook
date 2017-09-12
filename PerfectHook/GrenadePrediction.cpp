@@ -1,8 +1,8 @@
 #include "GrenadePrediction.h"
-#include "RenderManager.h"
+#include "Render.h"
 void grenade_prediction::Tick(int buttons)
 {
-    if (!menu.Visuals.GrenadePrediction)
+    if (!g_Options.Visuals.GrenadePrediction)
         return;
     bool in_attack = buttons & IN_ATTACK;
     bool in_attack2 = buttons & IN_ATTACK2;
@@ -16,7 +16,7 @@ void grenade_prediction::View(CViewSetup* setup)
 {
 
     auto local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
-    if (!menu.Visuals.GrenadePrediction)
+    if (!g_Options.Visuals.GrenadePrediction)
         return;
     if (local && local->IsAlive())
     {
@@ -35,7 +35,7 @@ void grenade_prediction::View(CViewSetup* setup)
 
 void grenade_prediction::Paint()
 {
-    if (!menu.Visuals.GrenadePrediction)
+    if (!g_Options.Visuals.GrenadePrediction)
         return;
     if ((type) && path.size()>1)
     {
@@ -95,7 +95,7 @@ void angle_vectors2(const Vector &angles, Vector *forward, Vector *right, Vector
 }
 void grenade_prediction::Setup(Vector& vecSrc, Vector& vecThrow, Vector viewangles)
 {
-    if (!menu.Visuals.GrenadePrediction)
+    if (!g_Options.Visuals.GrenadePrediction)
         return;
     Vector angThrow = viewangles;
     auto local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
@@ -155,7 +155,7 @@ void grenade_prediction::Setup(Vector& vecSrc, Vector& vecThrow, Vector viewangl
 
 void grenade_prediction::Simulate(CViewSetup* setup)
 {
-    if (!menu.Visuals.GrenadePrediction)
+    if (!g_Options.Visuals.GrenadePrediction)
         return;
     Vector vecSrc, vecThrow;
     Vector angles; g_Engine->GetViewAngles(angles);
@@ -250,7 +250,7 @@ bool grenade_prediction::CheckDetonate(const Vector& vecThrow, const trace_t& tr
 
 void grenade_prediction::TraceHull(Vector& src, Vector& end, trace_t& tr)
 {
-    if (!menu.Visuals.GrenadePrediction)
+    if (!g_Options.Visuals.GrenadePrediction)
         return;
     Ray_t ray;
     ray.Init(src, end, Vector(-2.0f, -2.0f, -2.0f), Vector(2.0f, 2.0f, 2.0f));
@@ -264,7 +264,7 @@ void grenade_prediction::TraceHull(Vector& src, Vector& end, trace_t& tr)
 
 void grenade_prediction::AddGravityMove(Vector& move, Vector& vel, float frametime, bool onground)
 {
-    if (!menu.Visuals.GrenadePrediction)
+    if (!g_Options.Visuals.GrenadePrediction)
         return;
     Vector basevel(0.0f, 0.0f, 0.0f);
 
@@ -289,7 +289,7 @@ void grenade_prediction::AddGravityMove(Vector& move, Vector& vel, float frameti
 
 void grenade_prediction::PushEntity(Vector& src, const Vector& move, trace_t& tr)
 {
-    if (!menu.Visuals.GrenadePrediction)
+    if (!g_Options.Visuals.GrenadePrediction)
         return;
     Vector vecAbsEnd = src;
     vecAbsEnd += move;
@@ -300,7 +300,7 @@ void grenade_prediction::PushEntity(Vector& src, const Vector& move, trace_t& tr
 
 void grenade_prediction::ResolveFlyCollisionCustom(trace_t& tr, Vector& vecVelocity, float interval)
 {
-    if (!menu.Visuals.GrenadePrediction)
+    if (!g_Options.Visuals.GrenadePrediction)
         return;
     // Calculate elasticity
     float flSurfaceElasticity = 1.0;  // Assume all surfaces have the same elasticity

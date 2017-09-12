@@ -42,7 +42,6 @@ inline int RandomSequence(int low, int high) {
 
 
 RecvVarProxyFn fnSequenceProxyFn = nullptr;
-RecvVarProxyFn oSequenceProxyFn = nullptr;
 
 RecvVarProxyFn oRecvnModelIndex;
 void Hooked_RecvProxy_Viewmodel(CRecvProxyData *pData, void *pStruct, void *pOut)
@@ -65,7 +64,7 @@ void Hooked_RecvProxy_Viewmodel(CRecvProxyData *pData, void *pStruct, void *pOut
 
     // Get local player (just to stop replacing spectators knifes)
     IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
-    if (menu.Skinchanger.Enabled && pLocal)
+    if (g_Options.Skinchanger.Enabled && pLocal)
     {
         // If we are alive and holding a default knife(if we already have a knife don't worry about changing)
         if (pLocal->IsAlive() && (
@@ -84,25 +83,25 @@ void Hooked_RecvProxy_Viewmodel(CRecvProxyData *pData, void *pStruct, void *pOut
             pData->m_Value.m_Int == iDagger))
         {
             // Set whatever knife we want
-            if (menu.Skinchanger.Knife == 0)
+            if (g_Options.Skinchanger.Knife == 0)
                 pData->m_Value.m_Int = iBayonet;
-            else if (menu.Skinchanger.Knife == 1)
+            else if (g_Options.Skinchanger.Knife == 1)
                 pData->m_Value.m_Int = iBowie;
-            else if (menu.Skinchanger.Knife == 2)
+            else if (g_Options.Skinchanger.Knife == 2)
                 pData->m_Value.m_Int = iButterfly;
-            else if (menu.Skinchanger.Knife == 3)
+            else if (g_Options.Skinchanger.Knife == 3)
                 pData->m_Value.m_Int = iFalchion;
-            else if (menu.Skinchanger.Knife == 4)
+            else if (g_Options.Skinchanger.Knife == 4)
                 pData->m_Value.m_Int = iFlip;
-            else if (menu.Skinchanger.Knife == 5)
+            else if (g_Options.Skinchanger.Knife == 5)
                 pData->m_Value.m_Int = iGut;
-            else if (menu.Skinchanger.Knife == 6)
+            else if (g_Options.Skinchanger.Knife == 6)
                 pData->m_Value.m_Int = iHuntsman;
-            else if (menu.Skinchanger.Knife == 7)
+            else if (g_Options.Skinchanger.Knife == 7)
                 pData->m_Value.m_Int = iKarambit;
-            else if (menu.Skinchanger.Knife == 8)
+            else if (g_Options.Skinchanger.Knife == 8)
                 pData->m_Value.m_Int = iM9Bayonet;
-            else if (menu.Skinchanger.Knife == 9)
+            else if (g_Options.Skinchanger.Knife == 9)
                 pData->m_Value.m_Int = iDagger;
         }
     }
@@ -225,31 +224,81 @@ void SetViewModelSequence2(const CRecvProxyData *pDataConst, void *pStruct, void
 RecvVarProxyFn fnNoSmoke;
 void NoSmoke(const CRecvProxyData *pData, void *pStruct, void *pOut)
 {
-	if(menu.Visuals.NoSmoke) *(bool*)((DWORD)pOut + 0x1) = true;
+	if(g_Options.Visuals.NoSmoke) *(bool*)((DWORD)pOut + 0x1) = true;
 
 	fnNoSmoke(pData, pStruct, pOut);
 }
+void AnimationFixHook()
+{
+    for (ClientClass* pClass = g_CHLClient->GetAllClasses(); pClass; pClass = pClass->m_pNext) {
+        if (!strcmp(pClass->m_pNetworkName, "CBaseViewModel")) {
+            // Search for the 'm_nModelIndex' property.
+            RecvTable* pClassTable = pClass->m_pRecvTable;
 
+            for (int nIndex = 0; nIndex < pClassTable->m_nProps; nIndex++) {
+                RecvProp* pProp = &pClassTable->m_pProps[nIndex];
+
+                if (!pProp || strcmp(pProp->m_pVarName, "m_nSequence"))
+                    continue;
+
+                // Store the original proxy function.
+                fnSequenceProxyFn = static_cast<RecvVarProxyFn>(pProp->m_ProxyFn);
+
+                // Replace the proxy function with our sequence changer.
+                pProp->m_ProxyFn = static_cast<RecvVarProxyFn>(SetViewModelSequence2);
+
+                break;
+            }
+
+            break;
+        }
+    }
+}
+
+void AnimationFixUnhook()
+{
+    for (ClientClass* pClass = g_CHLClient->GetAllClasses(); pClass; pClass = pClass->m_pNext) {
+        if (!strcmp(pClass->m_pNetworkName, "CBaseViewModel")) {
+            // Search for the 'm_nModelIndex' property.
+            RecvTable* pClassTable = pClass->m_pRecvTable;
+
+            for (int nIndex = 0; nIndex < pClassTable->m_nProps; nIndex++) {
+                RecvProp* pProp = &pClassTable->m_pProps[nIndex];
+
+                if (!pProp || strcmp(pProp->m_pVarName, "m_nSequence"))
+                    continue;
+
+                // Replace the proxy function with our sequence changer.
+                pProp->m_ProxyFn = fnSequenceProxyFn;
+
+                break;
+            }
+
+            break;
+        }
+    }
+}
 void NetvarHook()
 {
-	ClientClass *pClass = g_CHLClient->GetAllClasses();
-	while (pClass)
-	{
-		const char *pszName = pClass->m_pRecvTable->m_pNetTableName;
-		if (!strcmp(pszName, "DT_SmokeGrenadeProjectile"))
-		{
-			for (int i = 0; i < pClass->m_pRecvTable->m_nProps; i++)
-			{
-				RecvProp *pProp = &(pClass->m_pRecvTable->m_pProps[i]);
-				const char *name = pProp->m_pVarName;
-				if (!strcmp(name, "m_bDidSmokeEffect"))
-				{
-					fnNoSmoke = (RecvVarProxyFn)pProp->m_ProxyFn;
-					pProp->m_ProxyFn = NoSmoke;
-				}
+    AnimationFixHook();
+    ClientClass *pClass = g_CHLClient->GetAllClasses();
+    while (pClass)
+    {
+        const char *pszName = pClass->m_pRecvTable->m_pNetTableName;
+        if (!strcmp(pszName, "DT_SmokeGrenadeProjectile"))
+        {
+            for (int i = 0; i < pClass->m_pRecvTable->m_nProps; i++)
+            {
+                RecvProp *pProp = &(pClass->m_pRecvTable->m_pProps[i]);
+                const char *name = pProp->m_pVarName;
+                if (!strcmp(name, "m_bDidSmokeEffect"))
+                {
+                    fnNoSmoke = (RecvVarProxyFn)pProp->m_ProxyFn;
+                    pProp->m_ProxyFn = NoSmoke;
+                }
 
-			}
-		}
+            }
+        }
         else if (!strcmp(pszName, "DT_BaseViewModel"))
         {
             for (int i = 0; i < pClass->m_pRecvTable->m_nProps; i++)
@@ -263,41 +312,29 @@ void NetvarHook()
                 }
             }
         }
-        else if (!strcmp(pszName, "DT_BaseViewModel"))
+        pClass = pClass->m_pNext;
+    }
+}
+void UnloadProxy()
+{
+    AnimationFixUnhook();
+    ClientClass *pClass = g_CHLClient->GetAllClasses();
+    while (pClass)
+    {
+        const char *pszName = pClass->m_pRecvTable->m_pNetTableName;
+        if (!strcmp(pszName, "DT_SmokeGrenadeProjectile"))
         {
             for (int i = 0; i < pClass->m_pRecvTable->m_nProps; i++)
             {
                 RecvProp *pProp = &(pClass->m_pRecvTable->m_pProps[i]);
                 const char *name = pProp->m_pVarName;
-                if (!strcmp(name, "m_nModelIndex"))
+                if (!strcmp(name, "m_bDidSmokeEffect"))
                 {
-                    fnSequenceProxyFn = (RecvVarProxyFn)pProp->m_ProxyFn;
-                    pProp->m_ProxyFn = SetViewModelSequence2;
+                    pProp->m_ProxyFn = fnNoSmoke;
                 }
+
             }
         }
-        pClass = pClass->m_pNext;
-	}
-}
-void UnloadProxy()
-{
-	ClientClass *pClass = g_CHLClient->GetAllClasses();
-	while (pClass)
-	{
-		const char *pszName = pClass->m_pRecvTable->m_pNetTableName;
-		if (!strcmp(pszName, "DT_SmokeGrenadeProjectile"))
-		{
-			for (int i = 0; i < pClass->m_pRecvTable->m_nProps; i++)
-			{
-				RecvProp *pProp = &(pClass->m_pRecvTable->m_pProps[i]);
-				const char *name = pProp->m_pVarName;
-				if (!strcmp(name, "m_bDidSmokeEffect"))
-				{
-					pProp->m_ProxyFn = fnNoSmoke;
-				}
-
-			}
-		}
         else if (!strcmp(pszName, "DT_BaseViewModel"))
         {
             for (int i = 0; i < pClass->m_pRecvTable->m_nProps; i++)
@@ -313,21 +350,7 @@ void UnloadProxy()
                 }
             }
         }
-        else if (!strcmp(pszName, "DT_BaseViewModel"))
-        {
-            for (int i = 0; i < pClass->m_pRecvTable->m_nProps; i++)
-            {
-                RecvProp *pProp = &(pClass->m_pRecvTable->m_pProps[i]);
-                const char *name = pProp->m_pVarName;
-
-
-                // Knives
-                if (!strcmp(name, "m_nSequence"))
-                {
-                    pProp->m_ProxyFn = fnSequenceProxyFn;
-                }
-            }
-        }
-		pClass = pClass->m_pNext;
-	}
+        pClass = pClass->m_pNext;
+    }
 }
+

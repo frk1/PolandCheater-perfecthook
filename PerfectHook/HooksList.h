@@ -13,3 +13,4 @@
 #include "DoPostScreenSpaceEffects.h"
 #include "FindMDL.h"
 #include "IsHltv.h"
+#include "IsConnected.h"

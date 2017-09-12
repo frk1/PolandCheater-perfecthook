@@ -1,10 +1,10 @@
 #include "Interfaces.h"
 #include "Hooks.h"
-#include "RenderManager.h"
+#include "Render.h"
 #include "SDK.h"
 
 #include "recvproxy.h"
-#include "MiscHacks.h"
+#include "Misc.h"
 
 bool unload;
 

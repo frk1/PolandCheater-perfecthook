@@ -12,7 +12,7 @@ void RenderInterface() {
 
 		static int page = 0;
 
-		switch(menu.Menu.Theme)
+		switch(g_Options.Menu.Theme)
 		{
 		case 0:
 			RenderRay();
@@ -28,7 +28,7 @@ void RenderInterface() {
 
 
 		ImGui::SetNextWindowSize(ImVec2(960, 446), ImGuiSetCond_FirstUseEver);
-		if (ImGui::Begin(XorStr("big (large) xiaomi hook"), &menu.Menu.Opened, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | G::extra_flags))
+		if (ImGui::Begin(XorStr("big (large) xiaomi hook"), &g_Options.Menu.Opened, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | G::extra_flags))
 		{
 			const char* tabs[] = {
                 "Rage",

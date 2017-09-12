@@ -69,7 +69,7 @@ HRESULT __stdcall hkEndScene(IDirect3DDevice9* thisptr) {
 
 typedef HRESULT(_stdcall *Present_T)(void*, const RECT*, RECT*, HWND, RGNDATA*);
 Present_T oPresent;
-HRESULT _stdcall Present_H(LPDIRECT3DDEVICE9 pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion)
+HRESULT _stdcall hkPresent(LPDIRECT3DDEVICE9 pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion)
 {
     if (!renderer->IsReady())
     {

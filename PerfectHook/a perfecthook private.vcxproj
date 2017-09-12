@@ -65,6 +65,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>C:\Release\</OutDir>
+    <TargetName>memehook_debug</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -121,11 +123,11 @@
     <ClCompile Include="LegitBot.cpp" />
     <ClCompile Include="MathFunctions.cpp" />
     <ClCompile Include="memesets.cpp" />
-    <ClCompile Include="MiscHacks.cpp" />
+    <ClCompile Include="Misc.cpp" />
     <ClCompile Include="NetVarManager.cpp" />
     <ClCompile Include="RageBot.cpp" />
     <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="RenderManager.cpp" />
+    <ClCompile Include="Render.cpp" />
     <ClCompile Include="SpoofedConvar.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
     <ClCompile Include="MiscFunctions.cpp" />
@@ -135,6 +137,7 @@
     <ClInclude Include="CaviarDreams.h" />
     <ClInclude Include="DoPostScreenSpaceEffects.h" />
     <ClInclude Include="dropboxes.h" />
+    <ClInclude Include="IsConnected.h" />
     <ClInclude Include="IsHltv.h" />
     <ClInclude Include="Listener.h" />
     <ClInclude Include="recvproxy.h" />
@@ -178,7 +181,7 @@
     <ClInclude Include="memesets.h" />
     <ClInclude Include="MiscClasses.h" />
     <ClInclude Include="MiscDefinitions.h" />
-    <ClInclude Include="MiscHacks.h" />
+    <ClInclude Include="Misc.h" />
     <ClInclude Include="MovementRecorder.h" />
     <ClInclude Include="NetVarManager.h" />
     <ClInclude Include="OnScreenSizeChanged.h" />
@@ -188,7 +191,7 @@
     <ClInclude Include="PredictionSystem.h" />
     <ClInclude Include="RageBot.h" />
     <ClInclude Include="Renderer.h" />
-    <ClInclude Include="RenderManager.h" />
+    <ClInclude Include="Render.h" />
     <ClInclude Include="Resolver.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SDK.h" />

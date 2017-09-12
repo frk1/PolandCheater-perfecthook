@@ -6,7 +6,7 @@
 #include "Chams.h"
 
 #include "Interfaces.h"
-#include "RenderManager.h"
-#include "MiscHacks.h"
+#include "Render.h"
+#include "Misc.h"
 #include <unordered_map>
 

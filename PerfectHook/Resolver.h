@@ -81,7 +81,7 @@ void Resolver3()
 
 
 
-    if (menu.Ragebot.Resolver)
+    if (g_Options.Ragebot.Resolver)
     {
         IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
         {

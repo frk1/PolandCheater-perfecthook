@@ -1,6 +1,6 @@
-﻿#include "MiscHacks.h"
+﻿#include "Misc.h"
 #include "Interfaces.h"
-#include "RenderManager.h"
+#include "Render.h"
 #include <time.h>
 #include "BaseClient.h"
 
@@ -11,7 +11,7 @@ bool bDone=false;
 void misc::OnCreateMove(CInput::CUserCmd *cmd, IClientEntity *local)
 {
 
-    if (menu.Misc.Bhop && local->IsAlive())
+    if (g_Options.Misc.Bhop && local->IsAlive())
     {
         if (cmd->buttons & IN_JUMP && !(local->GetMoveType() & MOVETYPE_LADDER))
         {
@@ -21,7 +21,7 @@ void misc::OnCreateMove(CInput::CUserCmd *cmd, IClientEntity *local)
                 cmd->buttons &= ~IN_JUMP;
         }
     }
-    if(menu.Misc.syncclantag)
+    if(g_Options.Misc.syncclantag)
     {
         if (int(g_Globals->curtime) != iLastTime)
         {
@@ -52,11 +52,11 @@ void misc::OnCreateMove(CInput::CUserCmd *cmd, IClientEntity *local)
 
         iLastTime = int(g_Globals->curtime);
     }
-    if (!menu.Misc.animatedclantag && animatedclantag.c_str() != G::AnimatedClantag)
+    if (!g_Options.Misc.animatedclantag && animatedclantag.c_str() != G::AnimatedClantag)
     {
         animatedclantag = G::AnimatedClantag;
     }
-    if (menu.Misc.animatedclantag && animatedclantag.length() > 1)
+    if (g_Options.Misc.animatedclantag && animatedclantag.length() > 1)
     {
         if (int(g_Globals->curtime) != iLastTime)
         {
@@ -76,7 +76,7 @@ void misc::OnCreateMove(CInput::CUserCmd *cmd, IClientEntity *local)
         counter = counter + 1;
         if (counter >= 6)
             counter = 0;
-        switch (menu.Misc.spammer)
+        switch (g_Options.Misc.spammer)
         {
         case 1:
             SayInChat(tuxlist[counter]);
@@ -90,10 +90,10 @@ void misc::OnCreateMove(CInput::CUserCmd *cmd, IClientEntity *local)
 
 
     }
-    if (menu.Misc.AutoStrafe)
-        AutoStrafe(cmd, local);
+    //if (g_Options.Misc.AutoStrafe)
+        //AutoStrafe(cmd, local);
 
-    if(menu.Misc.silentstealer)
+    if(g_Options.Misc.silentstealer)
     {
         bool bDidMeme = false;
         int iNameIndex = -1;
@@ -129,8 +129,8 @@ void misc::OnCreateMove(CInput::CUserCmd *cmd, IClientEntity *local)
 void misc::AutoStrafe(CInput::CUserCmd *cmd, IClientEntity *local)
 {
 
-
-    static float move = 450; //4?.f; // move = max(move, (abs(cmd->move.x) + abs(cmd->move.y)) * 0.5f);
+    QAngle oldangles; g_Engine->GetViewAngles(oldangles);
+    static float move = 450;
     float s_move = move * 0.5065f;
     if (local->GetMoveType() & (MOVETYPE_NOCLIP | MOVETYPE_LADDER))
         return;
@@ -139,26 +139,24 @@ void misc::AutoStrafe(CInput::CUserCmd *cmd, IClientEntity *local)
 
     if (cmd->buttons & IN_JUMP || !(local->GetFlags() & FL_ONGROUND))
     {
-        if (local->GetVelocity().Length2D() >= menu.Misc.MinVel)
-        {
-            cmd->forwardmove = move * 0.015f;
-            cmd->sidemove += (float)(((cmd->tick_count % 2) * 2) - 1) * s_move;
+        cmd->forwardmove = move * 0.015f;
+        cmd->sidemove += (float)(((cmd->tick_count % 2) * 2) - 1) * s_move;
 
-            if (cmd->mousedx)
-                cmd->sidemove = (float)clamp(cmd->mousedx, -1, 1) * s_move;
+        if (cmd->mousedx)
+            cmd->sidemove = (float)clamp(cmd->mousedx, -1, 1) * s_move;
 
-            static float strafe = cmd->viewangles.y;
+        static float strafe = cmd->viewangles.y;
 
-            float rt = cmd->viewangles.y, rotation;
-            rotation = strafe - rt;
+        float rt = cmd->viewangles.y, rotation;
+        rotation = strafe - rt;
 
-            if (rotation < FloatNegate(g_Globals->interval_per_tick))
-                cmd->sidemove = -s_move;
+        if (rotation < FloatNegate(g_Globals->interval_per_tick))
+            cmd->sidemove = -s_move;
 
-            if (rotation > g_Globals->interval_per_tick)
-                cmd->sidemove = s_move;
+        if (rotation > g_Globals->interval_per_tick)
+            cmd->sidemove = s_move;
 
-            strafe = rt;
-        }
+        strafe = rt;
     }
+    movementfix(oldangles, cmd, cmd->forwardmove, cmd->sidemove);
 }

@@ -29,8 +29,8 @@ namespace hooks
 
         clientmode.setup(g_ClientMode);
         clientmode.hook_index(18, hkOverrideView);
-        clientmode.hook_index(35, Hooked_GetViewModelFOV);
-        clientmode.hook_index(44, do_post_screen_space_effects);
+        clientmode.hook_index(35, hkGetViewModelFOV);
+        clientmode.hook_index(44, hkDoPostScreenSpaceEffects);
 
         panel.setup(g_Panel);
         panel.hook_index(41, hkPaintTraverse);
@@ -39,11 +39,11 @@ namespace hooks
         modelrender.hook_index(21, hkDrawModelExecute);
 
         surface.setup(g_Surface);
-        surface.hook_index(82, Hooked_PlaySound);
+        surface.hook_index(82, hkPlaySound);
 
         engine.setup(g_Engine);
-        engine.hook_index(93, is_hltv);
-
+        engine.hook_index(27, hkIsConnected);
+        engine.hook_index(93, hkIsHltv);
 
 
 
@@ -62,7 +62,7 @@ namespace hooks
         oPresent = **reinterpret_cast<Present_T**>(m_present);
         oReset = **reinterpret_cast<Reset_t**>(m_reset);
 
-        **reinterpret_cast<void***>(m_present) = reinterpret_cast<void*>(&Present_H);
+        **reinterpret_cast<void***>(m_present) = reinterpret_cast<void*>(&hkPresent);
         **reinterpret_cast<void***>(m_reset) = reinterpret_cast<void*>(&hkReset);
 
 

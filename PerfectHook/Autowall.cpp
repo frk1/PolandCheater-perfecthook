@@ -165,7 +165,7 @@ bool SimulateFireBullet(IClientEntity *local, CBaseCombatWeapon *weapon, FireBul
 		if ((data.enter_trace.hitgroup <= 7)
 			&& (data.enter_trace.hitgroup > 0)
 			&& (local->GetTeamNum() != data.enter_trace.m_pEnt->GetTeamNum()
-				|| menu.Ragebot.FriendlyFire))
+				|| g_Options.Ragebot.FriendlyFire))
 		{
 			data.trace_length += (float)(data.enter_trace.fraction * data.trace_length_remaining);
 			data.current_damage *= (float)(pow(wpn_data->m_fRangeModifier, data.trace_length * 0.002));
