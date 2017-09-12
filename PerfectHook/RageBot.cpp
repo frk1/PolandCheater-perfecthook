@@ -12,26 +12,23 @@ using namespace std;
 
 #define TICK_INTERVAL			(g_Globals->interval_per_tick)
 #define TIME_TO_TICKS( dt )		( (int)( 0.5f + (float)(dt) / TICK_INTERVAL ) )
-
 ragebot::ragebot()
 {
-	IsLocked = false;
-	TargetID = -1;
-	pTarget = nullptr;
-    AimPoint = Vector(0,0,0);
-    HitBox = -1;
+    IsLocked = false;
+    TargetID = -1;
+    pTarget = nullptr;
 }
 
 
 
 
-
-void ragebot::OnCreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket, IClientEntity* local)
+void ragebot::OnCreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
 {
     if (!menu.Ragebot.MainSwitch)
         return;
 
-    if (local && local->IsAlive())
+    IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+    if (pLocal && pLocal->IsAlive())
     {
         if (menu.Ragebot.BAIMkey && G::PressedKeys[menu.Ragebot.BAIMkey] && menu.Ragebot.Hitscan != 4)
         {
@@ -42,7 +39,7 @@ void ragebot::OnCreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket, IClientEnt
             menu.Ragebot.Hitscan = 3;
         }
 
-        CBaseCombatWeapon* weapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(local->GetActiveWeaponHandle());
+        CBaseCombatWeapon* weapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
         if (weapon && weapon->m_AttributeManager()->m_Item()->GetItemDefinitionIndex() == 64)
         {
             if (!CanAttack() && weapon->GetAmmoInClip() > 0)
@@ -53,14 +50,19 @@ void ragebot::OnCreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket, IClientEnt
 
 
         if (menu.Ragebot.Enabled)
-            DoAimbot(pCmd, bSendPacket, local);
+            DoAimbot(pCmd, bSendPacket);
+
+        if (menu.Ragebot.AntiRecoil)
+            DoNoRecoil(pCmd);
+
 
 
         if (menu.Ragebot.EnabledAntiAim)
-            DoAntiAim(pCmd, bSendPacket, local);
+            DoAntiAim(pCmd, bSendPacket);
+
+
     }
 }
-
 bool ragebot::hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseCombatWeapon* weapon, IClientEntity* target)
 {
     Vector forward, right, up;
@@ -95,7 +97,7 @@ bool ragebot::hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseComba
 
         Vector viewAnglesSpread;
         VectorAngles(viewSpreadForward, viewAnglesSpread);
-        sanitize_angles(viewAnglesSpread);
+        MiscFunctions::NormaliseViewAngle(viewAnglesSpread);
 
         Vector viewForward;
         AngleVectors(viewAnglesSpread, &viewForward);
@@ -122,30 +124,79 @@ bool ragebot::hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseComba
 
     return false;
 }
+template<class T, class U>
+T clamp(T in, U low, U high)
+{
+    if (in <= low)
+        return low;
 
-void ragebot::DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket, IClientEntity* local)
+    if (in >= high)
+        return high;
+
+    return in;
+}
+float LagFix()
+{
+    float updaterate = g_CVar->FindVar("cl_updaterate")->fValue;
+    ConVar* minupdate = g_CVar->FindVar("sv_minupdaterate");
+    ConVar* maxupdate = g_CVar->FindVar("sv_maxupdaterate");
+
+    if (minupdate && maxupdate)
+        updaterate = maxupdate->fValue;
+
+    float ratio = g_CVar->FindVar("cl_interp_ratio")->fValue;
+
+    if (ratio == 0)
+        ratio = 1.0f;
+
+    float lerp = g_CVar->FindVar("cl_interp")->fValue;
+    ConVar* cmin = g_CVar->FindVar("sv_client_min_interp_ratio");
+    ConVar* cmax = g_CVar->FindVar("sv_client_max_interp_ratio");
+
+    if (cmin && cmax && cmin->fValue != 1)
+        ratio = clamp(ratio, cmin->fValue, cmax->fValue);
+
+
+    return max(lerp, ratio / updaterate);
+}
+
+// Functionality
+void ragebot::DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket)
 {
 
+    IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
     bool FindNewTarget = true;
-    CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(local->GetActiveWeaponHandle());
+    //IsLocked = false;
 
-    if (!pWeapon) return;
-    if (pWeapon->GetAmmoInClip() == 0 || MiscFunctions::IsKnife(pWeapon) || MiscFunctions::IsGrenade(pWeapon))
+    // Don't aimbot with the knife..
+    CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
+
+    if (pWeapon != nullptr)
+    {
+
+        if (pWeapon->GetAmmoInClip() == 0 || MiscFunctions::IsKnife(pWeapon) || MiscFunctions::IsGrenade(pWeapon))
+        {
+            //TargetID = 0;
+            //pTarget = nullptr;
+            //HitBox = -1;
+            return;
+        }
+    }
+    else
         return;
 
     // Make sure we have a good target
     if (IsLocked && TargetID >= 0 && HitBox >= 0)
     {
         pTarget = g_EntityList->GetClientEntity(TargetID);
-        if (pTarget  && TargetMeetsRequirements(pTarget, local))
+        if (pTarget  && TargetMeetsRequirements(pTarget))
         {
             HitBox = HitScan(pTarget);
             if (HitBox >= 0)
             {
+                Vector ViewOffset = pLocal->GetOrigin() + pLocal->GetViewOffset();
                 Vector View; g_Engine->GetViewAngles(View);
-                Vector hitboxpos = GetHitboxPosition(pTarget, HitBox);
-
-                float FoV = FovToPlayer(View, compute_angle(local->GetEyePosition(), hitboxpos));
+                float FoV = FovToPlayer(ViewOffset, View, pTarget, HitBox);
                 if (FoV < menu.Ragebot.FOV)
                     FindNewTarget = false;
             }
@@ -162,7 +213,7 @@ void ragebot::DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket, IClientEntity*
         HitBox = -1;
 
 
-        TargetID = GetTargetCrosshair(local);
+        TargetID = GetTargetCrosshair();
 
 
         // Memesj
@@ -195,23 +246,23 @@ void ragebot::DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket, IClientEntity*
 
 
 
-        if (AimAtPoint(local, AimPoint, pCmd))
+
+        if (AimAtPoint(pLocal, AimPoint, pCmd))
         {
             if (menu.Ragebot.AutoFire && CanAttack() && MiscFunctions::IsSniper(pWeapon) && menu.Ragebot.AutoScope)
             {
-                if (local->IsScoped()) if (!menu.Ragebot.Hitchance || hit_chance(local, pCmd, pWeapon, pTarget)) pCmd->buttons |= IN_ATTACK;
-                if (!local->IsScoped()) pCmd->buttons |= IN_ATTACK2;
+                if (pLocal->IsScoped()) if (!menu.Ragebot.Hitchance || hit_chance(pLocal, pCmd, pWeapon, pTarget)) pCmd->buttons |= IN_ATTACK;
+                if (!pLocal->IsScoped()) pCmd->buttons |= IN_ATTACK2;
             }
             if (menu.Ragebot.AutoFire && CanAttack() && !(MiscFunctions::IsSniper(pWeapon)))
             {
-                if (!menu.Ragebot.Hitchance || hit_chance(local, pCmd, pWeapon, pTarget)) pCmd->buttons |= IN_ATTACK;
+                if (!menu.Ragebot.Hitchance || hit_chance(pLocal, pCmd, pWeapon, pTarget)) pCmd->buttons |= IN_ATTACK;
             }
             if (menu.Ragebot.AutoFire && CanAttack() && (MiscFunctions::IsSniper(pWeapon)) && !menu.Ragebot.AutoScope)
             {
-                if (!menu.Ragebot.Hitchance || hit_chance(local, pCmd, pWeapon, pTarget)) if (local->IsScoped()) pCmd->buttons |= IN_ATTACK;
+                if (!menu.Ragebot.Hitchance || hit_chance(pLocal, pCmd, pWeapon, pTarget)) if (pLocal->IsScoped()) pCmd->buttons |= IN_ATTACK;
             }
         }
-
 
 
 
@@ -221,12 +272,16 @@ void ragebot::DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket, IClientEntity*
             pCmd->forwardmove = 0.f;
             pCmd->sidemove = 0.f;
         }
+
+
+
         if (menu.Ragebot.AutoCrouch)
         {
             pCmd->buttons |= IN_DUCK;
         }
 
     }
+
     // Auto Pistol
     static bool WasFiring = false;
     if (pWeapon != nullptr)
@@ -251,63 +306,104 @@ void ragebot::DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket, IClientEntity*
 
 
 
-bool ragebot::TargetMeetsRequirements(IClientEntity* pEntity, IClientEntity* local)
-{
+bool ragebot::TargetMeetsRequirements(IClientEntity* pEntity)
+{ 
+    auto local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+    // Is a valid player
     if (pEntity && pEntity->IsDormant() == false && pEntity->IsAlive() && pEntity->GetIndex() != local->GetIndex())
     {
+        // Entity Type checks
         ClientClass *pClientClass = pEntity->GetClientClass();
         player_info_t pinfo;
         if (pClientClass->m_ClassID == (int)ClassID::CCSPlayer && g_Engine->GetPlayerInfo(pEntity->GetIndex(), &pinfo))
+        {
+            // Team Check
             if (pEntity->GetTeamNum() != local->GetTeamNum() || menu.Ragebot.FriendlyFire)
+            {
+                // Spawn Check
                 if (!pEntity->HasGunGameImmunity())
+                {
                     return true;
+                }
+            }
+        }
     }
 
-	return false;
+    // They must have failed a requirement
+    return false;
 }
 
-float ragebot::FovToPlayer(const Vector &viewAngles, const Vector &aimAngles)
-{
-    Vector ang, aim;
-    AngleVectors(viewAngles, &aim);
-    AngleVectors(aimAngles, &ang);
 
-    return RAD2DEG(acos(aim.Dot(ang) / aim.LengthSqr()));
+
+
+float ragebot::FovToPlayer(Vector ViewOffSet, Vector View, IClientEntity* pEntity, int aHitBox)
+{
+    // Anything past 180 degrees is just going to wrap around
+    CONST FLOAT MaxDegrees = 180.0f;
+
+    // Get local angles
+    Vector Angles = View;
+
+    // Get local view / eye position
+    Vector Origin = ViewOffSet;
+
+    // Create and intiialize vectors for calculations below
+    Vector Delta(0, 0, 0);
+    //Vector Origin(0, 0, 0);
+    Vector Forward(0, 0, 0);
+
+    // Convert angles to normalized directional forward vector
+    AngleVectors(Angles, &Forward);
+    Vector AimPos = GetHitboxPosition(pEntity, aHitBox); //pvs fix disabled
+                                                         // Get delta vector between our local eye position and passed vector
+    VectorSubtract(AimPos, Origin, Delta);
+    //Delta = AimPos - Origin;
+
+    // Normalize our delta vector
+    Normalize(Delta, Delta);
+
+    // Get dot product between delta position and directional forward vectors
+    FLOAT DotProduct = Forward.Dot(Delta);
+
+    // Time to calculate the field of view
+    return (acos(DotProduct) * (MaxDegrees / PI));
 }
 
-int ragebot::GetTargetCrosshair(IClientEntity* local)
+int ragebot::GetTargetCrosshair()
 {
-	int target = -1;
-	float minFoV = menu.Ragebot.FOV;
+    // Target selection
+    int target = -1;
+    float minFoV = menu.Ragebot.FOV;
 
+    IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+    Vector ViewOffset = pLocal->GetOrigin() + pLocal->GetViewOffset();
+    Vector View; g_Engine->GetViewAngles(View);
 
-	Vector View; g_Engine->GetViewAngles(View);
+    for (int i = 0; i < g_EntityList->GetHighestEntityIndex(); i++)
+    {
+        IClientEntity *pEntity = g_EntityList->GetClientEntity(i);
+        if (TargetMeetsRequirements(pEntity))
+        {
+            int NewHitBox = HitScan(pEntity);
+            if (NewHitBox >= 0)
+            {
+                float fov = FovToPlayer(ViewOffset, View, pEntity, 0);
+                if (fov < minFoV)
+                {
+                    minFoV = fov;
+                    target = i;
+                }
+            }
+        }
+    }
 
-	for (int i = 0; i < g_EntityList->GetHighestEntityIndex(); i++)
-	{
-		IClientEntity *pEntity = g_EntityList->GetClientEntity(i);
-		if (TargetMeetsRequirements(pEntity, local))
-		{
-			int NewHitBox = HitScan(pEntity);
-			if (NewHitBox >= 0)
-			{
-                Vector hitboxpos = GetHitboxPosition(pEntity, 0);
-				float fov = FovToPlayer(View, compute_angle(local->GetEyePosition(), hitboxpos));
-				if (fov < minFoV)
-				{
-					minFoV = fov;
-					target = i;
-				}
-			}
-		}
-	}
-
-	return target;
+    return target;
 }
 
 int ragebot::HitScan(IClientEntity* pEntity)
 {
-    vector<int> HitBoxesToScan{ };
+    vector<int> HitBoxesToScan{ Head , Neck, Chest, Stomach };
+
 
     int HitScanMode = menu.Ragebot.Hitscan;
 
@@ -401,7 +497,6 @@ int ragebot::HitScan(IClientEntity* pEntity)
 
     int bestHitbox = -1;
     float highestDamage = menu.Ragebot.MinimumDamage;
-    float health = pEntity->GetHealth();
     for (auto HitBoxID : HitBoxesToScan)
     {
 
@@ -410,7 +505,7 @@ int ragebot::HitScan(IClientEntity* pEntity)
         float damage = 0.0f;
         if (CanHit(Point, &damage))
         {
-            if (damage > highestDamage || damage > health)
+            if (damage > highestDamage || damage > pEntity->GetHealth())
             {
                 bestHitbox = HitBoxID;
                 highestDamage = damage;
@@ -425,7 +520,7 @@ int ragebot::HitScan(IClientEntity* pEntity)
         float damage = 0.0f;
         if (CanHit(Point, &damage))
         {
-            if (damage > highestDamage && damage > health)
+            if (damage > highestDamage && damage > pEntity->GetHealth())
             {
                 bestHitbox = HitBoxID;
                 highestDamage = damage;
@@ -436,344 +531,388 @@ int ragebot::HitScan(IClientEntity* pEntity)
 
 }
 
+
+
+void ragebot::DoNoRecoil(CInput::CUserCmd *pCmd)
+{
+    // Ghetto rcs shit, implement properly later
+    IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+    if (pLocal != nullptr)
+    {
+        Vector AimPunch = pLocal->localPlayerExclusive()->GetAimPunchAngle();
+        if (AimPunch.Length2D() > 0 && AimPunch.Length2D() < 150)
+        {
+            pCmd->viewangles -= AimPunch * 2;
+            MiscFunctions::NormaliseViewAngle(pCmd->viewangles);
+        }
+    }
+}
+
+float FovToPoint(Vector ViewOffSet, Vector View, Vector Point)
+{
+    // Get local view / eye position
+    Vector Origin = ViewOffSet;
+
+    // Create and intiialize vectors for calculations below
+    Vector Delta(0, 0, 0);
+    Vector Forward(0, 0, 0);
+
+    // Convert angles to normalized directional forward vector
+    AngleVectors(View, &Forward);
+    Vector AimPos = Point;
+
+    // Get delta vector between our local eye position and passed vector
+    Delta = AimPos - Origin;
+    //Delta = AimPos - Origin;
+
+    // Normalize our delta vector
+    Normalize(Delta, Delta);
+
+    // Get dot product between delta position and directional forward vectors
+    FLOAT DotProduct = Forward.Dot(Delta);
+
+    // Time to calculate the field of view
+    return (acos(DotProduct) * (180.f / PI));
+}
+bool me123 = false;
 bool ragebot::AimAtPoint(IClientEntity* pLocal, Vector point, CInput::CUserCmd *pCmd)
 {
+    bool ReturnValue = false;
 
-	if (point.Length() == 0) return false;
+    if (point.Length() == 0) return ReturnValue;
 
-	Vector angles;
+    Vector angles;
 
-	Vector src = pLocal->GetOrigin() + pLocal->GetViewOffset();
+    Vector src = pLocal->GetOrigin() + pLocal->GetViewOffset();
 
-	VectorAngles(point - src, angles);
-    if (!sanitize_angles(angles)) return false;
+    VectorAngles(point - src, angles);
 
-	CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
-	bool can_shoot = true;
-	float server_time = pLocal->GetTickBase() * g_Globals->interval_per_tick;
 
-	if (pWeapon != nullptr)
-	{
-		float next_shot = pWeapon->GetNextPrimaryAttack() - server_time;
-		if (next_shot > 0) {
-			can_shoot = false;
-		}
-	}
 
-	IsLocked = true;
 
-    if(menu.Ragebot.AntiRecoil) 
-        angles -= pLocal->localPlayerExclusive()->GetAimPunchAngle() * 2;
 
-	if (menu.Ragebot.Silent && can_shoot) 
-        pCmd->viewangles = angles;
-	
+    IsLocked = true;
+        ReturnValue = true;
+
+
+
+    if (menu.Ragebot.Silent)
+    {
+        if (CanAttack()) {
+            pCmd->viewangles = angles;
+        }
+    }
 
     if (!menu.Ragebot.Silent)
     {
         pCmd->viewangles = angles;
         g_Engine->SetViewAngles(pCmd->viewangles);
     }
-	return true;
+    if (menu.Ragebot.FakeLagFix)
+    {
+        pCmd->tick_count = TIME_TO_TICKS(LagFix());
+    }
+    return ReturnValue;
 }
 
 
 
 
 void NormalizeVector(Vector& vec) {
-	for (int i = 0; i < 3; ++i) {
-		while (vec[i] > 180.f)
-			vec[i] -= 360.f;
+    for (int i = 0; i < 3; ++i) {
+        while (vec[i] > 180.f)
+            vec[i] -= 360.f;
 
-		while (vec[i] < -180.f)
-			vec[i] += 360.f;
-	}
-	vec[2] = 0.f;
+        while (vec[i] < -180.f)
+            vec[i] += 360.f;
+    }
+    vec[2] = 0.f;
 }
 
 
 void VectorAngles2(const Vector &vecForward, Vector &vecAngles)
 {
-	Vector vecView;
-	if (vecForward[1] == 0.f && vecForward[0] == 0.f)
-	{
-		vecView[0] = 0.f;
-		vecView[1] = 0.f;
-	}
-	else
-	{
-		vecView[1] = vec_t(atan2(vecForward[1], vecForward[0]) * 180.f / M_PI);
+    Vector vecView;
+    if (vecForward[1] == 0.f && vecForward[0] == 0.f)
+    {
+        vecView[0] = 0.f;
+        vecView[1] = 0.f;
+    }
+    else
+    {
+        vecView[1] = vec_t(atan2(vecForward[1], vecForward[0]) * 180.f / M_PI);
 
-		if (vecView[1] < 0.f)
-			vecView[1] += 360.f;
+        if (vecView[1] < 0.f)
+            vecView[1] += 360.f;
 
-		vecView[2] = sqrt(vecForward[0] * vecForward[0] + vecForward[1] * vecForward[1]);
+        vecView[2] = sqrt(vecForward[0] * vecForward[0] + vecForward[1] * vecForward[1]);
 
-		vecView[0] = vec_t(atan2(vecForward[2], vecView[2]) * 180.f / M_PI);
-	}
+        vecView[0] = vec_t(atan2(vecForward[2], vecView[2]) * 180.f / M_PI);
+    }
 
-	vecAngles[0] = -vecView[0];
-	vecAngles[1] = vecView[1];
-	vecAngles[2] = 0.f;
+    vecAngles[0] = -vecView[0];
+    vecAngles[1] = vecView[1];
+    vecAngles[2] = 0.f;
 }
+
 
 
 
 bool EdgeAntiAim(IClientEntity* pLocalBaseEntity, CInput::CUserCmd* cmd, float flWall, float flCornor)
 {
-	Ray_t ray;
-	trace_t tr;
+    Ray_t ray;
+    trace_t tr;
 
-	CTraceFilter traceFilter;
-	traceFilter.pSkip = pLocalBaseEntity;
+    CTraceFilter traceFilter;
+    traceFilter.pSkip = pLocalBaseEntity;
 
-	auto bRetVal = false;
-	auto vecCurPos = pLocalBaseEntity->GetEyePosition();
+    auto bRetVal = false;
+    auto vecCurPos = pLocalBaseEntity->GetEyePosition();
 
-	for (float i = 0; i < 360; i++)
-	{
-		Vector vecDummy(10.f, cmd->viewangles.y, 0.f);
-		vecDummy.y += i;
+    for (float i = 0; i < 360; i++)
+    {
+        Vector vecDummy(10.f, cmd->viewangles.y, 0.f);
+        vecDummy.y += i;
 
-		NormalizeVector(vecDummy);
+        NormalizeVector(vecDummy);
 
-		Vector vecForward;
-		AngleVectors2(vecDummy, vecForward);
+        Vector vecForward;
+        AngleVectors2(vecDummy, vecForward);
 
-		auto flLength = ((16.f + 3.f) + ((16.f + 3.f) * sin(DEG2RAD(10.f)))) + 7.f;
-		vecForward *= flLength;
+        auto flLength = ((16.f + 3.f) + ((16.f + 3.f) * sin(DEG2RAD(10.f)))) + 7.f;
+        vecForward *= flLength;
 
-		ray.Init(vecCurPos, (vecCurPos + vecForward));
-		g_Trace->TraceRay(ray, MASK_SHOT, (CTraceFilter *)&traceFilter, &tr);
+        ray.Init(vecCurPos, (vecCurPos + vecForward));
+        g_Trace->TraceRay(ray, MASK_SHOT, (CTraceFilter *)&traceFilter, &tr);
 
-		if (tr.fraction != 1.0f)
-		{
-			Vector qAngles;
-			auto vecNegate = tr.plane.normal;
+        if (tr.fraction != 1.0f)
+        {
+            Vector qAngles;
+            auto vecNegate = tr.plane.normal;
 
-			vecNegate *= -1.f;
-			VectorAngles2(vecNegate, qAngles);
+            vecNegate *= -1.f;
+            VectorAngles2(vecNegate, qAngles);
 
-			vecDummy.y = qAngles.y;
+            vecDummy.y = qAngles.y;
 
-			NormalizeVector(vecDummy);
-			trace_t leftTrace, rightTrace;
+            NormalizeVector(vecDummy);
+            trace_t leftTrace, rightTrace;
 
-			Vector vecLeft;
-			AngleVectors2(vecDummy + Vector(0.f, 30.f, 0.f), vecLeft);
+            Vector vecLeft;
+            AngleVectors2(vecDummy + Vector(0.f, 30.f, 0.f), vecLeft);
 
-			Vector vecRight;
-			AngleVectors2(vecDummy - Vector(0.f, 30.f, 0.f), vecRight);
+            Vector vecRight;
+            AngleVectors2(vecDummy - Vector(0.f, 30.f, 0.f), vecRight);
 
-			vecLeft *= (flLength + (flLength * sin(DEG2RAD(30.f))));
-			vecRight *= (flLength + (flLength * sin(DEG2RAD(30.f))));
+            vecLeft *= (flLength + (flLength * sin(DEG2RAD(30.f))));
+            vecRight *= (flLength + (flLength * sin(DEG2RAD(30.f))));
 
-			ray.Init(vecCurPos, (vecCurPos + vecLeft));
-			g_Trace->TraceRay(ray, MASK_SHOT, (CTraceFilter*)&traceFilter, &leftTrace);
+            ray.Init(vecCurPos, (vecCurPos + vecLeft));
+            g_Trace->TraceRay(ray, MASK_SHOT, (CTraceFilter*)&traceFilter, &leftTrace);
 
-			ray.Init(vecCurPos, (vecCurPos + vecRight));
-			g_Trace->TraceRay(ray, MASK_SHOT, (CTraceFilter*)&traceFilter, &rightTrace);
+            ray.Init(vecCurPos, (vecCurPos + vecRight));
+            g_Trace->TraceRay(ray, MASK_SHOT, (CTraceFilter*)&traceFilter, &rightTrace);
 
-			if ((leftTrace.fraction == 1.f) && (rightTrace.fraction != 1.f))
-				vecDummy.y -= flCornor; // left
-			else if ((leftTrace.fraction != 1.f) && (rightTrace.fraction == 1.f))
-				vecDummy.y += flCornor; // right			
+            if ((leftTrace.fraction == 1.f) && (rightTrace.fraction != 1.f))
+                vecDummy.y -= flCornor; // left
+            else if ((leftTrace.fraction != 1.f) && (rightTrace.fraction == 1.f))
+                vecDummy.y += flCornor; // right			
 
-			cmd->viewangles.y = vecDummy.y;
-			cmd->viewangles.y -= flWall;
-			cmd->viewangles.x = 89.0f;
-			bRetVal = true;
-		}
-	}
-	return bRetVal;
+            cmd->viewangles.y = vecDummy.y;
+            cmd->viewangles.y -= flWall;
+            cmd->viewangles.x = 89.0f;
+            bRetVal = true;
+        }
+    }
+    return bRetVal;
 }
 
 // AntiAim
-void ragebot::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket, IClientEntity* local)
+void ragebot::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket)
 {
-	CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(local->GetActiveWeaponHandle());
+    IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+    CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
 
 
 
 
-	// If the aimbot is doing something don't do anything
-	if (pCmd->buttons & IN_ATTACK && CanAttack())
-		return;
-	if ((pCmd->buttons & IN_USE))
-		return;
-	if (local->GetMoveType() == MOVETYPE_LADDER)
-		return;
-	// Weapon shit
+    // If the aimbot is doing something don't do anything
+    if (pCmd->buttons & IN_ATTACK && CanAttack())
+        return;
+    if ((pCmd->buttons & IN_USE))
+        return;
+    if (pLocal->GetMoveType() == MOVETYPE_LADDER)
+        return;
+    // Weapon shit
 
-	if (pWeapon)
-	{
-		CSWeaponInfo* pWeaponInfo = pWeapon->GetCSWpnData();
-		CCSGrenade* csGrenade = (CCSGrenade*)pWeapon;
-
-
-		if (MiscFunctions::IsKnife(pWeapon) && !menu.Ragebot.KnifeAA)
-			return;
-
-		if (csGrenade->GetThrowTime() > 0.f)
-			return;
-	}
-
-	// Don't do antiaim
-	// if (DoExit) return;
-
-	if (menu.Ragebot.Edge) {
-		auto bEdge = EdgeAntiAim(local, pCmd, 360.f, 89.f);
-		if (bEdge)
-			return;
-	}
+    if (pWeapon)
+    {
+        CSWeaponInfo* pWeaponInfo = pWeapon->GetCSWpnData();
+        CCSGrenade* csGrenade = (CCSGrenade*)pWeapon;
 
 
-	
+        if (MiscFunctions::IsKnife(pWeapon) && !menu.Ragebot.KnifeAA)
+            return;
 
-	// Anti-Aim Pitch
+        if (csGrenade->GetThrowTime() > 0.f)
+            return;
+    }
 
+    // Don't do antiaim
+    // if (DoExit) return;
 
-	//Anti-Aim Yaw
-/*	switch (Menu::Window.Rage.AntiAimYaw.GetIndex())
-	{
-	case 0:
-		// No Yaw AA
-		break;
-	case 1:
-		// Fake sideways
-		AntiAims::FakeSideways(pCmd, bSendPacket);
-		break;
-	case 2:
-		// Slow Spin
-		AntiAims::SlowSpin(pCmd);
-		break;
-	case 3:
-		// Fast Spin
-		AntiAims::FastSpin(pCmd);
-		break;
-	case 4:
-		//backwards
-		pCmd->viewangles.y -= 180;
-		break;
-	}*/
-
-	static bool ySwitch;
-
-	if (menu.Ragebot.YawFake != 0)
-		ySwitch = !ySwitch;
-	else
-		ySwitch = true;
-
-	bSendPacket = ySwitch;
-
-	Vector SpinAngles;
-	Vector FakeAngles;
-    float server_time = local->GetTickBase() * g_Globals->interval_per_tick;
-	static int ticks;
-	static bool flip;
-	if (ticks < 15 + rand() % 20)
-		ticks++;
-	else
-	{
-		flip = !flip;
-		ticks = 0;
-	}
-	Vector StartAngles;
-	double rate = 360.0 / 1.618033988749895;
-	double yaw = fmod(static_cast<double>(server_time)*rate, 360.0);
-	double factor = 360.0 / M_PI;
-	factor *= 25;
-	switch (menu.Ragebot.YawTrue)
-	{
-	case 1: //sideways
-	{
-		g_Engine->GetViewAngles(StartAngles);
-		SpinAngles.y = flip ? StartAngles.y - 90.f : StartAngles.y + 90.f;
-	}
-		break;
-	case 2://slowspin
-		SpinAngles.y += static_cast<float>(yaw);
-		break;
-	case 3://fastspin
-	{
-		SpinAngles.y = (float)(fmod(server_time / 0.05f * 360.0f, 360.0f));
-	}
-		break;
-	case 4://backwards
-	{
-		g_Engine->GetViewAngles(StartAngles);
-		StartAngles.y -= 180.f;
-		SpinAngles = StartAngles;
-	}
-		break;
-	case 5:
-	{
-		SpinAngles.y = local->GetLowerBodyYaw();
-	}
-		break;
-	}
+    if (menu.Ragebot.Edge) {
+        auto bEdge = EdgeAntiAim(pLocal, pCmd, 360.f, 89.f);
+        if (bEdge)
+            return;
+    }
 
 
 
-	switch (menu.Ragebot.YawFake)
-	{
-	case 1://sideways
-	{
-		g_Engine->GetViewAngles(StartAngles);
-		FakeAngles.y = flip ? StartAngles.y + 90.f : StartAngles.y - 90.f;
-	}
-		break;
-	case 2://slowspin
-		FakeAngles.y += static_cast<float>(yaw);
-		break;
-	case 3://fastspin
-		FakeAngles.y = (float)(fmod(server_time / 0.05f * 360.0f, 360.0f));
-	break;
-	case 4://backwards
-	{
-		g_Engine->GetViewAngles(StartAngles);
-		StartAngles -= 180.f;
-		FakeAngles = StartAngles;
-	}
-	break;
-	case 5: //lby antiaim
-		{
-			g_Engine->GetViewAngles(StartAngles);
-			static bool llamaflip;
-			static float oldLBY = 0.0f;
-			float LBY = local->GetLowerBodyYaw();
-			if (LBY != oldLBY) // did lowerbody update?
-			{
-				llamaflip = !llamaflip;
-				oldLBY = LBY;
-			}
-			FakeAngles.y = llamaflip ? StartAngles.y + 90.f : StartAngles.y - 90.f;
-		}
-		break;
-	}
 
 
-	{
-		if (ySwitch && menu.Ragebot.YawTrue != 0)
-			pCmd->viewangles = SpinAngles;
-		else if (!ySwitch && menu.Ragebot.YawFake != 0)
-			pCmd->viewangles = FakeAngles;
-	}
+    // Anti-Aim Pitch
 
-	switch (menu.Ragebot.Pitch)
-	{
-	case 0:
-		// No Pitch AA
-		break;
-	case 1:
-		// Down
-		pCmd->viewangles.x = 89;
-		break;
-	case 2:
-		pCmd->viewangles.x = -89;
-		break;
-	}
+
+    //Anti-Aim Yaw
+    /*	switch (Menu::Window.Rage.AntiAimYaw.GetIndex())
+    {
+    case 0:
+    // No Yaw AA
+    break;
+    case 1:
+    // Fake sideways
+    AntiAims::FakeSideways(pCmd, bSendPacket);
+    break;
+    case 2:
+    // Slow Spin
+    AntiAims::SlowSpin(pCmd);
+    break;
+    case 3:
+    // Fast Spin
+    AntiAims::FastSpin(pCmd);
+    break;
+    case 4:
+    //backwards
+    pCmd->viewangles.y -= 180;
+    break;
+    }*/
+
+    static bool ySwitch;
+
+    if (menu.Ragebot.YawFake != 0)
+        ySwitch = !ySwitch;
+    else
+        ySwitch = true;
+
+    bSendPacket = ySwitch;
+
+    Vector SpinAngles;
+    Vector FakeAngles;
+    float server_time = pLocal->GetTickBase() * g_Globals->interval_per_tick;
+    static int ticks;
+    static bool flip;
+    if (ticks < 15 + rand() % 20)
+        ticks++;
+    else
+    {
+        flip = !flip;
+        ticks = 0;
+    }
+    Vector StartAngles;
+    double rate = 360.0 / 1.618033988749895;
+    double yaw = fmod(static_cast<double>(server_time)*rate, 360.0);
+    double factor = 360.0 / M_PI;
+    factor *= 25;
+    switch (menu.Ragebot.YawTrue)
+    {
+    case 1: //sideways
+    {
+        g_Engine->GetViewAngles(StartAngles);
+        SpinAngles.y = flip ? StartAngles.y - 90.f : StartAngles.y + 90.f;
+    }
+    break;
+    case 2://slowspin
+        SpinAngles.y += static_cast<float>(yaw);
+        break;
+    case 3://fastspin
+    {
+        SpinAngles.y = (float)(fmod(server_time / 0.05f * 360.0f, 360.0f));
+    }
+    break;
+    case 4://backwards
+    {
+        g_Engine->GetViewAngles(StartAngles);
+        StartAngles.y -= 180.f;
+        SpinAngles = StartAngles;
+    }
+    break;
+    case 5:
+    {
+        SpinAngles.y = pLocal->GetLowerBodyYaw();
+    }
+    break;
+    }
+
+
+
+    switch (menu.Ragebot.YawFake)
+    {
+    case 1://sideways
+    {
+        g_Engine->GetViewAngles(StartAngles);
+        FakeAngles.y = flip ? StartAngles.y + 90.f : StartAngles.y - 90.f;
+    }
+    break;
+    case 2://slowspin
+        FakeAngles.y += static_cast<float>(yaw);
+        break;
+    case 3://fastspin
+        FakeAngles.y = (float)(fmod(server_time / 0.05f * 360.0f, 360.0f));
+        break;
+    case 4://backwards
+    {
+        g_Engine->GetViewAngles(StartAngles);
+        StartAngles -= 180.f;
+        FakeAngles = StartAngles;
+    }
+    break;
+    case 5: //lby antiaim
+    {
+        g_Engine->GetViewAngles(StartAngles);
+        static bool llamaflip;
+        static float oldLBY = 0.0f;
+        float LBY = pLocal->GetLowerBodyYaw();
+        if (LBY != oldLBY) // did lowerbody update?
+        {
+            llamaflip = !llamaflip;
+            oldLBY = LBY;
+        }
+        FakeAngles.y = llamaflip ? StartAngles.y + 90.f : StartAngles.y - 90.f;
+    }
+    break;
+    }
+
+
+    {
+        if (ySwitch && menu.Ragebot.YawTrue != 0)
+            pCmd->viewangles = SpinAngles;
+        else if (!ySwitch && menu.Ragebot.YawFake != 0)
+            pCmd->viewangles = FakeAngles;
+    }
+
+    switch (menu.Ragebot.Pitch)
+    {
+    case 0:
+        // No Pitch AA
+        break;
+    case 1:
+        // Down
+        pCmd->viewangles.x = 89;
+        break;
+    case 2:
+        pCmd->viewangles.x = -89;
+        break;
+    }
 
 }
-
-

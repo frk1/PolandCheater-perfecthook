@@ -4,35 +4,41 @@
 #include "Interfaces.h"
 #include <sstream>
 #define RandomInt(nMin, nMax) (rand() % (nMax - nMin + 1) + nMin);
+DWORD sig1;
+DWORD sig2;
 void InitKeyValues(KeyValues* keyValues, const char* name)
 {
-    static DWORD sig = U::FindPattern("client.dll", (PBYTE)"\x68\x00\x00\x00\x00\x8B\xC8\xE8\x00\x00\x00\x00\x89\x45\xFC\xEB\x07\xC7\x45\x00\x00\x00\x00\x00\x8B\x03\x56", "x????xxx????xxxxxxx?????xxx");
-    sig += 7;
-    sig = sig + *reinterpret_cast< PDWORD_PTR >(sig + 1) + 5;
-	DWORD dwFunction = sig;
-	__asm
-	{
-		push name
-		mov ecx, keyValues
-		call dwFunction
-	}
+    if (!sig1)
+    {
+        sig1 = U::FindPattern("client.dll", (PBYTE)"\x68\x00\x00\x00\x00\x8B\xC8\xE8\x00\x00\x00\x00\x89\x45\xFC\xEB\x07\xC7\x45\x00\x00\x00\x00\x00\x8B\x03\x56", "x????xxx????xxxxxxx?????xxx");
+        sig1 += 7;
+        sig1 = sig1 + *reinterpret_cast<PDWORD_PTR>(sig1 + 1) + 5;
+    }
+
+    DWORD dwFunction = (DWORD)sig1;
+    __asm
+    {
+        push name
+        mov ecx, keyValues
+        call dwFunction
+    }
 }
 
 void LoadFromBuffer(KeyValues* keyValues, char const* resourceName, const char* pBuffer)
 {
-    static DWORD sig  = (DWORD)U::pattern_scan(GetModuleHandleW(L"client.dll"), "55 8B EC 83 E4 F8 83 EC 34 53 8B 5D 0C 89 4C 24 04");
-	DWORD dwFunction = sig;
+    if (!sig2) sig2 = (DWORD)U::pattern_scan(GetModuleHandleW(L"client.dll"), "55 8B EC 83 E4 F8 83 EC 34 53 8B 5D 0C 89 4C 24 04");
+    DWORD dwFunction = sig2;
 
-	__asm
-	{
-		push 0
-		push 0
-		push 0
-		push pBuffer
-		push resourceName
-		mov ecx, keyValues
-		call dwFunction
-	}
+    __asm
+    {
+        push 0
+        push 0
+        push 0
+        push pBuffer
+        push resourceName
+        mov ecx, keyValues
+        call dwFunction
+    }
 }
 
 IMaterial* CreateMaterial(std::string type, std::string texture, bool ignorez, bool nofog, bool model, bool nocull, bool halflambert)

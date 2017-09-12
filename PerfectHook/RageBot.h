@@ -11,16 +11,17 @@ public:
 
     ragebot();
 
-    void OnCreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket, IClientEntity* local);
+    void OnCreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket);
 	bool hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseCombatWeapon* weapon, IClientEntity* target);
 private:
-	int GetTargetCrosshair(IClientEntity* local);
-	bool TargetMeetsRequirements(IClientEntity* pEntity, IClientEntity* local);
-    float FovToPlayer(const QAngle &viewAngles, const QAngle &aimAngles);
+    float FovToPlayer(Vector ViewOffSet, Vector View, IClientEntity* pEntity, int aHitBox);
+	int GetTargetCrosshair();
+	bool TargetMeetsRequirements(IClientEntity* pEntity);
 	int HitScan(IClientEntity* pEntity);
-	bool AimAtPoint(IClientEntity* pLocal, Vector point, CInput::CUserCmd *pCmd);
-	void DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket, IClientEntity* local);
-	void DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket, IClientEntity* local);
+    void DoNoRecoil(CInput::CUserCmd* pCmd);
+    bool AimAtPoint(IClientEntity* pLocal, Vector point, CInput::CUserCmd *pCmd);
+	void DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket);
+	void DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket);
 private:
 	bool IsLocked;
 	int TargetID;
