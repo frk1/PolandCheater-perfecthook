@@ -1,5 +1,5 @@
 #include "LagComp.h"
-
+#include "RageBot.h"
 void BackTrack::Update(int tick_count)
 {
     if (!g_Options.Ragebot.FakeLagFix)
@@ -54,9 +54,9 @@ void BackTrack::legitBackTrack(CInput::CUserCmd* cmd, IClientEntity* pLocal)
     if (g_Options.Legitbot.backtrack)
     {
         int bestTargetIndex = -1;
-        float bestFov = FLT_MAX;
+        float bestFov = 100;
         player_info_t info;
-
+        static float oldsimtime;
         if (!pLocal->IsAlive())
             return;
 
@@ -100,7 +100,7 @@ void BackTrack::legitBackTrack(CInput::CUserCmd* cmd, IClientEntity* pLocal)
         float bestTargetSimTime;
         if (bestTargetIndex != -1)
         {
-            float tempFloat = FLT_MAX;
+            float tempFloat = 100;
             Vector ViewDir = angle_vector(cmd->viewangles + (pLocal->localPlayerExclusive()->GetAimPunchAngle() * 2.f));
             for (int t = 0; t < 12; ++t)
             {
@@ -111,9 +111,11 @@ void BackTrack::legitBackTrack(CInput::CUserCmd* cmd, IClientEntity* pLocal)
                     bestTargetSimTime = headPositions[bestTargetIndex][t].simtime;
                 }
             }
-            if (cmd->buttons & IN_ATTACK)
+            if (cmd->buttons & IN_ATTACK && CanAttack())
             {
+                g_ChatElement->ChatPrintf(0, 0, " ""\x03""nigga got blacktracked %i ticks", TIME_TO_TICKS(pLocal->GetSimulationTime()) - TIME_TO_TICKS(bestTargetSimTime));
                 cmd->tick_count = TIME_TO_TICKS(bestTargetSimTime);
+                oldsimtime = bestTargetSimTime;
             }
         }
     }

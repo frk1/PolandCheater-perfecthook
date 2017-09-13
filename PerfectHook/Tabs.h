@@ -76,7 +76,7 @@ void RenderRageBot()
 		ImGui::Checkbox(("Hitchance"), &g_Options.Ragebot.Hitchance);
 		ImGui::SliderFloat(("Hitchance Amount"), &g_Options.Ragebot.HitchanceAmount, 0.f, 100.f, "%.1f");
 		ImGui::Checkbox(("Resolver"), &g_Options.Ragebot.Resolver);
-        //ImGui::Checkbox("LBY Backtracking", &menu.Ragebot.FakeLagFix);
+        ImGui::Checkbox("Backtracking", &g_Options.Ragebot.FakeLagFix);
         ImGui::Hotkey(("BAIM key"), &g_Options.Ragebot.BAIMkey);
 
 

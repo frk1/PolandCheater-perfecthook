@@ -508,6 +508,7 @@ const char* p250[] =
 const char* spammers[] =
 {
     "Off",
+    "PerfectHook",
     "AimTux",
     "EzFrags"
 };

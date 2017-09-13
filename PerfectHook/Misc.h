@@ -56,6 +56,15 @@ char* const ezfragslist[] =
     "Stop being a noob! Get good with www.EZFrags.co.uk",
     "You just got pwned by www.EZFrags.co.uk, the #1 CS:GO cheat",
 };
+char* const phooklist[] =
+{
+    "You just got rekt by PerfectHook",
+    "Git Gud! Git PerfectHook!",
+    "I'm not cheating, but If I was I would recommend PerfectHook",
+    "PerfectHook > all",
+    "You think your ayypaste is better than PerfectHook?",
+    "Stop being a noob nigger, git PerfectHook"
+};
 inline void setclantag(const char* tag)
 {
     static auto ClanTagOffset = U::FindPattern("engine.dll", (PBYTE)"\x53\x56\x57\x8B\xDA\x8B\xF9\xFF\x15", "xxxxxxxxx");

@@ -74,14 +74,17 @@ void misc::OnCreateMove(CInput::CUserCmd *cmd, IClientEntity *local)
     {
 
         counter = counter + 1;
-        if (counter >= 6)
+        if (counter > 5)
             counter = 0;
         switch (g_Options.Misc.spammer)
         {
         case 1:
-            SayInChat(tuxlist[counter]);
+            SayInChat(phooklist[counter]);
             break;
         case 2:
+            SayInChat(tuxlist[counter]);
+            break;
+        case 3:
             SayInChat(ezfragslist[counter]);
             break;
         }

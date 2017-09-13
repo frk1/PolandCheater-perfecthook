@@ -222,7 +222,6 @@ void ragebot::DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket)
 
 
 
-
         if (AimAtPoint(pLocal, AimPoint, pCmd))
         {
             if (g_Options.Ragebot.AutoFire && CanAttack() && MiscFunctions::IsSniper(pWeapon) && g_Options.Ragebot.AutoScope)
@@ -262,7 +261,6 @@ void ragebot::DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket)
     static bool WasFiring = false;
     if (pWeapon != nullptr)
     {
-        CSWeaponInfo* WeaponInfo = pWeapon->GetCSWpnData();
         if (MiscFunctions::IsPistol(pWeapon) && g_Options.Ragebot.AutoPistol && pWeapon->m_AttributeManager()->m_Item()->GetItemDefinitionIndex() != 64)
         {
             if (pCmd->buttons & IN_ATTACK && !MiscFunctions::IsKnife(pWeapon) && !MiscFunctions::IsGrenade(pWeapon))

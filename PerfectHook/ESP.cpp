@@ -775,8 +775,8 @@ void visuals::SpecList(IClientEntity *local)
                         {
                             if (g_Engine->GetPlayerInfo(pTarget->GetIndex(), &pinfo2))
                             {
-                                g_Render->DrawString2(g_Render->font.ESP, scrn.right - 98, (scrn.top) + 1, Color(255, 255, 255, 255), FONT_LEFT, "Spectating you:");
-                                g_Render->DrawString2(g_Render->font.ESP, scrn.right - 98, (scrn.top) + (16 * kapi) + 10, Color(255, 255, 255, 255), FONT_LEFT, "%s", pinfo.name);
+
+                                g_Render->DrawString2(g_Render->font.ESP, scrn.right - 98, (scrn.top) + (16 * kapi) + 20, Color(255, 0, 0, 255), FONT_LEFT, "%s", pinfo.name);
                                 kapi++;
                             }
                         }
@@ -785,4 +785,5 @@ void visuals::SpecList(IClientEntity *local)
             }
         }
     }
+    g_Render->DrawString2(g_Render->font.ESP, scrn.right - 98, (scrn.top) + 10, Color(255, 255, 255, 255), FONT_LEFT, "Spectating you:");
 }
