@@ -237,6 +237,15 @@ void visuals::DrawPlayer(IClientEntity* entity, player_info_t pinfo, IClientEnti
 
 	int bottom = 0;
 
+    /*auto m_AnimOverlay = entity->GetAnimationOverlay();
+
+    for (int i = 0; i < 14; i++)
+    {
+        char sequence_string[64];
+        sprintf_s(sequence_string, sizeof(sequence_string) - 1, "%d | %d", i, m_AnimOverlay.m_pElements[i].Sequence);
+        g_Render->DrawString2(g_Render->font.ESP, top.x + 20 + height, top.y + 10 * i, Color::White(), FONT_LEFT, sequence_string);
+    }*/
+
 	std::vector<std::string> weapon;
 	std::vector<std::string> bomb;
 	std::vector<std::string> rank;

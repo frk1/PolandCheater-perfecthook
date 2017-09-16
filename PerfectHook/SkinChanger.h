@@ -69,6 +69,9 @@ void SkinChanger() {
                     case 14:
                         *pWeapon->FallbackPaintKit() = 380;//wasteland rebel
                         break;
+                    case 15:
+                        *pWeapon->FallbackPaintKit() = 675;//The Empress
+                        break;
                     default:
                         break;
                     }
@@ -151,6 +154,9 @@ void SkinChanger() {
                         break;
                     case 10:
                         *pWeapon->FallbackPaintKit() = 631;//Flashback
+                        break;
+                    case 11:
+                        *pWeapon->FallbackPaintKit() = 681;//Flashback
                         break;
                     default:
                         break;
@@ -254,11 +260,14 @@ void SkinChanger() {
                     case 2:
                         *pWeapon->FallbackPaintKit() = 437;
                         break;
-                    case 20:
+                    case 3:
                         *pWeapon->FallbackPaintKit() = 586;
                         break;
-                    case 13:
+                    case 4:
                         *pWeapon->FallbackPaintKit() = 353;
+                        break;
+                    case 5:
+                        *pWeapon->FallbackPaintKit() = 680;
                         break;
                     default:
                         break;
@@ -332,7 +341,7 @@ void SkinChanger() {
                 break;
                 case 11: // G3SG1
                 {
-                    *pWeapon->FallbackPaintKit() = 493;
+                    *pWeapon->FallbackPaintKit() = 677;
                 }
                 break;
                 case 13: // Galil
@@ -352,50 +361,7 @@ void SkinChanger() {
                 break;
                 case 19: // P90
                 {
-                    switch (g_Options.Skinchanger.P90Skin)
-                    {
-                    case 1:
                         *pWeapon->FallbackPaintKit() = 156;
-                        break;
-                    case 2:
-                        *pWeapon->FallbackPaintKit() = 169;
-                        break;
-                    case 3:
-                        *pWeapon->FallbackPaintKit() = 175;
-                        break;
-                    case 4:
-                        *pWeapon->FallbackPaintKit() = 182;
-                        break;
-                    case 5:
-                        *pWeapon->FallbackPaintKit() = 244;
-                        break;
-                    case 6:
-                        *pWeapon->FallbackPaintKit() = 228;
-                        break;
-                    case 7:
-                        *pWeapon->FallbackPaintKit() = 283;
-                        break;
-                    case 8:
-                        *pWeapon->FallbackPaintKit() = 311;
-                        break;
-                    case 9:
-                        *pWeapon->FallbackPaintKit() = 335;
-                        break;
-                    case 10:
-                        *pWeapon->FallbackPaintKit() = 359;
-                        break;
-                    case 11:
-                        *pWeapon->FallbackPaintKit() = 486;
-                        break;
-                    case 12:
-                        *pWeapon->FallbackPaintKit() = 516;
-                        break;
-                    case 13:
-                        *pWeapon->FallbackPaintKit() = 636;
-                        break;
-                    default:
-                        break;
-                    }
                 }
                 break;
                 case 24: // UMP-45
@@ -426,7 +392,7 @@ void SkinChanger() {
                 break;
                 case 26: // Bizon
                 {
-                    *pWeapon->FallbackPaintKit() = 542;
+                    *pWeapon->FallbackPaintKit() = 676;
                 }
                 break;
                 case 27: // Mag 7
@@ -553,6 +519,9 @@ void SkinChanger() {
                     case 4:
                         *pWeapon->FallbackPaintKit() = 551;
                         break;
+                    case 5:
+                        *pWeapon->FallbackPaintKit() = 678;
+                        break;
                     default:
                         break;
                     }
@@ -582,6 +551,9 @@ void SkinChanger() {
                         break;
                     case 6:
                         *pWeapon->FallbackPaintKit() = 597;
+                        break;
+                    case 7:
+                        *pWeapon->FallbackPaintKit() = 685;
                         break;
                     default:
                         break;
@@ -652,9 +624,7 @@ void SkinChanger() {
                 break;
                 case 64: // Revolver
                 {
-
-                    *pWeapon->FallbackPaintKit() = 523;
-
+                    *pWeapon->FallbackPaintKit() = 683;
                 }
                 break;
                 default:

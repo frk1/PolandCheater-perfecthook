@@ -1,7 +1,6 @@
 
 
 #pragma once
-
 #include "MiscDefinitions.h"
 #include "Vector.h"
 #include "Utilities.h"
@@ -899,6 +898,21 @@ enum EntityShape_t : int
 	SHAPE_TRIANGLE_UPSIDEDOWN
 };
 
+class animation_layer
+{
+public:
+    char  pad_0[20];
+    uint32_t Index; //0x0014
+    uint32_t Sequence; //0x0018
+    char  pad_[4];
+    float unknwn_active_flt;
+    float unknwn_active_flt0;
+    float m_fl_Weight; // Not sure, based off another guy, does change though.
+    float m_fl_AnimTime; // last update time for this layer
+    void* m_pOwner; //0x0030 // player's thisptr
+    float unknwnfloat; //0x0034
+}; //Size: 0x0038
+
 class __declspec (novtable)IClientEntity : public IClientUnknown, public IClientRenderable, public IClientNetworkable, public IClientThinkable
 {
 public:
@@ -909,6 +923,9 @@ public:
 	virtual const Vector&	GetAbsAngles(void) const = 0;
 
 
+    CUtlVector<animation_layer> GetAnimationOverlay() {
+        return (CUtlVector<animation_layer>)((DWORD)this + 0x2970);
+    }
 
 	CLocalPlayerExclusive* localPlayerExclusive()
 	{

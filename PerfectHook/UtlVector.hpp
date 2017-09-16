@@ -111,7 +111,7 @@ public:
   int NumAllocated() const;    // Only use this if you really know what you're doing!
   void Sort(int(__cdecl *pfnCompare)(const T *, const T *));
 
-protected:
+public:
   // Can't copy this unless we explicitly do it!
   CUtlVector(CUtlVector const& vec) { assert(0); }
 

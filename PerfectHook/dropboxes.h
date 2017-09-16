@@ -321,7 +321,8 @@ const char* m4a1s[] =
     "Mecha Industries",
     "Cyrex",
     "Icarus Fell",
-    "Flashback"
+    "Flashback",
+    "Leaded Glass"
 };
 
 const char* ak47[] =
@@ -340,7 +341,8 @@ const char* ak47[] =
     "Redline",
     "Jaguar",
     "Jet Set",
-    "Wasteland Rebel"
+    "Wasteland Rebel",
+    "The Empress"
 };
 
 const char* m4a4[] =
@@ -416,7 +418,8 @@ const char* scar20[] =
     "Emerald",
     "Green Marine",
     "Outbreak",
-    "Bloodsport"
+    "Bloodsport",
+    "Jungle Slipstream"
 };
 
 const char* p90[] =
@@ -450,7 +453,8 @@ const char* glock[] =
     "Dragon Tattoo",
     "Twilight Galaxy",
     "Wasteland Rebel",
-    "Water Elemental"
+    "Water Elemental",
+    "Off World"
 };
 
 const char* usp[] =
@@ -503,7 +507,8 @@ const char* p250[] =
     "Crimson Kimono",
     "Mint Kimono",
     "Wing Shot",
-    "Asiimov"
+    "Asiimov",
+    "See Ya Later"
 };
 const char* spammers[] =
 {
