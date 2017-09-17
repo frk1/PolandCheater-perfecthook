@@ -65,6 +65,13 @@ char* const phooklist[] =
     "You think your ayypaste is better than PerfectHook?",
     "Stop being a noob nigger, git PerfectHook"
 };
+inline void SetName(const char* new_name)
+{
+    static auto name = g_CVar->FindVar("name");
+
+    name->SetValue(new_name);
+    *reinterpret_cast<int*>(uintptr_t(&name->fnChangeCallback) + 0xC) = 0;
+}
 inline void setclantag(const char* tag)
 {
     static auto ClanTagOffset = U::FindPattern("engine.dll", (PBYTE)"\x53\x56\x57\x8B\xDA\x8B\xF9\xFF\x15", "xxxxxxxxx");

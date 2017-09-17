@@ -68,6 +68,18 @@ void misc::OnCreateMove(CInput::CUserCmd *cmd, IClientEntity *local)
             iLastTime = int(g_Globals->curtime);
         }
     }
+    if (g_Options.Misc.namespam)
+    {
+        char name[151];
+        char fucked_char = static_cast<char>(-1);
+        for (auto i = 0; i <= 150; i++)
+            name[i] = fucked_char;
+
+        const char nick[12] = "PerfectHook";
+        memcpy(name, nick, 11);
+
+        SetName(name);
+    }
     static size_t lastTime = 0;
     static int counter = 0;
     if (GetTickCount() > lastTime)

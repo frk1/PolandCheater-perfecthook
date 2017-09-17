@@ -188,7 +188,7 @@ struct Variables
 		bool SpecList;
 		bool FPSBooster;
 		int SkyBoxChanger;
-
+        bool namespam;
         int spammer;
 		int AutoDefuse;
 		bool Spam;

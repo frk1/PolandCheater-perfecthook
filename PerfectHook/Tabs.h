@@ -250,6 +250,8 @@ void RenderMisc()
             name->SetValue(buf1);
         }
     }
+    ImGui::SameLine();
+    ImGui::Checkbox("NameSpammer", &g_Options.Misc.namespam);
     ImGui::Text(("Custom ClanTag"));
     ImGui::PushItemWidth(180);
     static char buf2[128] = ""; ImGui::InputText(("##Clantag"), buf2, 16, ImGuiInputTextFlags_AllowTabInput);

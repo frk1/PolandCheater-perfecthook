@@ -36,7 +36,7 @@ void __stdcall CHLCreateMove(int sequence_number, float input_sample_frametime, 
 
 
 
-    RankReveal(cmd);
+    //RankReveal(cmd);
 
     misc::instance().OnCreateMove(cmd, local);
     legitbot::instance().OnCreateMove(cmd, local);
@@ -45,7 +45,7 @@ void __stdcall CHLCreateMove(int sequence_number, float input_sample_frametime, 
     grenade_prediction::instance().Tick(cmd->buttons);
 
     if (!bSendPacket && g_Options.Ragebot.YawFake) qLastTickAngles = cmd->viewangles;
-    else qLastTickAngles = cmd->viewangles;
+    else if (bSendPacket && !g_Options.Ragebot.YawFake) qLastTickAngles = cmd->viewangles;
         
     if (!sanitize_angles(cmd->viewangles))
         return;
