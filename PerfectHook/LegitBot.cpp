@@ -169,6 +169,13 @@ void legitbot::do_aimbot(IClientEntity *local, CBaseCombatWeapon *weapon, CInput
         return;
 
 
+    if (weapon->GetAmmoInClip() == 0)
+        return;
+
+    if (MiscFunctions::IsKnife(weapon) || MiscFunctions::IsGrenade(weapon)) 
+        return;
+
+
     weapon_settings(weapon);
 
     if (!aim_key)
