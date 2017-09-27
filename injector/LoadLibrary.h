@@ -4,7 +4,7 @@
 class loadlibrary
 {
 public:
-    int loadlibrarymain(const char* proccessname, const char* dllname);
+    int loadlibrarymain(const char* proccessname, const char* dllname, int argc);
 private:
     unsigned int GetProcessPID(const char* process_name);
     bool LoadProcess(const char* procName);

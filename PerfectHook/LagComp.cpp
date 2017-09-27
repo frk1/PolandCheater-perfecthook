@@ -21,7 +21,7 @@ bool BackTrack::IsTickValid(int tick)
 
 void BackTrack::UpdateRecord(int i)
 {
-    IClientEntity* pEntity = g_EntityList->GetClientEntity(i);
+    C_BaseEntity* pEntity = g_EntityList->GetClientEntity(i);
     if (pEntity && pEntity->IsAlive() && !pEntity->IsDormant())
     {
         float lby = pEntity->GetLowerBodyYaw();
@@ -49,7 +49,7 @@ bool BackTrack::RunLBYBackTrack(int i, CInput::CUserCmd* cmd, Vector& aimPoint)
     return false;
 }
 
-void BackTrack::legitBackTrack(CInput::CUserCmd* cmd, IClientEntity* pLocal)
+void BackTrack::legitBackTrack(CInput::CUserCmd* cmd, C_BaseEntity* pLocal)
 {
     if (g_Options.Legitbot.backtrack)
     {
@@ -61,7 +61,7 @@ void BackTrack::legitBackTrack(CInput::CUserCmd* cmd, IClientEntity* pLocal)
 
         for (int i = 0; i < g_Engine->GetMaxClients(); i++)
         {
-            auto entity = (IClientEntity*)g_EntityList->GetClientEntity(i);
+            auto entity = (C_BaseEntity*)g_EntityList->GetClientEntity(i);
 
             if (!entity || !pLocal)
                 continue;
@@ -80,6 +80,7 @@ void BackTrack::legitBackTrack(CInput::CUserCmd* cmd, IClientEntity* pLocal)
 
             if (entity->IsAlive())
             {
+				
                 float simtime = entity->GetSimulationTime();
                 Vector hitboxPos = GetHitboxPosition(entity, 0);
 

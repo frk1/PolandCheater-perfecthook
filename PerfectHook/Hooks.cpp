@@ -41,9 +41,9 @@ namespace hooks
         surface.setup(g_Surface);
         surface.hook_index(82, hkPlaySound);
 
-        engine.setup(g_Engine);
-        engine.hook_index(27, hkIsConnected);
-        engine.hook_index(93, hkIsHltv);
+        //engine.setup(g_Engine);
+        //engine.hook_index(27, hkIsConnected);
+        //engine.hook_index(93, hkIsHltv);
 
 
 

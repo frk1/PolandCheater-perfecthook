@@ -1,7 +1,7 @@
 #include "LoadLibrary.h"
 
 
-int loadlibrary::loadlibrarymain(const char* proccessname, const char* dllname)
+int loadlibrary::loadlibrarymain(const char* proccessname, const char* dllname, int argc)
 {
     printf("You have chosen LoadLibrary injection method\n");
     while (!LoadProcess(proccessname))
@@ -16,14 +16,18 @@ int loadlibrary::loadlibrarymain(const char* proccessname, const char* dllname)
     }
 
     printf("%s found! Injecting DLL!", proccessname);
-    char dllpath[512];
-    sprintf_s(dllpath, sizeof(dllpath) - 1, "%s\\/%s", ExePath().c_str(), dllname);
+	char dllpath[512];
+	if(argc == 1) sprintf_s(dllpath, sizeof(dllpath) - 1, "%s\\/%s", ExePath().c_str(), dllname);
+	else if (argc == 2) sprintf_s(dllpath, sizeof(dllpath) - 1, "%s", dllname);
     if (pid)
     {
-        while (!GetModuleHandleExtern("serverbrowser.dll", pid))
-        {
-            Sleep(500);
-        }
+		if (strstr(proccessname, "csgo.exe"))
+		{
+			while (!GetModuleHandleExtern("serverbrowser.dll", pid))
+			{
+				Sleep(500);
+			}
+		}
         CreateRemoteThreadMethod(pid, dllpath);
     }
     return 0;

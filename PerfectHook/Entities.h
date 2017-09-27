@@ -27,7 +27,7 @@ class IClientRenderable;
 class IClientNetworkable;
 class IClientUnknown;
 class IClientThinkable;
-class IClientEntity;
+class C_BaseEntity;
 class CSWeaponInfo;
 
 typedef unsigned long CBaseHandle;
@@ -843,8 +843,8 @@ public:
 	}
 	virtual IClientNetworkable*	GetClientNetworkable() = 0;
 	virtual IClientRenderable*	GetClientRenderable() = 0;
-	virtual IClientEntity*		GetIClientEntity() = 0;
-	virtual IClientEntity*		GetBaseEntity() = 0;
+	virtual C_BaseEntity*		GetIClientEntity() = 0;
+	virtual C_BaseEntity*		GetBaseEntity() = 0;
 	virtual IClientThinkable*	GetClientThinkable() = 0;
 };
 
@@ -913,7 +913,8 @@ public:
     float unknwnfloat; //0x0034
 }; //Size: 0x0038
 
-class __declspec (novtable)IClientEntity : public IClientUnknown, public IClientRenderable, public IClientNetworkable, public IClientThinkable
+
+class __declspec (novtable)C_BaseEntity : public IClientUnknown, public IClientRenderable, public IClientNetworkable, public IClientThinkable
 {
 public:
 public:
@@ -921,6 +922,8 @@ public:
 	virtual void			blahblahpad(void) = 0;
 	virtual Vector&	GetAbsOrigin(void) const = 0;
 	virtual const Vector&	GetAbsAngles(void) const = 0;
+
+
 
 
     CUtlVector<animation_layer> GetAnimationOverlay() {

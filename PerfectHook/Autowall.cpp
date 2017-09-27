@@ -50,7 +50,7 @@ float GetHitgroupDamageMult(int iHitGroup)
 
 	return 1.f;
 }
-bool IsArmored(IClientEntity* Entity, int ArmorValue, int Hitgroup)
+bool IsArmored(C_BaseEntity* Entity, int ArmorValue, int Hitgroup)
 {
     bool result = false;
 
@@ -74,7 +74,7 @@ bool IsArmored(IClientEntity* Entity, int ArmorValue, int Hitgroup)
     return result;
 }
 
-void ScaleDamage(int Hitgroup,  IClientEntity* Entity, float WeaponArmorRatio, float &Damage)
+void ScaleDamage(int Hitgroup,  C_BaseEntity* Entity, float WeaponArmorRatio, float &Damage)
 {
     // NOTE: the Guardian/Coop Missions/Gamemode have bots with heavy armor which has a less damage modifier
     auto HeavyArmor = Entity->m_bHasHeavyArmor(); // DT_CSPlayer -> m_bHasHeavyArmor
@@ -120,7 +120,7 @@ void ScaleDamage(int Hitgroup,  IClientEntity* Entity, float WeaponArmorRatio, f
     }
 }
 
-/*void ScaleDamage(int hitgroup, IClientEntity *enemy, float weapon_armor_ratio, float &current_damage)
+/*void ScaleDamage(int hitgroup, C_BaseEntity *enemy, float weapon_armor_ratio, float &current_damage)
 {
 	current_damage *= GetHitgroupDamageMult(hitgroup);
 
@@ -141,7 +141,7 @@ void ScaleDamage(int Hitgroup,  IClientEntity* Entity, float WeaponArmorRatio, f
 
 }*/
 
-bool SimulateFireBullet(IClientEntity *local, CBaseCombatWeapon *weapon, FireBulletData &data)
+bool SimulateFireBullet(C_BaseEntity* entity, C_BaseEntity *local, CBaseCombatWeapon *weapon, FireBulletData &data)
 {
 	//Utils::ToLog("SimulateFireBullet");
 	data.penetrate_count = 4;
@@ -157,7 +157,7 @@ bool SimulateFireBullet(IClientEntity *local, CBaseCombatWeapon *weapon, FireBul
 		Vector end = data.src + data.direction * data.trace_length_remaining;
 
 		UTIL_TraceLine(data.src, end, 0x4600400B, local, 0, &data.enter_trace);
-		UTIL_ClipTraceToPlayers(data.src, end + data.direction * 40.f, 0x4600400B, &data.filter, &data.enter_trace);
+		UTIL_ClipTraceToPlayers(entity, data.src, end + data.direction * 40.f, 0x4600400B, &data.filter, &data.enter_trace);
 
 		if (data.enter_trace.fraction == 1.0f)
 			break;
@@ -199,7 +199,7 @@ bool HandleBulletPenetration(CSWeaponInfo *wpn_data, FireBulletData &data)
 
 	Vector dummy;
 	trace_t trace_exit;
-	if (!TraceToExit(dummy, data.enter_trace, data.enter_trace.endpos, data.direction, &trace_exit))
+	if (!TraceToExit(dummy, data.direction, data.enter_trace.endpos, data.enter_trace, trace_exit))
 		return false;
 
 	surfacedata_t *exit_surface_data = g_PhysProps->GetSurfaceData(trace_exit.surface.surfaceProps);
@@ -259,7 +259,7 @@ bool HandleBulletPenetration(CSWeaponInfo *wpn_data, FireBulletData &data)
 *     @in  point: target hitbox vector
 *     @out damage_given: amount of damage the shot would do
 */
-bool CanHit(const Vector &point, float *damage_given)
+bool CanHit(C_BaseEntity* entity,const Vector &point, float *damage_given)
 {
 	//Utils::ToLog("CANHIT");
 	auto *local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
@@ -273,7 +273,7 @@ bool CanHit(const Vector &point, float *damage_given)
 	AngleVectors(angles, &data.direction);
 	VectorNormalize(data.direction);
 
-	if (SimulateFireBullet(local, reinterpret_cast<CBaseCombatWeapon*>(g_EntityList->GetClientEntityFromHandle(static_cast<HANDLE>(local->GetActiveWeaponHandle()))), data))
+	if (SimulateFireBullet(entity, local, reinterpret_cast<CBaseCombatWeapon*>(g_EntityList->GetClientEntityFromHandle(static_cast<HANDLE>(local->GetActiveWeaponHandle()))), data))
 	{
 		*damage_given = data.current_damage;
 		//Utils::ToLog("CANHIT END");

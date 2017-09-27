@@ -45,7 +45,7 @@ public:
 
     void on_fire_event(IGameEvent* event)
     {
-        IClientEntity* local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+        C_BaseEntity* local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
         if (!strcmp(event->GetName(), "item_purchase"))
         {
             auto _buyer = event->GetInt("userid");
@@ -62,7 +62,7 @@ public:
                 || strstr(_gun.c_str(), "defuse")
                 )  return;
             auto _player_index = g_Engine->GetPlayerForUserID(_buyer);
-            IClientEntity* player = (IClientEntity*)g_EntityList->GetClientEntity(_player_index);
+            C_BaseEntity* player = (C_BaseEntity*)g_EntityList->GetClientEntity(_player_index);
             player_info_t pinfo;
             
             if (player && local &&  player->GetTeamNum() != local->GetTeamNum() && g_Engine->GetPlayerInfo(_player_index, &pinfo))

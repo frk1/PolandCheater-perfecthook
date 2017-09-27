@@ -12,9 +12,9 @@ class misc
     : public singleton<misc>
 {
 public:
-	void OnCreateMove(CInput::CUserCmd *cmd, IClientEntity *local);
+	void OnCreateMove(CInput::CUserCmd *cmd, C_BaseEntity *local);
 private:
-	void AutoStrafe(CInput::CUserCmd *cmd, IClientEntity *local);
+	void AutoStrafe(CInput::CUserCmd *cmd, C_BaseEntity *local);
 };
 template<class T, class U>
 inline T clamp(T in, U low, U high)

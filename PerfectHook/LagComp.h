@@ -22,7 +22,7 @@ public:
     lbyRecords records[64];
     bool RunLBYBackTrack(int i, CInput::CUserCmd* cmd, Vector& aimPoint);
     void Update(int tick_count);
-    void legitBackTrack(CInput::CUserCmd* cmd, IClientEntity* pLocal);
+    void legitBackTrack(CInput::CUserCmd* cmd, C_BaseEntity* pLocal);
 };
 
 extern backtrackData headPositions[64][12];

@@ -6,28 +6,28 @@
 namespace MiscFunctions
 {
 	void NormaliseViewAngle(Vector &angle);
-	bool IsVisible(IClientEntity* pLocal, IClientEntity* pEntity, int BoneID);
+	bool IsVisible(C_BaseEntity* pLocal, C_BaseEntity* pEntity, int BoneID);
 	bool IsKnife(void* weapon);
 	bool IsPistol(void* weapon);
 	bool IsSniper(void* weapon);
 	bool IsGrenade(void* weapon);
-	//	int GetPlayerCompRank(IClientEntity* pEntity);
+	//	int GetPlayerCompRank(C_BaseEntity* pEntity);
 };
 
 // Trace Line Memes
 void UTIL_TraceLine(const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask,
-	const IClientEntity *ignore, int collisionGroup, trace_t *ptr);
+	C_BaseEntity *ignore, int collisionGroup, trace_t *ptr);
 
-void UTIL_ClipTraceToPlayers(const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* filter, trace_t* tr);
+void UTIL_ClipTraceToPlayers(C_BaseEntity* pEntity, Vector start, Vector end, unsigned int mask, ITraceFilter* filter, trace_t* tr);
 
-bool IsBreakableEntity(IClientEntity* ent);
+bool IsBreakableEntity(C_BaseEntity* ent);
 
-bool TraceToExit(Vector& end, trace_t& tr, Vector start, Vector vEnd, trace_t* trace);
+bool TraceToExit(Vector start, Vector& dir, Vector& out_end, CGameTrace& enter_trace, CGameTrace& exit_trace);
 
 void SayInChat(const char *text);
 
-Vector GetHitboxPosition(IClientEntity* pEntity, int Hitbox);
-Vector GetHitboxPositionFromMatrix(IClientEntity* pEntity, matrix3x4 matrix[128], int Hitbox);
+Vector GetHitboxPosition(C_BaseEntity* pEntity, int Hitbox);
+Vector GetHitboxPositionFromMatrix(C_BaseEntity* pEntity, matrix3x4 matrix[128], int Hitbox);
 
 void ForceUpdate();
 inline void clampMovement(CInput::CUserCmd* cmd)

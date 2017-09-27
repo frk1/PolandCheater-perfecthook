@@ -65,29 +65,6 @@ namespace U
 	template< typename T = uintptr_t > static T first_match(uintptr_t start, std::string sig, size_t len);
 	template< typename T = uintptr_t > static T first_code_match(HMODULE start, std::string sig);
 
-	class VMT
-	{
-	private:
-		DWORD	*CustomTable;
-		bool	initComplete;
-		DWORD	*OriginalTable;
-		DWORD	*Instance;
-
-		int		MethodCount(DWORD* InstancePointer);
-
-	public:
-		bool	Initialize(DWORD* InstancePointer); // Pass a &class
-
-		DWORD	Hook(DWORD NewFunction, int Index);
-		void	UnhookMethod(int Index);
-
-		void	Unhook();
-		void	RestoreCustom();
-		//template <class Function>
-		//const Function GetOriginalFunction(std::size_t Index);
-
-		DWORD GetOriginalFunction(int Index);
-	};
 };
 namespace detail
 {

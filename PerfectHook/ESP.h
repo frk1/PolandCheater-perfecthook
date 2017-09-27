@@ -9,8 +9,8 @@ class visuals
 {
 public:
     visuals();
-	void OnPaintTraverse(IClientEntity* local);
-	void DrawPlayer(IClientEntity* entity, player_info_t pinfo, IClientEntity* local);
+	void OnPaintTraverse(C_BaseEntity* local);
+	void DrawPlayer(C_BaseEntity* entity, player_info_t pinfo, C_BaseEntity* local);
 private:
 	struct playerlist_t
 	{
@@ -22,32 +22,32 @@ private:
 		char *mmrank;
 	}players[64];
 	// Other shit
-	IClientEntity *BombCarrier;
+	C_BaseEntity *BombCarrier;
 
 	struct ESPBox
 	{
 		int x, y, w, h, gay;
 	};
-    void DLight(IClientEntity* local, IClientEntity* entity);
+    void DLight(C_BaseEntity* local, C_BaseEntity* entity);
 
 	// Get player info
-	Color GetPlayerColor(IClientEntity* pEntity, IClientEntity* local);
-	bool GetBox(IClientEntity* pEntity, ESPBox &result);
-	void BoxAndText(IClientEntity* pEntity, std::string text);
+	Color GetPlayerColor(C_BaseEntity* pEntity, C_BaseEntity* local);
+	bool GetBox(C_BaseEntity* pEntity, ESPBox &result);
+	void BoxAndText(C_BaseEntity* pEntity, std::string text);
 
 	// Draw shit about player
 	void DrawBox(ESPBox size, Color color);
 	void PlayerBox(float x, float y, float w, float h, Color clr);
 	void DrawHealth(Vector bot, Vector top, float health);
-	void DrawHealth(IClientEntity* pEntity, ESPBox size);
+	void DrawHealth(C_BaseEntity* pEntity, ESPBox size);
 
 
-	void DrawDrop(IClientEntity* pEntity);
-	void DrawBombPlanted(IClientEntity* entity, IClientEntity* local);
-	void DrawBomb(IClientEntity* pEntity, ClientClass* cClass);
-	void DrawThrowable(IClientEntity* throwable);
+	void DrawDrop(C_BaseEntity* pEntity);
+	void DrawBombPlanted(C_BaseEntity* entity, C_BaseEntity* local);
+	void DrawBomb(C_BaseEntity* pEntity, ClientClass* cClass);
+	void DrawThrowable(C_BaseEntity* throwable);
     void NightMode();
-    void SpecList(IClientEntity *local);
+    void SpecList(C_BaseEntity *local);
 };
 
 inline float CSGO_Armor(float flDamage, int ArmorValue)

@@ -7,7 +7,7 @@ CMoveData m_MoveData;
 int* m_pPredictionRandomSeed;
 
 void StartPrediction(CInput::CUserCmd* pCmd) {
-	IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+	C_BaseEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 	static bool bInit = false;
 	if (!bInit) {
 		m_pPredictionRandomSeed = *(int**)(U::FindPattern("client.dll", (PBYTE)"\x8B\x0D\x00\x00\x00\x00\xBA\x00\x00\x00\x00\xE8\x00\x00\x00\x00\x83\xC4\x04", "xx????x????x????xxx") + 2);
@@ -35,7 +35,7 @@ void StartPrediction(CInput::CUserCmd* pCmd) {
 }
 
 void EndPrediction(CInput::CUserCmd* pCmd) {
-	IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+	C_BaseEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 	g_GameMovement->FinishTrackPredictionErrors(pLocal);
 	g_MoveHelper->SetHost(0);
 

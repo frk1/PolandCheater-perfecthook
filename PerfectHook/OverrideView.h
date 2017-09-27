@@ -16,7 +16,7 @@ float __fastcall hkGetViewModelFOV(void* ecx, void* edx)
 void __fastcall hkOverrideView(void* _this, void* _edx, CViewSetup* setup)
 {
     static auto ofunc = hooks::clientmode.get_original<override_view_t>(18);
-	IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+	C_BaseEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 	if (pLocal && g_Engine->IsInGame())
 	{
 		if (!pLocal->IsScoped())

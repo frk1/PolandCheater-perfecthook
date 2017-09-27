@@ -38,7 +38,7 @@ void RotateMovement(CInput::CUserCmd* pCmd, float rotation)
 
 void MovementRecorder(CInput::CUserCmd *cmd)
 {
-	IClientEntity *pLocalPlayer = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+	C_BaseEntity *pLocalPlayer = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 
 	if (menu.Misc.isRecording && !m_bIsRecording && !menu.Misc.isReplaying)
 	{

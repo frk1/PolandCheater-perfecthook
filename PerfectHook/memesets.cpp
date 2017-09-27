@@ -108,6 +108,7 @@ void Offsetz::GetNetvars()
 	offsetz.DT_CSPlayer.m_flFlashMaxAlpha = NetVarManager->GetOffset("DT_CSPlayer", "m_flFlashMaxAlpha");
 	offsetz.DT_CSPlayer.m_flLowerBodyYawTarget = NetVarManager->GetOffset("DT_CSPlayer", "m_flLowerBodyYawTarget");
     offsetz.DT_CSPlayer.m_bHasHeavyArmor = NetVarManager->GetOffset("DT_CSPlayer", "m_bHasHeavyArmor");
+	offsetz.DT_CSPlayer.m_iGunGameProgressiveWeaponIndex = NetVarManager->GetOffset("DT_CSPlayer", "m_iGunGameProgressiveWeaponIndex");
 
 	offsetz.DT_BaseAttributableItem.m_iItemDefinitionIndex = NetVarManager->GetOffset("DT_BaseAttributableItem", "m_iItemDefinitionIndex");
 	offsetz.DT_BaseAttributableItem.m_iAccountID = NetVarManager->GetOffset("DT_BaseAttributableItem", "m_iAccountID");

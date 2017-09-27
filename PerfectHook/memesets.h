@@ -130,6 +130,7 @@ struct COffsetz
 		std::ptrdiff_t m_flFlashMaxAlpha;
 		std::ptrdiff_t m_flLowerBodyYawTarget;
         std::ptrdiff_t m_bHasHeavyArmor;
+		std::ptrdiff_t m_iGunGameProgressiveWeaponIndex;
 	} DT_CSPlayer;
 
 	struct

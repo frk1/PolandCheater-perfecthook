@@ -12,14 +12,14 @@ public:
     ragebot();
 
     void OnCreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket);
-	bool hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseCombatWeapon* weapon, IClientEntity* target);
+	bool hit_chance(C_BaseEntity* local, CInput::CUserCmd* cmd, CBaseCombatWeapon* weapon, C_BaseEntity* target);
 private:
-    float FovToPlayer(Vector ViewOffSet, Vector View, IClientEntity* pEntity, int aHitBox);
+    float FovToPlayer(Vector ViewOffSet, Vector View, C_BaseEntity* pEntity, int aHitBox);
 	int GetTargetCrosshair();
-	bool TargetMeetsRequirements(IClientEntity* pEntity);
-	int HitScan(IClientEntity* pEntity);
+	bool TargetMeetsRequirements(C_BaseEntity* pEntity);
+	int HitScan(C_BaseEntity* pEntity);
     void DoNoRecoil(CInput::CUserCmd* pCmd);
-    bool AimAtPoint(IClientEntity* pLocal, Vector point, CInput::CUserCmd *pCmd);
+    bool AimAtPoint(C_BaseEntity* pLocal, Vector point, CInput::CUserCmd *pCmd);
 	void DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket);
 	void DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket);
 private:
@@ -27,7 +27,7 @@ private:
 	int TargetID;
 	int HitBox;
 	Vector AimPoint;
-	IClientEntity* pTarget;
+	C_BaseEntity* pTarget;
 };
 
 inline bool CanAttack()

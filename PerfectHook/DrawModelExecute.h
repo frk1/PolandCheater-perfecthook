@@ -15,8 +15,8 @@ void __fastcall hkDrawModelExecute(void* thisptr, int edx, void* ctx, void* stat
         DontDraw = false;
 
         const char * ModelName = g_ModelInfo->GetModelName((model_t*)pInfo.pModel);
-        IClientEntity* pModelEntity = (IClientEntity*)g_EntityList->GetClientEntity(pInfo.entity_index);
-        IClientEntity* pLocal = (IClientEntity*)g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+        C_BaseEntity* pModelEntity = (C_BaseEntity*)g_EntityList->GetClientEntity(pInfo.entity_index);
+        C_BaseEntity* pLocal = (C_BaseEntity*)g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 
 
 

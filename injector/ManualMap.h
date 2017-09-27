@@ -20,9 +20,9 @@ typedef struct _MANUAL_INJECT
 class manualmap
 {
 public:
-    int manualmapmain(const char* proccessname, const char* dllname);
+    int manualmapmain(const char* proccessname, const char* dllname, int argc);
 private:
-    int map(unsigned int pid, LPCSTR dllname);
+    int map(unsigned int pid, LPCSTR dllname, LPCSTR exename);
     unsigned int GetProcessPID(const char* process_name);
     bool LoadProcess(const char* procName);
 private:

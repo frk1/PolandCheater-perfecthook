@@ -19,4 +19,4 @@ struct FireBulletData
 	int             penetrate_count;
 };
 
-bool CanHit(const Vector &point, float *damage_given);
+bool CanHit(C_BaseEntity* entity,const Vector &point, float *damage_given);

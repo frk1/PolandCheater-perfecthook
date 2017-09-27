@@ -55,7 +55,7 @@ bool isKnife(int id)
 }
 void GloveChanger()
 {
-    IClientEntity *local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+    C_BaseEntity *local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
     player_info_t localPlayerInfo;
     if (!g_Engine->GetPlayerInfo(g_Engine->GetLocalPlayer(), &localPlayerInfo)) return;
 

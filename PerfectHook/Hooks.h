@@ -1,7 +1,6 @@
 #pragma once
 extern bool unload;
 #include "Utilities.h"
-#include "vmthook.h"
 
 namespace hooks
 {

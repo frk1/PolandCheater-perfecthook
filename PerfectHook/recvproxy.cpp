@@ -63,7 +63,7 @@ void Hooked_RecvProxy_Viewmodel(CRecvProxyData *pData, void *pStruct, void *pOut
     int iGunGame = g_ModelInfo->GetModelIndex("models/weapons/v_knife_gg.mdl");
 
     // Get local player (just to stop replacing spectators knifes)
-    IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+    C_BaseEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
     if (g_Options.Skinchanger.Enabled && pLocal)
     {
         // If we are alive and holding a default knife(if we already have a knife don't worry about changing)
@@ -124,7 +124,7 @@ void SetViewModelSequence2(const CRecvProxyData *pDataConst, void *pStruct, void
 
     if (pViewModel)
     {
-        IClientEntity* pOwner = static_cast<IClientEntity*>(g_EntityList->GetClientEntity(pViewModel->GetOwner() & 0xFFF));
+        C_BaseEntity* pOwner = static_cast<C_BaseEntity*>(g_EntityList->GetClientEntity(pViewModel->GetOwner() & 0xFFF));
 
         // Compare the owner entity of this view model to the local player entity.
         if (pOwner && pOwner->GetIndex() == g_Engine->GetLocalPlayer())

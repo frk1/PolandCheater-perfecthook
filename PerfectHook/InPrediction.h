@@ -12,7 +12,7 @@ bool __stdcall hkInPrediction()
 	result = ofunc(ecxVal);
 	if (g_Options.Visuals.NoVisualRecoil && (DWORD)(_ReturnAddress()) == sig)
 	{
-		IClientEntity* pLocalEntity = NULL;
+		C_BaseEntity* pLocalEntity = NULL;
 		float* m_LocalViewAngles = NULL;
 		__asm
 		{

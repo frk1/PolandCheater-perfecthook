@@ -10,11 +10,11 @@ int GetEstimatedServerTickCount(float latency)
 float oldlowerbodyyaw = 0;
 /*void Resolver3()
 {
-    IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+    C_BaseEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 
     for (auto i = 0; i < g_EntityList->GetHighestEntityIndex(); i++)
     {
-        IClientEntity* pEnt = g_EntityList->GetClientEntity(i);
+        C_BaseEntity* pEnt = g_EntityList->GetClientEntity(i);
         if (!pEnt) continue;
 
         if ((pEnt == pLocal)) continue;
@@ -83,11 +83,11 @@ void Resolver3()
 
     if (g_Options.Ragebot.Resolver)
     {
-        IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+        C_BaseEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
         {
             for (auto i = 0; i < g_EntityList->GetHighestEntityIndex(); i++)
             {
-                IClientEntity* pEnt = g_EntityList->GetClientEntity(i);
+                C_BaseEntity* pEnt = g_EntityList->GetClientEntity(i);
                 if (!pEnt) continue;
 
                 if (pEnt == pLocal) continue;

@@ -19,14 +19,14 @@ visuals::visuals()
 int width = 0;
 int height = 0;
 bool done = false;
-void visuals::OnPaintTraverse(IClientEntity* local)
+void visuals::OnPaintTraverse(C_BaseEntity* local)
 {
 
 
     for (int i = 0; i < g_EntityList->GetHighestEntityIndex(); i++)
     {
 
-        IClientEntity *entity = g_EntityList->GetClientEntity(i);
+        C_BaseEntity *entity = g_EntityList->GetClientEntity(i);
         player_info_t pinfo;
         if (entity == local && local->IsAlive() && g_Engine->GetPlayerInfo(g_Engine->GetLocalPlayer(), &pinfo))
         {
@@ -205,7 +205,7 @@ wchar_t* CharToWideChar(const char* text)
 
 
 C_CSPlayerResource* playerresources;
-void visuals::DrawPlayer(IClientEntity* entity, player_info_t pinfo, IClientEntity* local)
+void visuals::DrawPlayer(C_BaseEntity* entity, player_info_t pinfo, C_BaseEntity* local)
 {
 
 	Vector max = entity->GetCollideable()->OBBMaxs();
@@ -305,7 +305,7 @@ void visuals::PlayerBox(float x, float y, float w, float h, Color clr)
 	g_Surface->DrawOutlinedRect(int(x - w + 1), int(y + 1), int(x + w - 1), int(y + h - 1));
 }
 
-Color visuals::GetPlayerColor(IClientEntity* entity, IClientEntity* local)
+Color visuals::GetPlayerColor(C_BaseEntity* entity, C_BaseEntity* local)
 {
 	int TeamNum = entity->GetTeamNum();
 	bool IsVis = MiscFunctions::IsVisible(local, entity, Head);
@@ -331,7 +331,7 @@ Color visuals::GetPlayerColor(IClientEntity* entity, IClientEntity* local)
 	return color;
 }
 
-void visuals::DrawHealth(IClientEntity* entity, visuals::ESPBox size)
+void visuals::DrawHealth(C_BaseEntity* entity, visuals::ESPBox size)
 {
 	int health = entity->GetHealth();
 	int HP = health;
@@ -362,7 +362,7 @@ void visuals::DrawHealth(Vector bot, Vector top, float health)
 	g_Render->Line(int((top.x - offset)), int(top.y + hp), int((top.x - offset)), int(top.y + h), Color(Red, Green, 0, 255));
 }
 
-void visuals::DrawDrop(IClientEntity* entity)
+void visuals::DrawDrop(C_BaseEntity* entity)
 {
     if (entity)
     {
@@ -393,7 +393,7 @@ void visuals::DrawDrop(IClientEntity* entity)
 float damage;
 char bombdamagestringdead[24];
 char bombdamagestringalive[24];
-void visuals::DrawBombPlanted(IClientEntity* entity, IClientEntity* local)
+void visuals::DrawBombPlanted(C_BaseEntity* entity, C_BaseEntity* local)
 {
 	BombCarrier = nullptr;
 
@@ -462,7 +462,7 @@ void visuals::DrawBombPlanted(IClientEntity* entity, IClientEntity* local)
 	}
 }
 
-void visuals::DrawBomb(IClientEntity* entity, ClientClass* cClass)
+void visuals::DrawBomb(C_BaseEntity* entity, ClientClass* cClass)
 {
 	// Null it out incase bomb has been dropped or planted
 	BombCarrier = nullptr;
@@ -473,7 +473,7 @@ void visuals::DrawBomb(IClientEntity* entity, ClientClass* cClass)
 	auto parent = BombWeapon->GetOwnerHandle();
 	if (parent || (vOrig.x == 0 && vOrig.y == 0 && vOrig.z == 0))
 	{
-		IClientEntity* pParentEnt = (g_EntityList->GetClientEntityFromHandle(parent));
+		C_BaseEntity* pParentEnt = (g_EntityList->GetClientEntityFromHandle(parent));
 		if (pParentEnt && pParentEnt->IsAlive())
 		{
 			BombCarrier = pParentEnt;
@@ -498,7 +498,7 @@ void visuals::DrawBox(visuals::ESPBox size, Color color)
 	g_Render->Outline(size.x - 1, size.y - 1, size.w + 2, size.h + 2, Color(10, 10, 10, 150));
 	g_Render->Outline(size.x + 1, size.y + 1, size.w - 2, size.h - 2, Color(10, 10, 10, 150));
 }
-bool visuals::GetBox(IClientEntity* entity, visuals::ESPBox &result)
+bool visuals::GetBox(C_BaseEntity* entity, visuals::ESPBox &result)
 {
 	// Variables
 	Vector  vOrigin, min, max, sMin, sMax, sOrigin,
@@ -558,7 +558,7 @@ bool visuals::GetBox(IClientEntity* entity, visuals::ESPBox &result)
 
 	return true;
 }
-void visuals::BoxAndText(IClientEntity* entity, std::string text)
+void visuals::BoxAndText(C_BaseEntity* entity, std::string text)
 {
 	ESPBox Box;
 	std::vector<std::string> Info;
@@ -577,7 +577,7 @@ void visuals::BoxAndText(IClientEntity* entity, std::string text)
 		}
 	}
 }
-void visuals::DrawThrowable(IClientEntity* throwable)
+void visuals::DrawThrowable(C_BaseEntity* throwable)
 {
 	model_t* nadeModel = (model_t*)throwable->GetModel();
 
@@ -633,7 +633,7 @@ void visuals::DrawThrowable(IClientEntity* throwable)
 	BoxAndText(throwable, nadeName);
 }
 
-void visuals::DLight(IClientEntity *local, IClientEntity* entity)
+void visuals::DLight(C_BaseEntity *local, C_BaseEntity* entity)
 {
     player_info_t pinfo;
     if (local && entity && entity != local)
@@ -758,7 +758,7 @@ void visuals::NightMode()
     }
 }
 
-void visuals::SpecList(IClientEntity *local)
+void visuals::SpecList(C_BaseEntity *local)
 {
 
     RECT scrn = g_Render->GetViewport();
@@ -769,7 +769,7 @@ void visuals::SpecList(IClientEntity *local)
         for (int i = 0; i < g_EntityList->GetHighestEntityIndex(); i++)
         {
             // Get the entity
-            IClientEntity *pEntity = g_EntityList->GetClientEntity(i);
+            C_BaseEntity *pEntity = g_EntityList->GetClientEntity(i);
             player_info_t pinfo;
             if (pEntity && pEntity != local)
             {
@@ -778,7 +778,7 @@ void visuals::SpecList(IClientEntity *local)
                     HANDLE obs = pEntity->GetObserverTargetHandle();
                     if (obs)
                     {
-                        IClientEntity *pTarget = g_EntityList->GetClientEntityFromHandle(obs);
+                        C_BaseEntity *pTarget = g_EntityList->GetClientEntityFromHandle(obs);
                         player_info_t pinfo2;
                         if (pTarget && pTarget->GetIndex() == local->GetIndex())
                         {

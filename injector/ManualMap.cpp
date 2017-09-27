@@ -1,6 +1,6 @@
 #include "ManualMap.h"
 
-int manualmap::manualmapmain(const char* proccessname, const char* dllname)
+int manualmap::manualmapmain(const char* proccessname, const char* dllname, int argc)
 {
     printf("You have chosen ManualMap injection method\n");
     while (!LoadProcess(proccessname))
@@ -15,9 +15,10 @@ int manualmap::manualmapmain(const char* proccessname, const char* dllname)
     }
 
     printf("%s found! Injecting!", proccessname);
-    char dllpath[512];
-    sprintf_s(dllpath, sizeof(dllpath) - 1, "%s\\/%s", ExePath().c_str(), dllname);
-    map(PID, dllpath);
+	char dllpath[512];
+	if (argc == 1) sprintf_s(dllpath, sizeof(dllpath) - 1, "%s\\/%s", ExePath().c_str(), dllname);
+	else if (argc == 2) sprintf_s(dllpath, sizeof(dllpath) - 1, "%s", dllname);
+    map(PID, dllpath, proccessname);
 
     return 0;
 }
@@ -134,7 +135,7 @@ DWORD WINAPI LoadDllEnd()
     return 0;
 }
 
-int manualmap::map(unsigned int pid, LPCSTR dllname)
+int manualmap::map(unsigned int pid, LPCSTR dllname, LPCSTR exename)
 {
     PIMAGE_DOS_HEADER pIDH;
     PIMAGE_NT_HEADERS pINH;
@@ -241,18 +242,19 @@ int manualmap::map(unsigned int pid, LPCSTR dllname)
     printf("\nOpening target process.\n");
 #endif
 
-
-    HMODULE module = GetModuleHandleExtern("serverbrowser.dll", ProcessId);
-
-    while (!module)
+    if (strstr(exename, "csgo.exe"))
     {
-#ifndef NDEBUG
-        printf("\nWaiting for engine.dll \n");
-#endif
-        module = GetModuleHandleExtern("serverbrowser.dll", ProcessId);
-        Sleep(1000);
-    }
+        HMODULE module = GetModuleHandleExtern("serverbrowser.dll", ProcessId);
 
+        while (!module)
+        {
+#ifndef NDEBUG
+            printf("\nWaiting for serverbrowser.dll \n");
+#endif
+            module = GetModuleHandleExtern("serverbrowser.dll", ProcessId);
+            Sleep(1000);
+    }
+}
     hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ProcessId);
 
     if (!hProcess)

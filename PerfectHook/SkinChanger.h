@@ -6,11 +6,11 @@ std::unordered_map<char*, char*> killIcons = {};
 HANDLE worldmodel_handle;
 CBaseCombatWeapon* worldmodel;
 void SkinChanger() {
-    IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+    C_BaseEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
     auto weapons = pLocal->m_hMyWeapons();
     for (size_t i = 0; weapons[i] != INVALID_EHANDLE_INDEX; i++)
     {
-        IClientEntity *pEntity = g_EntityList->GetClientEntityFromHandle(weapons[i]);
+        C_BaseEntity *pEntity = g_EntityList->GetClientEntityFromHandle(weapons[i]);
         if (pEntity)
         {
             CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)pEntity;

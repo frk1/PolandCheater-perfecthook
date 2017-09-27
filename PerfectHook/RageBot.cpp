@@ -27,7 +27,7 @@ void ragebot::OnCreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
     if (!g_Options.Ragebot.MainSwitch)
         return;
 
-    IClientEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+    C_BaseEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
     if (pLocal && pLocal->IsAlive())
     {
         if (g_Options.Ragebot.BAIMkey && G::PressedKeys[g_Options.Ragebot.BAIMkey] && g_Options.Ragebot.Hitscan != 4)
@@ -63,7 +63,7 @@ void ragebot::OnCreateMove(CInput::CUserCmd *pCmd, bool& bSendPacket)
 
     }
 }
-bool ragebot::hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseCombatWeapon* weapon, IClientEntity* target)
+bool ragebot::hit_chance(C_BaseEntity* local, CInput::CUserCmd* cmd, CBaseCombatWeapon* weapon, C_BaseEntity* target)
 {
     Vector forward, right, up;
 
@@ -109,7 +109,7 @@ bool ragebot::hit_chance(IClientEntity* local, CInput::CUserCmd* cmd, CBaseComba
         Ray_t ray;
         ray.Init(eyes, viewForward);
 
-        g_Trace->ClipRayToEntity(ray, MASK_SHOT | CONTENTS_GRATE, target, &tr);
+        g_EngineTrace->ClipRayToEntity(ray, MASK_SHOT | CONTENTS_GRATE, target, &tr);
 
 
         if (tr.m_pEnt == target)
@@ -140,7 +140,7 @@ T clamp(T in, U low, U high)
 void ragebot::DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket)
 {
 
-    IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+    C_BaseEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
     bool FindNewTarget = true;
     //IsLocked = false;
 
@@ -280,7 +280,7 @@ void ragebot::DoAimbot(CInput::CUserCmd *pCmd, bool& bSendPacket)
 
 
 
-bool ragebot::TargetMeetsRequirements(IClientEntity* pEntity)
+bool ragebot::TargetMeetsRequirements(C_BaseEntity* pEntity)
 { 
     auto local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
     // Is a valid player
@@ -310,7 +310,7 @@ bool ragebot::TargetMeetsRequirements(IClientEntity* pEntity)
 
 
 
-float ragebot::FovToPlayer(Vector ViewOffSet, Vector View, IClientEntity* pEntity, int aHitBox)
+float ragebot::FovToPlayer(Vector ViewOffSet, Vector View, C_BaseEntity* pEntity, int aHitBox)
 {
     // Anything past 180 degrees is just going to wrap around
     CONST FLOAT MaxDegrees = 180.0f;
@@ -349,13 +349,13 @@ int ragebot::GetTargetCrosshair()
     int target = -1;
     float minFoV = g_Options.Ragebot.FOV;
 
-    IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+    C_BaseEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
     Vector ViewOffset = pLocal->GetOrigin() + pLocal->GetViewOffset();
     Vector View; g_Engine->GetViewAngles(View);
 
     for (int i = 0; i < g_EntityList->GetHighestEntityIndex(); i++)
     {
-        IClientEntity *pEntity = g_EntityList->GetClientEntity(i);
+        C_BaseEntity *pEntity = g_EntityList->GetClientEntity(i);
         if (TargetMeetsRequirements(pEntity))
         {
             int NewHitBox = HitScan(pEntity);
@@ -374,7 +374,7 @@ int ragebot::GetTargetCrosshair()
     return target;
 }
 
-int ragebot::HitScan(IClientEntity* pEntity)
+int ragebot::HitScan(C_BaseEntity* pEntity)
 {
     vector<int> HitBoxesToScan{ Head , Neck, Chest, Stomach };
 
@@ -477,7 +477,7 @@ int ragebot::HitScan(IClientEntity* pEntity)
         Vector Point = GetHitboxPosition(pEntity, HitBoxID); //pvs fix disabled
 
         float damage = 0.0f;
-        if (CanHit(Point, &damage))
+        if (CanHit(pEntity, Point, &damage))
         {
             if (damage > highestDamage || damage > pEntity->GetHealth())
             {
@@ -492,7 +492,7 @@ int ragebot::HitScan(IClientEntity* pEntity)
         Vector Point = GetHitboxPosition(pEntity, HitBoxID); //pvs fix disabled
 
         float damage = 0.0f;
-        if (CanHit(Point, &damage))
+        if (CanHit(pEntity,Point, &damage))
         {
             if (damage > highestDamage && damage > pEntity->GetHealth())
             {
@@ -510,7 +510,7 @@ int ragebot::HitScan(IClientEntity* pEntity)
 void ragebot::DoNoRecoil(CInput::CUserCmd *pCmd)
 {
     // Ghetto rcs shit, implement properly later
-    IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+    C_BaseEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
     if (pLocal != nullptr)
     {
         Vector AimPunch = pLocal->localPlayerExclusive()->GetAimPunchAngle();
@@ -549,7 +549,7 @@ float FovToPoint(Vector ViewOffSet, Vector View, Vector Point)
     return (acos(DotProduct) * (180.f / PI));
 }
 bool me123 = false;
-bool ragebot::AimAtPoint(IClientEntity* pLocal, Vector point, CInput::CUserCmd *pCmd)
+bool ragebot::AimAtPoint(C_BaseEntity* pLocal, Vector point, CInput::CUserCmd *pCmd)
 {
     bool ReturnValue = false;
 
@@ -628,7 +628,7 @@ void VectorAngles2(const Vector &vecForward, Vector &vecAngles)
 
 
 
-bool EdgeAntiAim(IClientEntity* pLocalBaseEntity, CInput::CUserCmd* cmd, float flWall, float flCornor)
+bool EdgeAntiAim(C_BaseEntity* pLocalBaseEntity, CInput::CUserCmd* cmd, float flWall, float flCornor)
 {
     Ray_t ray;
     trace_t tr;
@@ -653,7 +653,7 @@ bool EdgeAntiAim(IClientEntity* pLocalBaseEntity, CInput::CUserCmd* cmd, float f
         vecForward *= flLength;
 
         ray.Init(vecCurPos, (vecCurPos + vecForward));
-        g_Trace->TraceRay(ray, MASK_SHOT, (CTraceFilter *)&traceFilter, &tr);
+        g_EngineTrace->TraceRay(ray, MASK_SHOT, (CTraceFilter *)&traceFilter, &tr);
 
         if (tr.fraction != 1.0f)
         {
@@ -678,10 +678,10 @@ bool EdgeAntiAim(IClientEntity* pLocalBaseEntity, CInput::CUserCmd* cmd, float f
             vecRight *= (flLength + (flLength * sin(DEG2RAD(30.f))));
 
             ray.Init(vecCurPos, (vecCurPos + vecLeft));
-            g_Trace->TraceRay(ray, MASK_SHOT, (CTraceFilter*)&traceFilter, &leftTrace);
+            g_EngineTrace->TraceRay(ray, MASK_SHOT, (CTraceFilter*)&traceFilter, &leftTrace);
 
             ray.Init(vecCurPos, (vecCurPos + vecRight));
-            g_Trace->TraceRay(ray, MASK_SHOT, (CTraceFilter*)&traceFilter, &rightTrace);
+            g_EngineTrace->TraceRay(ray, MASK_SHOT, (CTraceFilter*)&traceFilter, &rightTrace);
 
             if ((leftTrace.fraction == 1.f) && (rightTrace.fraction != 1.f))
                 vecDummy.y -= flCornor; // left
@@ -700,7 +700,7 @@ bool EdgeAntiAim(IClientEntity* pLocalBaseEntity, CInput::CUserCmd* cmd, float f
 // AntiAim
 void ragebot::DoAntiAim(CInput::CUserCmd *pCmd, bool& bSendPacket)
 {
-    IClientEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+    C_BaseEntity* pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
     CBaseCombatWeapon* pWeapon = (CBaseCombatWeapon*)g_EntityList->GetClientEntityFromHandle(pLocal->GetActiveWeaponHandle());
 
 

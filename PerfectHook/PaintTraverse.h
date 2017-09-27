@@ -13,7 +13,7 @@ int height1 = 0;
 void __fastcall hkPaintTraverse(PVOID pPanels, int edx, unsigned int vguiPanel, bool forceRepaint, bool allowForce)
 {
     static auto ofunc = hooks::panel.get_original<paint_traverse_t>(41);
-	IClientEntity* local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
+	C_BaseEntity* local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 	if (local != nullptr && local->IsAlive() && g_Options.Visuals.noscopeborder && !strcmp("HudZoom", g_Panel->GetName(vguiPanel)))
 	{
 		return;

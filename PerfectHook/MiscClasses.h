@@ -8,22 +8,22 @@
 #include "bspflags.h"
 
 // Entity List
-class IClientEntityList
+class C_BaseEntityList
 {
 public:
 	virtual void Function0();
 	virtual void Function1();
 	virtual void Function2();
-	virtual IClientEntity *		GetClientEntity(int entnum);
-	virtual IClientEntity *		GetClientEntityFromHandle(HANDLE hEnt) = 0;
+	virtual C_BaseEntity *		GetClientEntity(int entnum);
+	virtual C_BaseEntity *		GetClientEntityFromHandle(HANDLE hEnt) = 0;
 	virtual int					NumberOfEntities(bool bIncludeNonNetworkable) = 0;
 	virtual int					GetHighestEntityIndex(void);
 	virtual void				SetMaxEntities(int maxents);
 	virtual int					GetMaxEntities();
 
-    IClientEntity *GetClientEntityFromHandle(CBaseHandle hEnt)
+    C_BaseEntity *GetClientEntityFromHandle(CBaseHandle hEnt)
     {
-        typedef IClientEntity* (__thiscall* OriginalFn)(PVOID, CBaseHandle);
+        typedef C_BaseEntity* (__thiscall* OriginalFn)(PVOID, CBaseHandle);
         return call_vfunc<OriginalFn>(this, 4)(this, hEnt);
     }
 };
@@ -284,7 +284,7 @@ public:
 	int                             hitgroup;
 	short                   physicsbone;
 	unsigned short  worldSurfaceIndex;
-	IClientEntity*               m_pEnt;
+	C_BaseEntity*               m_pEnt;
 	int                             hitbox;
 	char shit[0x24];
 };
@@ -364,14 +364,14 @@ enum ItemDefinitionIndex
 class ITraceFilter
 {
 public:
-	virtual bool            ShouldHitEntity(IClientEntity* pEntity, int contentsMask) = 0;
+	virtual bool            ShouldHitEntity(C_BaseEntity* pEntity, int contentsMask) = 0;
 	virtual TraceType_t     GetTraceType() const = 0;
 };
 
 class CTraceFilter : public ITraceFilter
 {
 public:
-	bool ShouldHitEntity(IClientEntity* pEntityHandle, int contentsMask)
+	bool ShouldHitEntity(C_BaseEntity* pEntityHandle, int contentsMask)
 	{
 		return !(pEntityHandle == pSkip);
 	}
@@ -388,17 +388,17 @@ class CTraceFilterNoPlayer : public CTraceFilter
 {
 public:
 	CTraceFilterNoPlayer() {}
-	virtual bool ShouldHitEntity(IClientEntity *pServerEntity, int contentsMask)
+	virtual bool ShouldHitEntity(C_BaseEntity *pServerEntity, int contentsMask)
 	{
 		IClientUnknown *pUnk = (IClientUnknown*)pServerEntity;
-		IClientEntity *pEnt = pUnk->GetBaseEntity();
+		C_BaseEntity *pEnt = pUnk->GetBaseEntity();
 		return !pEnt->IsPlayer();
 	}
 };
 class CTraceFilterWorldAndPropsOnly : public ITraceFilter
 {
 public:
-    bool ShouldHitEntity(IClientEntity* /*pServerEntity*/, int /*contentsMask*/)
+    bool ShouldHitEntity(C_BaseEntity* /*pServerEntity*/, int /*contentsMask*/)
     {
         return false;
     }
@@ -411,15 +411,15 @@ public:
 class IEngineTrace
 {
 public:
-	int		GetPointContents(const Vector &vecAbsPosition, int contentsMask = MASK_ALL, IClientEntity** ppEntity = NULL)
+	int		GetPointContents(const Vector &vecAbsPosition, int contentsMask = MASK_ALL, C_BaseEntity** ppEntity = NULL)
 	{
-		typedef int(__thiscall* fnGetPointContents)(void*, const Vector&, int, IClientEntity**);
+		typedef int(__thiscall* fnGetPointContents)(void*, const Vector&, int, C_BaseEntity**);
 		return call_vfunc<fnGetPointContents>(this, 0)(this, vecAbsPosition, contentsMask, ppEntity);
 	}
 
-	void	ClipRayToEntity(const Ray_t &ray, unsigned int fMask, IClientEntity *pEnt, trace_t *pTrace)
+	void	ClipRayToEntity(const Ray_t &ray, unsigned int fMask, C_BaseEntity *pEnt, trace_t *pTrace)
 	{
-		typedef void(__thiscall* fnGetPointContents)(void*, const Ray_t&, unsigned int, IClientEntity*, trace_t*);
+		typedef void(__thiscall* fnGetPointContents)(void*, const Ray_t&, unsigned int, C_BaseEntity*, trace_t*);
 		return call_vfunc<fnGetPointContents>(this, 3)(this, ray, fMask, pEnt, pTrace);
 	}
 
@@ -822,10 +822,10 @@ class IGameMovement {
 public:
 	virtual			~IGameMovement(void) {}
 
-	virtual void	ProcessMovement(IClientEntity *pPlayer, CMoveData *pMove) = 0;
+	virtual void	ProcessMovement(C_BaseEntity *pPlayer, CMoveData *pMove) = 0;
 	virtual void	Reset(void) = 0;
-	virtual void	StartTrackPredictionErrors(IClientEntity *pPlayer) = 0;
-	virtual void	FinishTrackPredictionErrors(IClientEntity *pPlayer) = 0;
+	virtual void	StartTrackPredictionErrors(C_BaseEntity *pPlayer) = 0;
+	virtual void	FinishTrackPredictionErrors(C_BaseEntity *pPlayer) = 0;
 	virtual void	DiffPrint(char const *fmt, ...) = 0;
 
 	virtual Vector const&	GetPlayerMins(bool ducked) const = 0;
@@ -833,8 +833,8 @@ public:
 	virtual Vector const&   GetPlayerViewOffset(bool ducked) const = 0;
 
 	virtual bool			IsMovingPlayerStuck(void) const = 0;
-	virtual IClientEntity*	GetMovingPlayer(void) const = 0;
-	virtual void			UnblockPusher(IClientEntity* pPlayer, IClientEntity *pPusher) = 0;
+	virtual C_BaseEntity*	GetMovingPlayer(void) const = 0;
+	virtual void			UnblockPusher(C_BaseEntity* pPlayer, C_BaseEntity *pPusher) = 0;
 
 	virtual void SetupMovementBounds(CMoveData *pMove) = 0;
 };
@@ -845,7 +845,7 @@ class IMoveHelper {
 private:
 	virtual void UnknownVirtual() = 0;
 public:
-	virtual void SetHost(IClientEntity* host) = 0;
+	virtual void SetHost(C_BaseEntity* host) = 0;
 };
 
 
@@ -1435,7 +1435,7 @@ class CGlowObjectManager
 {
 public:
 
-	int RegisterGlowObject(IClientEntity *pEntity, const Vector &vGlowColor, float flGlowAlpha, bool bRenderWhenOccluded, bool bRenderWhenUnoccluded, int nSplitScreenSlot)
+	int RegisterGlowObject(C_BaseEntity *pEntity, const Vector &vGlowColor, float flGlowAlpha, bool bRenderWhenOccluded, bool bRenderWhenUnoccluded, int nSplitScreenSlot)
 	{
 		int nIndex;
 		if (m_nFirstFreeSlot == GlowObjectDefinition_t::END_OF_FREE_LIST)
@@ -1473,7 +1473,7 @@ public:
 		m_nFirstFreeSlot = nGlowObjectHandle;
 	}
 
-	int HasGlowEffect(IClientEntity *pEntity) const
+	int HasGlowEffect(C_BaseEntity *pEntity) const
 	{
 		for (int i = 0; i < m_GlowObjectDefinitions.Count(); ++i)
 		{
@@ -1498,7 +1498,7 @@ public:
 			m_flBloomAmount = 1.0f;
 		}
 
-		IClientEntity* getEnt()
+		C_BaseEntity* getEnt()
 		{
 			return m_hEntity;
 		}
@@ -1506,7 +1506,7 @@ public:
 		bool IsUnused() const { return m_nNextFreeSlot != GlowObjectDefinition_t::ENTRY_IN_USE; }
 
 	public:
-		IClientEntity*    m_hEntity;
+		C_BaseEntity*    m_hEntity;
 		Vector            m_vGlowColor;
 		float            m_flGlowAlpha;
 
@@ -1851,8 +1851,8 @@ private:
 	virtual void UnknownVirtual18() = 0;
 	virtual void UnknownVirtual19() = 0;
 public:
-	virtual void SetupMove(IClientEntity* player, CInput::CUserCmd* ucmd, IMoveHelper* pHelper, CMoveData* move) = 0; //20
-	virtual void FinishMove(IClientEntity* player, CInput::CUserCmd* ucmd, CMoveData* move) = 0;
+	virtual void SetupMove(C_BaseEntity* player, CInput::CUserCmd* ucmd, IMoveHelper* pHelper, CMoveData* move) = 0; //20
+	virtual void FinishMove(C_BaseEntity* player, CInput::CUserCmd* ucmd, CMoveData* move) = 0;
 };
 class C_TEFireBullets
 {
@@ -1886,8 +1886,8 @@ public:
     virtual void*       GetViewportAnimationController() = 0;
     virtual void        ProcessInput(bool bActive) = 0;
     virtual bool        ShouldDrawDetailObjects() = 0;
-    virtual bool        ShouldDrawEntity(IClientEntity *pEnt) = 0;
-    virtual bool        ShouldDrawLocalPlayer(IClientEntity *pPlayer) = 0;
+    virtual bool        ShouldDrawEntity(C_BaseEntity *pEnt) = 0;
+    virtual bool        ShouldDrawLocalPlayer(C_BaseEntity *pPlayer) = 0;
     virtual bool        ShouldDrawParticles() = 0;
     virtual bool        ShouldDrawFog(void) = 0;
     virtual void        OverrideView(CViewSetup *pSetup) = 0;

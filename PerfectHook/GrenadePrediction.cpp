@@ -259,7 +259,7 @@ void grenade_prediction::TraceHull(Vector& src, Vector& end, trace_t& tr)
     //filter.SetIgnoreClass("BaseCSGrenadeProjectile");
     //filter.bShouldHitPlayers = false;
 
-    g_Trace->TraceRay(ray, 0x200400B, &filter, &tr);
+    g_EngineTrace->TraceRay(ray, 0x200400B, &filter, &tr);
 }
 
 void grenade_prediction::AddGravityMove(Vector& move, Vector& vel, float frametime, bool onground)

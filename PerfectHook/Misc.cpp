@@ -8,7 +8,7 @@
 std::string animatedclantag;
 int iLastTime;
 bool bDone=false;
-void misc::OnCreateMove(CInput::CUserCmd *cmd, IClientEntity *local)
+void misc::OnCreateMove(CInput::CUserCmd *cmd, C_BaseEntity *local)
 {
 
     if (g_Options.Misc.Bhop && local->IsAlive())
@@ -117,7 +117,7 @@ void misc::OnCreateMove(CInput::CUserCmd *cmd, IClientEntity *local)
         {
             for (int iPlayerIndex = 0; iPlayerIndex < g_Engine->GetMaxClients(); iPlayerIndex++)
             {
-                IClientEntity *pEntity = g_EntityList->GetClientEntity(iPlayerIndex);
+                C_BaseEntity *pEntity = g_EntityList->GetClientEntity(iPlayerIndex);
                 if (!pEntity || pEntity == local || iPlayerIndex == g_Engine->GetLocalPlayer())
                     continue;
                 if (rand() % 3 == 1)
@@ -141,7 +141,7 @@ void misc::OnCreateMove(CInput::CUserCmd *cmd, IClientEntity *local)
 
 
 
-void misc::AutoStrafe(CInput::CUserCmd *cmd, IClientEntity *local)
+void misc::AutoStrafe(CInput::CUserCmd *cmd, C_BaseEntity *local)
 {
 
     QAngle oldangles; g_Engine->GetViewAngles(oldangles);
