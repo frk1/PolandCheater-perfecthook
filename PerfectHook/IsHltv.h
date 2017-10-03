@@ -1,5 +1,6 @@
 #pragma once
 #include "HookIncludes.h"
+#include <intrin.h>  
 using is_hltv_t = bool(__thiscall*)(void*);
 
 bool __fastcall hkIsHltv(void* ecx, void* edx)

@@ -24,8 +24,8 @@ namespace hooks
         client.hook_index(36, hkFrameStageNotify);
         client.hook_index(21, hkCreateMove);
 
-        prediction.setup(g_Prediction);
-        prediction.hook_index(14, hkInPrediction);
+        //prediction.setup(g_Prediction);
+        //prediction.hook_index(14, hkInPrediction);
 
         clientmode.setup(g_ClientMode);
         clientmode.hook_index(18, hkOverrideView);

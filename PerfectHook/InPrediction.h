@@ -1,6 +1,6 @@
 #pragma once
 #include "HookIncludes.h"
-
+#include <intrin.h>  
 typedef bool(__thiscall* in_prediction_t)(PVOID);
 
 bool __stdcall hkInPrediction()

@@ -1,6 +1,6 @@
 #pragma once
 #include "HookIncludes.h"
-
+#include <intrin.h>  
 typedef bool(__thiscall *svc_get_bool_t)(PVOID);
 
 

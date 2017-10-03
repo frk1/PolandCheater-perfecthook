@@ -5,12 +5,8 @@
 #include "Autowall.h"
 #include "Render.h"
 
-void UTIL_TraceLine(const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask,
-    C_BaseEntity *ignore, int collisionGroup, trace_t *ptr)
+void UTIL_TraceLine(const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, C_BaseEntity *ignore, int collisionGroup, trace_t *ptr)
 {
-	/*typedef void(__cdecl* UTIL_TraceLine_t)(const Vector&, const Vector&, unsigned int, const C_BaseEntity*, int, trace_t*);
-	static UTIL_TraceLine_t TraceLine = (UTIL_TraceLine_t)U::FindPattern("client.dll", (PBYTE)"\x55\x8B\xEC\x83\xE4\xF0\x83\xEC\x7C\x56\x52", "xxxxxxxxxxx");
-	TraceLine(vecAbsStart, vecAbsEnd, mask, ignore, collisionGroup, ptr);*/
 	Ray_t ray;
 	ray.Init(vecAbsStart, vecAbsEnd);
 	CTraceFilter traceFilter;
@@ -39,36 +35,6 @@ void UTIL_ClipTraceToPlayers(C_BaseEntity* pEntity, Vector start, Vector end, un
 		smallestFraction = playerTrace.fraction;
 	}
 }
-/*void UTIL_ClipTraceToPlayers(const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, ITraceFilter* filter, trace_t* tr)
-{
-	static DWORD dwAddress = U::FindPattern("client.dll", (BYTE*)"\x53\x8B\xDC\x83\xEC\x08\x83\xE4\xF0\x83\xC4\x04\x55\x8B\x6B\x04\x89\x6C\x24\x04\x8B\xEC\x81\xEC\x00\x00\x00\x00\x8B\x43\x10", "xxxxxxxxxxxxxxxxxxxxxxxx????xxx");
-
-	if (!dwAddress)
-		return;
-
-	_asm
-	{
-		MOV		EAX, filter
-		LEA		ECX, tr
-		PUSH	ECX
-		PUSH	EAX
-		PUSH	mask
-		LEA		EDX, vecAbsEnd
-		LEA		ECX, vecAbsStart
-		CALL	dwAddress
-		ADD		ESP, 0xC
-	}
-}*/
-
-/*bool IsBreakableEntity(C_BaseEntity* ent)
-{
-	typedef bool(__thiscall* IsBreakbaleEntity_t)(C_BaseEntity*);
-	IsBreakbaleEntity_t IsBreakbaleEntityFn = (IsBreakbaleEntity_t)U::FindPattern("client.dll", (PBYTE)"\x55\x8B\xEC\x51\x56\x8B\xF1\x85\xF6\x74\x68", "xxxxxxxxxxx");
-	if (IsBreakbaleEntityFn)
-		return IsBreakbaleEntityFn(ent);
-	else
-		return false;
-}*/
 bool IsBreakableEntity(C_BaseEntity* entity)
 {
 	ClientClass* client_class = entity->GetClientClass();
@@ -78,20 +44,7 @@ bool IsBreakableEntity(C_BaseEntity* entity)
 
 	return client_class->m_ClassID == (int)ClassID::CBreakableProp || client_class->m_ClassID == (int)ClassID::CBreakableSurface;
 }
-
-/*bool TraceToExit(Vector& end, trace_t& tr, Vector start, Vector vEnd, trace_t* trace)
-{
-	typedef bool(__fastcall* TraceToExitFn)(Vector&, trace_t&, float, float, float, float, float, float, trace_t*);
-	static TraceToExitFn TraceToExit = (TraceToExitFn)U::FindPattern("client.dll", (BYTE*)"\x55\x8B\xEC\x83\xEC\x30\xF3\x0F\x10\x75", "xxxxxxxxxx");
-
-	if (!TraceToExit)
-		return false;
-
-	return TraceToExit(end, tr, start.x, start.y, start.z, vEnd.x, vEnd.y, vEnd.z, trace);
-}*/
-
 bool DidHitNonWorldEntity(C_BaseEntity* entity) { return entity != nullptr && entity->GetIndex() != 0; }
-
 bool TraceToExit(Vector start, Vector& dir, Vector& out_end, CGameTrace& enter_trace, CGameTrace& exit_trace)
 {
 	float dist = 0.f;
@@ -151,7 +104,6 @@ bool TraceToExit(Vector start, Vector& dir, Vector& out_end, CGameTrace& enter_t
 			return true;
 		}
 	}
-
 	return false;
 }
 

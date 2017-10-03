@@ -19,6 +19,11 @@ void __fastcall hkOverrideView(void* _this, void* _edx, CViewSetup* setup)
 	C_BaseEntity *pLocal = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
 	if (pLocal && g_Engine->IsInGame())
 	{
+		if (g_Options.Visuals.NoVisualRecoil)
+		{
+			setup->angles.x -= ((pLocal->localPlayerExclusive()->GetViewPunchAngle().x * 2) * 0.45);
+			setup->angles.y -= ((pLocal->localPlayerExclusive()->GetViewPunchAngle().y * 2) * 0.45);
+		}
 		if (!pLocal->IsScoped())
 			setup->fov += g_Options.Visuals.FOVChanger;
         if (g_Options.Visuals.ThirdPerson && pLocal->IsAlive())

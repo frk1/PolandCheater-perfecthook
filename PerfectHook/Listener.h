@@ -35,12 +35,12 @@ public:
 
     void initialize()
     {
-        _listener.start();
+        listener.start();
     }
 
     void remove()
     {
-        _listener.stop();
+        listener.stop();
     }
 
     void on_fire_event(IGameEvent* event)
@@ -48,33 +48,33 @@ public:
         C_BaseEntity* local = g_EntityList->GetClientEntity(g_Engine->GetLocalPlayer());
         if (!strcmp(event->GetName(), "item_purchase"))
         {
-            auto _buyer = event->GetInt("userid");
-            std::string _gun = event->GetString("weapon");
+            auto buyer = event->GetInt("userid");
+            std::string gun = event->GetString("weapon");
 
-            if (strstr(_gun.c_str(), "molotov")
-                || strstr(_gun.c_str(), "nade")
-                || strstr(_gun.c_str(), "kevlar")
-                || strstr(_gun.c_str(), "decoy")
-                || strstr(_gun.c_str(), "suit")
-                || strstr(_gun.c_str(), "flash")
-                || strstr(_gun.c_str(), "vest")
-                || strstr(_gun.c_str(), "cutter")
-                || strstr(_gun.c_str(), "defuse")
+            if (strstr(gun.c_str(), "molotov")
+                || strstr(gun.c_str(), "nade")
+                || strstr(gun.c_str(), "kevlar")
+                || strstr(gun.c_str(), "decoy")
+                || strstr(gun.c_str(), "suit")
+                || strstr(gun.c_str(), "flash")
+                || strstr(gun.c_str(), "vest")
+                || strstr(gun.c_str(), "cutter")
+                || strstr(gun.c_str(), "defuse")
                 )  return;
-            auto _player_index = g_Engine->GetPlayerForUserID(_buyer);
-            C_BaseEntity* player = (C_BaseEntity*)g_EntityList->GetClientEntity(_player_index);
+            auto player_index = g_Engine->GetPlayerForUserID(buyer);
+            C_BaseEntity* player = (C_BaseEntity*)g_EntityList->GetClientEntity(player_index);
             player_info_t pinfo;
             
-            if (player && local &&  player->GetTeamNum() != local->GetTeamNum() && g_Engine->GetPlayerInfo(_player_index, &pinfo))
+            if (player && local &&  player->GetTeamNum() != local->GetTeamNum() && g_Engine->GetPlayerInfo(player_index, &pinfo))
             {
                 if (g_ChatElement)
                 {
-                    _gun.erase(_gun.find("weapon_"), 7);
-                    g_ChatElement->ChatPrintf(0, 0, " ""\x04""%s bought %s\n", pinfo.name, _gun.c_str());
+                    gun.erase(gun.find("weapon_"), 7);
+                    g_ChatElement->ChatPrintf(0, 0, " ""\x04""%s bought %s\n", pinfo.name, gun.c_str());
                 }
             }
         }
     }
 private:
-    item_purchase_listener  _listener;
+    item_purchase_listener  listener;
 };

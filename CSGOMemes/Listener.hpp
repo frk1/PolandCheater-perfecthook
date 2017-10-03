@@ -38,12 +38,12 @@ public:
 
     void initialize()
     {
-        _listener.start();
+        listener.start();
     }
 
     void remove()
     {
-        _listener.stop();
+        listener.stop();
     }
 
     void on_fire_event(IGameEvent* event)
@@ -63,7 +63,7 @@ public:
         }
     }
 private:
-    item_purchase_listener  _listener;
+    item_purchase_listener  listener;
 };
 
 

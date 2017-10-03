@@ -1,6 +1,6 @@
 #pragma once
 #include "HookIncludes.h"
-
+#include <intrin.h>  
 using is_connected_t = bool(__stdcall*)(void*);
 
 bool __stdcall hkIsConnected()

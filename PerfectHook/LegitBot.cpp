@@ -88,8 +88,7 @@ void legitbot::triggerbot(CInput::CUserCmd *cmd, C_BaseEntity* local, CBaseComba
 
     Vector CrosshairForward;
     AngleVectors(ViewAngles, &CrosshairForward);
-    //CrosshairForward *= LocalPlayerWeaponData->m_flRange;
-    CrosshairForward *= 8000.f;
+    CrosshairForward *= weapon->GetCSWpnData()->m_fRange;
 
 
     Vector TraceSource = local->GetEyePosition() ;
@@ -107,8 +106,6 @@ void legitbot::triggerbot(CInput::CUserCmd *cmd, C_BaseEntity* local, CBaseComba
     if (!Trace.m_pEnt)
         return;
     if (!Trace.m_pEnt->IsAlive())
-        return;
-    if (Trace.m_pEnt->GetHealth() <= 0 || Trace.m_pEnt->GetHealth() > 100)
         return;
     if (Trace.m_pEnt->HasGunGameImmunity())
         return;
